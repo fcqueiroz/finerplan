@@ -1,5 +1,5 @@
-finpy.db
+finerplan.db
 .eggs/
 __pycache__/
-finpy/__pycache__/
+finerplan/__pycache__/
 test/__pycache__/

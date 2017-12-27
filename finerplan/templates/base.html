@@ -1,0 +1,22 @@
+<!doctype html>
+<head>
+    <title>FinerPlan - {{ title }}</title>
+    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class=metanav>
+        FinerPlan: 
+        <a href="/">Overview</a>
+        <a href="/earnings">Earnings</a>
+        <a href="/expenses">Expenses</a>
+        <a href="/assets">Assets</a>
+        <a href="/settings">Settings</a>
+    </div>
+    <hr>
+    <ul>
+        {% for message in get_flashed_messages() %}
+        <li class=flash>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% block content %}{% endblock %}
+</body>

@@ -1,0 +1,31 @@
+body            { font-family: sans-serif; background: #eee; }
+a, h1, h2       { color: #377ba8; }
+h1, h2          { font-family: 'Georgia', serif; margin: 0; }
+h1              { border-bottom: 2px solid #eee; }
+h2              { font-size: 1.2em; }
+table, th, td   { border: 1px solid black; border-collapse: collapse; }
+th, td { padding: 2px; text-align: left;}
+.page           { margin: 2em auto; width: 35em; border: 5px solid #ccc;
+                  padding: 0.8em; background: white; }
+.entries        { list-style: none; margin: 0; padding: 0; }
+.entries li     { margin: 0.8em 1.2em; }
+.entries li h2  { margin-left: -1em; }
+.add-entry      { font-size: 0.9em; border-bottom: 1px solid #ccc; }
+.add-entry dl   { font-weight: bold; }
+.metanav        { text-align: left; font-size: 0.8em; padding: 0.3em;
+                  margin-bottom: 1em; background: #fafafa; }
+.flash          { background: #cee5F5; padding: 0.5em;
+                  border: 1px solid #aacbe2; }
+.error          { background: #f0d6d6; padding: 0.5em; }
+
+.flex-container     {display: flex;  flex-direction: row;}
+.flex-container>div {background-color: #f1f1f1; margin: 10px; padding:10px;}
+.wrapper            {background-color: whitesmoke; list-style-type: none; 
+                     width: 800px; padding: 0; justify-content: center; 
+                     border-radius: 3px; }
+.flex-header        {display: flex; text-align: center; justify-content: center;}
+.form-row           {display: flex; justify-content: flex-end; margin: 10px; }
+.form-row > label   {padding: .5em 1em .5em 0; flex: 1; }
+.form-row > input   {flex: 2;}
+.form-row > button  {padding: .5em; background: gray; color: white; border: 0;}
+.container          {width: 940px; margin: 0 auto;}

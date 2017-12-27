@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='finpy',
+    name='finerplan',
     version='0.0.1',
-    packages=['finpy'],
+    packages=['finerplan'],
     include_package_data=True,
     install_requires=[
         'flask',

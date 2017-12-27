@@ -1,3 +1,3 @@
-graft finpy/templates
-graft finpy/static
-include finpy/schema.sql
+graft finerplan/templates
+graft finerplan/static
+include finerplan/schema.sql
