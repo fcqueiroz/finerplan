@@ -1,0 +1,5 @@
+finpy.db
+.eggs/
+__pycache__/
+finpy/__pycache__/
+test/__pycache__/

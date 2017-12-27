@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex-container">
+    <div>
+    {% if report.categorias %}
+        <table>
+        <caption><h2>Most used categories</h2></caption>
+        {% for elem in report.categorias %}
+            <tr>
+                <td>{{ elem }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
+    </div>
+    <div class="flex-container">
+        <div class="flex-container" style="flex-direction: column">
+            <div>
+                <h1>Hi, {{ report.name }}!</h1>
+                <div><p>Your balance for <ins>{{ report.eom }}</ins> is <b>{{ report.balance }}</b></p></div>
+                <div><p>Current month income: <b>{{ report.income }}</b></p></div>
+                <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
+                <div><p>Last 12 months savings rate: <b>{{ report.sav_rate }}</b></p></div>
+            <hr>
+
+            {% if report.expenses %}
+                <table>
+                <caption><h2>Recent Expenses</h2></caption>
+                <tr>
+                    <th>ID</th>
+                    <th>Accrual Date</th>
+                    <th>Cash Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Value</th>
+                </tr>
+                {% for row in report.expenses %}
+                    <tr>
+                    {% for elem in row %}
+                        <td>{{ elem }}</td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </table>
+            {% else %}
+                <h2>There are no expenses registered yet.</h2>
+            {% endif %}
+            </div>
+        </div>
+        <hr>
+        <div>
+            <form action="" method="post" name="transaction">
+                {{ form.hidden_tag() }}
+                <li class="flex-header">
+                    <h2>Add transaction</h2>
+                </li>
+                <li class="form-row">
+                    {{ form.pay_method.label }}<br>
+                    {{ form.pay_method(size=32) }}
+                    {% for error in form.pay_method.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+
+                </li>
+
+                <li class="form-row">
+                    {{ form.category_0.label }}<br>
+                    {{ form.category_0(size=32) }}
+                    {% for error in form.category_0.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+                </li>
+                <li class="form-row">
+                    {{ form.description.label }}<br>
+                    {{ form.description(size=32) }}<br>
+                    {% for error in form.description.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+                </li>
+                <li class="form-row">
+                    {{ form.date.label }}<br>
+                    {{ form.date(size=32) }}<br>
+                    {% for error in form.date.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+                </li>
+                <li class="form-row">
+                    {{ form.value.label }}<br>
+                    {{ form.value(size=32) }}<br><br>
+                    {% for error in form.value.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+                </li>
+                {{ form.submit() }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+graft finpy/templates
+graft finpy/static
+include finpy/schema.sql

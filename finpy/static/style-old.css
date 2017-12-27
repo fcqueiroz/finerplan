@@ -1,0 +1,11 @@
+.flex-container {display: flex;  flex-direction: row; }
+.flex-container>div {background-color: #f1f1f1; margin: 10px; padding:10px; font-size: 20px; }
+.wrapper {background-color: whitesmoke; list-style-type: none; width: 800px; padding: 0; justify-content: center; border-radius: 3px; }
+.flex-header {display: flex; text-align: center; justify-content: center; }
+.form-row {display: flex; justify-content: flex-end; margin: 10px; }
+.form-row > label {padding: .5em 1em .5em 0; flex: 1; }
+.form-row > input {flex: 2;}
+.form-row > button {padding: .5em; background: gray; color: white; border: 0; }
+th, td { padding: 2px; text-align: left;}
+body {margin: 5px; padding: 0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #444;}  
+.container {width: 940px; margin: 0 auto;}
