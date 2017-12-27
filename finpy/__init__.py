@@ -1,1 +1,0 @@
-from .finpy import app
