@@ -13,9 +13,9 @@ For installing the application, run the following command within the projects ro
 
 The editable flag allows editing source code without having to reinstall the Flask app each time you make changes. You should then be able to start up the application with the following commands:
 
-> export FLASK_APP=finerplan/finerplan.py
-> export FLASK_DEBUG=true
-> flask run
+> export FLASK_APP=finerplan/finerplan.py  
+> export FLASK_DEBUG=true  
+> flask run  
 
 
 

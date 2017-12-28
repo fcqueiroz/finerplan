@@ -7,7 +7,7 @@ app.config.from_object(__name__) # load config from this file
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
-    NAME = "Fernanda",
+    NAME = os.getenv("LOGNAME").capitalize(),
     DATABASE = os.path.join(app.root_path, 'finerplan.db'),
     CREDIT_CLOSING = 11, # Insert here the day of month when the credit card invoice closes
     CREDIT_PAYMENT = 25, # Insert here the day of month when the credit card invoice is paid
