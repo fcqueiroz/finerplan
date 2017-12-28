@@ -1,5 +1,10 @@
 finerplan.db
 .eggs/
+notebooks/
+ref/
+0_BACKLOG_SPRINT.md
+1_BACKLOG_PRODUCT.md
 __pycache__/
 finerplan/__pycache__/
 test/__pycache__/
+

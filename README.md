@@ -1,6 +1,9 @@
 # FinerPlan - Financial Early Retirement Planner #
 
-This program is being developed to help those people seeking financial independence and early retirement to track and analyze their finances. The program is designed so that you can focus on how to improve your savings rate and predict when you can set FIRE!
+This program intends to help those people seeking financial independence and early retirement to track and analyze their finances. It's designed so that you can focus on how to improve your savings rate and predict when you can set FIRE!
+
+## Disclaimer
+This is my first big project and the program is still in a really early development stage. It's not well suited for any kind of serious work. My main goals are to solve a personal need while I develop skills in programming, project management and other areas.
 
 ## Getting Started
 
@@ -13,4 +16,6 @@ The editable flag allows editing source code without having to reinstall the Fla
 > export FLASK_APP=finerplan/finerplan.py
 > export FLASK_DEBUG=true
 > flask run
+
+
 

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS expenses(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    pay_method TEXT,
     accrual_date TEXT, 
     cash_date TEXT, 
     description TEXT,
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS earnings(
     accrual_date TEXT, 
     cash_date TEXT, 
     description TEXT, 
+    category_0 TEXT,
     value REAL
 );
 
@@ -22,6 +24,6 @@ CREATE TABLE IF NOT EXISTS assets(
     accrual_date TEXT, 
     cash_date TEXT, 
     description TEXT, 
+    category_0 TEXT,
     value REAL
 );
-
