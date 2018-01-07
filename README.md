@@ -17,5 +17,4 @@ The editable flag allows editing source code without having to reinstall the Fla
 > export FLASK_DEBUG=true  
 > flask run  
 
-
-
+The application will greet you on _http://localhost:5000/_

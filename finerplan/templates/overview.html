@@ -2,144 +2,157 @@
 
 {% block content %}
 <div class="overview">
-    <div class="basic">
-        <div class="basic-report">
-            <h1>Hi, {{ report.name }}!</h1>
-            <div><p>Your balance for <ins>{{ report.eom }}</ins> is <b>{{ report.balance }}</b></p></div>
-            <div><p>Current month income: <b>{{ report.income }}</b></p></div>
-            <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
-            <div><p>Last 12 months savings rate: <b>{{ report.sav_rate }}</b></p></div>
-            <div><p>Your next credit card payment is due {{ report.credit.date }}.<br>The current value is <b>{{ report.credit.value }}</b> ({{ report.credit.state }})</p></div>
-        </div>
-        <br><br>
-        <form action="" method="post" name="transaction" class="basic-form">
-            {{ form.hidden_tag() }}
-            <li class="flex-header">
-                <h2>Add transaction</h2>
-            </li>
-            <li class="form-row">
-                {{ form.transaction.label }}<br>
-                {{ form.transaction(size=32) }}
-                {% for error in form.transaction.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            <li class="form-row">
-                {{ form.pay_method.label }}<br>
-                {{ form.pay_method(size=32) }}
-                {% for error in form.pay_method.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            <li class="form-row">
-                {{ form.category_0.label }}<br>
-                {{ form.category_0(size=32) }}
-                {% for error in form.category_0.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            <li class="form-row">
-                {{ form.description.label }}<br>
-                {{ form.description(size=32) }}<br>
-                {% for error in form.description.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            <li class="form-row">
-                {{ form.date.label }}<br>
-                {{ form.date(size=32) }}<br>
-                {% for error in form.date.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            <li class="form-row">
-                {{ form.value.label }}<br>
-                {{ form.value(size=32) }}<br><br>
-                {% for error in form.value.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </li>
-            {{ form.submit() }}
-        </form>
+  <div class="basic">
+    <div class="basic-report">
+      <h1>Hi, {{ report.name }}!</h1>
+      <div><p>Your current balance is <b>{{ report.balance }}</b></p></div>
+      <div>
+        <p>
+          Your next credit card payment is due {{ report.credit_date }}.<br>
+          The current value is <b>{{ report.credit_value }}</b>
+          ({{ report.credit_state }})
+        </p>
+      </div>
+      <div><p>Current month earnings: <b>{{ report.earnings }}</b></p></div>
+      <div><p>Current month expenses: <b>{{ report.expenses }}</b></p></div>
+      <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
+      <div>
+        <p>Last 12 months savings rate: <b>{{ report.savings_rate }}</b></p>
+      </div>
     </div>
-    <hr>
-    <div class="categories">
-    {% if report.categorias %}
-        <table>
-        <caption><h2>Most used categories</h2></caption>
-        {% for elem in report.categorias %}
+    <br><br>
+    <form action="" method="post" name="transaction" class="basic-form">
+      {{ form.hidden_tag() }}
+      <li class="flex-header">
+        <h2>Add transaction</h2>
+      </li>
+      <li id='transaction_type' class="form-row">
+          {% for subfield in form.transaction %}
             <tr>
-                <td>{{ elem }}</td>
+                <td>{{ subfield }}{{ subfield.label }}</td>
             </tr>
+          {% endfor %}{% for error in form.transaction.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <div id='basic'>
+      <li class="form-row">
+        {{ form.description.label }}<br>
+        {{ form.description(size=32) }}<br>
+        {% for error in form.description.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li id="category" class="form-row">
+        {{ form.category_0.label }}<br>
+        {{ form.category_0 }}
+        {% for error in form.category_0.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li class="form-row">
+        {{ form.date.label }}<br>
+        {{ form.date(size=32) }}<br>
+        {% for error in form.date.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li class="form-row">
+        {{ form.value.label }}<br>
+        {{ form.value(size=32) }}<br><br>
+        {% for error in form.value.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li id="pay_method" class="form-row">
+        {% for subfield in form.pay_method %}
+          <tr>
+              <td>{{ subfield }}{{ subfield.label }}</td>
+          </tr>
         {% endfor %}
-        </table>
+        {% for error in form.pay_method.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li id=credit_inst class="form-row">
+          {{ form.installments.label }}<br>
+          {{ form.installments(size=32) }}<br><br>
+          {% for error in form.installments.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}<br>
+      </li>
+      {{ form.submit() }}
+      </div>
+    </form>
+  </div>
+  <hr>
+  <div class="activity">
+    {% if tables.expenses %}
+      <table>
+      <caption><h2>Recent Expenses</h2></caption>
+      <tr>
+        <th>Payment Method</th>
+        <th>Accrual Date</th>
+        <th>Cash Date</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Value</th>
+      </tr>
+      {% for row in tables.expenses %}
+        <tr>
+        {% for elem in row %}
+          <td>{{ elem }}</td>
+        {% endfor %}
+        </tr>
+      {% endfor %}
+      </table>
+    {% else %}
+      <h2><center>There are no expenses registered yet.</center></h2>
     {% endif %}
-    </div>
-    <hr>
-    <div class="activity">
-        {% if report.expenses %}
-            <table>
-            <caption><h2>Recent Expenses</h2></caption>
-            <tr>
-                <th>Payment Method</th>
-                <th>Accrual Date</th>
-                <th>Cash Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Value</th>
-            </tr>
-            {% for row in report.expenses %}
-                <tr>
-                {% for elem in row %}
-                    <td>{{ elem }}</td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-            </table>
-        {% else %}
-            <h2>There are no expenses registered yet.</h2>
-        {% endif %}
-        {% if report.earnings %}
-            <table>
-            <caption><h2>Current Month Earnings</h2></caption>
-            <tr>
-                <th>Accrual Date</th>
-                <th>Cash Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Value</th>
-            </tr>
-            {% for row in report.earnings %}
-                <tr>
-                {% for elem in row %}
-                    <td>{{ elem }}</td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-            </table>
-        {% else %}
-            <h2>There are no earnings registered for this month yet.</h2>
-        {% endif %}
-        {% if report.investments %}
-            <table>
-            <caption><h2>Current Month  Investments</h2></caption>
-            <tr>
-                <th>Accrual Date</th>
-                <th>Cash Date</th>
-                <th>Description</th>
-                <th>Value</th>
-            </tr>
-            {% for row in report.investments %}
-                <tr>
-                {% for elem in row %}
-                    <td>{{ elem }}</td>
-                {% endfor %}
-                </tr>
-            {% endfor %}
-            </table>
-        {% else %}
-            <h2>There are no investments registered for this month yet.</h2>
-        {% endif %}
-    </div>
+    {% if tables.earnings %}
+      <table>
+      <caption><h2>Current Month Earnings</h2></caption>
+      <tr>
+        <th>Accrual Date</th>
+        <th>Cash Date</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Value</th>
+      </tr>
+      {% for row in tables.earnings %}
+        <tr>
+        {% for elem in row %}
+          <td>{{ elem }}</td>
+        {% endfor %}
+        </tr>
+      {% endfor %}
+      </table>
+    {% else %}
+      <h2><center>There are no earnings registered for this month yet.</center></h2>
+    {% endif %}
+    {% if tables.investments %}
+      <table>
+      <caption><h2>Current Month  Investments</h2></caption>
+      <tr>
+        <th>Accrual Date</th>
+        <th>Cash Date</th>
+        <th>Description</th>
+        <th>Value</th>
+      </tr>
+      {% for row in tables.investments %}
+        <tr>
+        {% for elem in row %}
+          <td>{{ elem }}</td>
+        {% endfor %}
+          </tr>
+      {% endfor %}
+      </table>
+    {% else %}
+      <h2><center>There are no investments registered for this month yet.</center></h2>
+    {% endif %}
+  </div>
 </div>
+
+<script src="static/jquery.js"></script>
+
 {% endblock %}

@@ -19,21 +19,30 @@ th, td          { padding: 2px; text-align: left;}
                   border: 1px solid #aacbe2; }
 .error          { background: #f0d6d6; padding: 0.5em; }
 
-.flex-container     {display: flex; flex-direction: row;}
-.flex-container>div {background-color: #f1f1f1; margin: 10px; padding:10px;}
-.wrapper            {background-color: whitesmoke; list-style-type: none; 
-                     width: 800px; padding: 0; justify-content: center; 
-                     border-radius: 3px; }
-.flex-header        {display: flex; text-align: center; justify-content: center;}
-.form-row           {display: flex; justify-content: flex-end; margin: 10px; }
-.form-row > label   {padding: .5em 1em .5em 0; flex: 1; }
-.form-row > input   {flex: 2;}
-.form-row > button  {padding: .5em; background: gray; color: white; border: 0;}
-.container          {width: 940px; margin: 0 auto;}
+.flex-container     { display: flex; flex-direction: row;}
+.flex-container>div { background-color: #f1f1f1; margin: 10px; padding:10px;}
+.wrapper            { background-color: whitesmoke; list-style-type: none;
+                      width: 800px; padding: 0; justify-content: center;
+                      border-radius: 3px; }
+.flex-header        { display: flex; text-align: center;
+                      justify-content: center;}
+.form-row           { display: flex; justify-content: flex-end; margin: 10px;}
+.form-row > label   { padding: .5em 1em .5em 0; flex: 1}
+.form-row > input   { flex: 2; text-align: center}
+.form-row > button  { padding: .5em; background: gray; color: white;
+                      border: 0;}
+.container          { width: 940px; margin: 0 auto;}
 
 .overview       { display: flex;}
-.basic          { flex-direction: column; margin-right:25px; margin-left:25px; }
+.basic          { flex-direction: column; margin-right:25px;
+                  margin-left:25px; }
 .basic-report   { }
 .basic-form     { }
 .categories     { margin-right:25px; margin-left:25px; }
-.activity   { margin-left:25px; }
+.activity       { margin-left:25px; }
+
+#basic          { visibility: hidden }
+#category       { visibility: hidden }
+#category_1     { display: none }
+#pay_method     { visibility: hidden }
+#credit_inst    { visibility: hidden; }

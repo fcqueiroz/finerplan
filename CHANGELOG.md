@@ -5,8 +5,8 @@
  - Overview shows how much is owed in the next credit card invoice, current month earnings and investments made
  - 'last expenses' view shows the payment method
  - 'add transaction' form accepts investments and earnings
- - Three payment methods are available; 'Dinheiro' for cash transactions, 'Crédito' for transactions with a credit card and 'Terceiros' (explained better below).
- - When using the credit payment method, the number of installments can be included separated by a comma. If no installment number is provided, it defaults to a single payment
+ - Three payment methods are available; 'Dinheiro' for cash transactions, 'Crédito' for transactions with a credit card and 'Terceiros' (explained below).
+ - When using the credit payment method, the number of installments can be included.
  - Expenses paid in credit (and their installments) automatically get the cash date assigned to the payment dates according to the period when the expense ocurred and the date when the invoice closes. 
  - The 'Terceiros' pay method is a way of keeping track of expenses that don't change the cash flow because another person paid for it. When used, an entry of equal value is created on the earnings table
 

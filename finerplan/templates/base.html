@@ -1,11 +1,25 @@
 <!doctype html>
 <head>
     <title>FinerPlan - {{ title }}</title>
-    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+        type=text/css
+        href="{{ url_for('static', filename='style.css') }}">
+    <!-- START - jQuery Reference -->
+    <script type="text/javascript" language="Javascript"
+    	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+    <script type='text/javascript'>//<![CDATA[
+        if (typeof jQuery == 'undefined') {
+            document.write(unescape("%3Cscript
+        src='/static/jquery-3.2.1.js' type='text/javascript' %3E%3C/script%3E"));
+        }//]]>
+    </script>
+    <!-- END - jQuery Reference -->
+    
 </head>
 <body>
     <div class=metanav>
-        FinerPlan: 
+        FinerPlan:
         <a href="/">Overview</a>
         <a href="/earnings">Earnings</a>
         <a href="/expenses">Expenses</a>

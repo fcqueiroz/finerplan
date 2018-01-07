@@ -1,42 +1,73 @@
-from .finerplan import app
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-model = '%Y-%m-%d'
-tday = date.today()
 
-def next_month(dtDateTime, start=False):
-    """Returns the last day of the month for a given date by default
-    If start=True then returns the 1st day of the given date's next month
-    """
-    next_month = months_delta(dtDateTime, 1)
-    sonm = date(next_month.year, next_month.month, 1)
-    if start:
-        return sonm
+from .finerplan import app
+
+__MODEL = '%Y-%m-%d'
+TODAY = date.today()
+
+def date_converter(_date):
+    if type(_date)==str:
+        _date = datetime.strptime(_date, __MODEL).date()
+    elif type(_date)==date:
+        _date = _date
     else:
-        return sonm - timedelta(days=1)
+        raise Exception('Wrong Date Type: {}'.format(type(_date)))
+    return _date
 
-def months_delta(original_date, months_delta):
-    dYear = original_date.year
-    dMonth = original_date.month + months_delta
+def next_month(_date, start=False):
+    """Returns the last day of the month for a given date
+    by default. If start=True then returns the 1st day of
+    the given date's next month.
+    """
+    _date = date_converter(_date)
+    next_month = improved_delta(_date, months=1).replace(day=1)
+    if start:
+        return next_month
+    else:
+        return next_month - timedelta(days=1)
+
+def cash(_date):
+    """Returns the date when a certain expense will be
+    paid (cash date) for a given date instance (usually
+    accrual date) according to the app's date for
+    closing the invoice.
+    """
+    _date = date_converter(_date)
+    cash_date = _date.replace(day=app.config['CREDIT_PAYMENT'])
+    if _date.day > app.config['CREDIT_CLOSING']:
+        cash_date = improved_delta(cash_date, months=1)
+    return cash_date
+
+def improved_delta(_date, years=0, months=0, weeks=0, days=0):
+    """Improves standard timedelta to add new deltas (years,
+    months and weeks). This is better suited for dealing
+    with bigger time periods.
+    """
+    _date = date_converter(_date)
+    new_date = _date + timedelta(days=(weeks*7 + days))
+    dMonth = new_date.month + months
+    dYear = new_date.year + years
     while dMonth > 12:
         dMonth = dMonth - 12
         dYear = dYear + 1
     while dMonth < 1:
         dMonth = dMonth + 12
         dYear = dYear - 1
-    return date(dYear, dMonth, original_date.day)
+    return date(dYear, dMonth, new_date.day)
 
-# Date of next card payment
-next_pay = date(tday.year, tday.month, app.config['CREDIT_PAYMENT'])
-if tday.day > next_pay.day:
-        next_pay = months_delta(next_pay, 1)
+def credit_state():
+    if ((TODAY.day > app.config['CREDIT_CLOSING'])
+        and (TODAY.day <= app.config['CREDIT_PAYMENT'])):
+        return True
+    else:
+        return False
 
-# Specific dates in string format
-# socm: Start Of Current Month
-# eom: End Of [current] Month
-# som: Start Of [next] Month
-s_socm = date(date.today().year,date.today().month,1).strftime(model)
-s_eom = next_month(date.today()).strftime('%d/%b/%Y')
-s_som = next_month(date.today(), start=True).strftime(model)
-
+SOCM = TODAY.replace(day=1)  # Start Of Current Month
+EOM = next_month(TODAY)  # End Of [current] Month
+SOM = next_month(TODAY, start=True)  # Start Of [next] Month
+# Date of credit card's next payment
+NEXT_PAY = TODAY.replace(day=app.config['CREDIT_PAYMENT'])
+if TODAY.day > app.config['CREDIT_PAYMENT']:
+    NEXT_PAY = improved_delta(NEXT_PAY, months=1)
