@@ -47,6 +47,12 @@ def last_investments():
     return cur.fetchall()
 
 def insert_entry(form):
+    """This function takes the information provided
+    by the AddTransactionForm and inserts new:
+    (1) expenses
+    (2) earnings
+    (3) investments
+    """
     accrual = form.date.data
     cash = accrual
     descr = form.description.data
@@ -91,10 +97,7 @@ def insert_entry(form):
     except: return 1  # Failed to commit changes to database
 
 def generate_categories():
-    """Generate a list of lists
-    each inner list contains all the unique category values
-    ordened by the most frequent
-    """
+    """Generate a tuple containing all the unique categories."""
     query = [('SELECT Category_0,count(Category_0) AS cont FROM expenses '
               'GROUP BY Category_0 ORDER BY cont DESC;'),
              ('SELECT Category_1,count(Category_1) AS cont FROM expenses '

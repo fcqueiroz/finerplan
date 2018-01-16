@@ -8,10 +8,10 @@ from .finerplan import app
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = AddTransactionForm()
-    if form.validate_on_submit():
-        flash("Form validated")
+    #if form.validate_on_submit():
+    if form.submit.data:
+        flash("Form submitted")
         if form.transaction.data:
-            flash("Inserted new entry in {} table".format(form.transaction.data))
             err = sql.insert_entry(form)
         if err:
             flash("The new entry wasn't inserted correctly")
