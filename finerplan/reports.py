@@ -18,7 +18,7 @@ def basic():
     SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
     TODAY = sdate['TODAY']
 
-    values = (SOCM, SOM,)
+    values = (SOCM, SOM)
     query = 'earnings WHERE ((? <= accrual_date) and (accrual_date < ?));'
     earnings = sum_query(query, values)
     query = 'expenses WHERE ((? <= accrual_date) and (accrual_date < ?));'

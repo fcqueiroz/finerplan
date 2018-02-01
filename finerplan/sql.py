@@ -1,6 +1,7 @@
 import sys
 import math
 import sqlite3
+from dateutil.relativedelta import *
 
 from .finerplan import app, form_words
 from finerplan import dates
@@ -81,7 +82,7 @@ def insert_entry(form):
         if method == form_words['credit'] and installments > 1:
             t_val = installment_quotient
             for i in range(1, installments):
-                cash = dates.improved_delta(cash, months=1)
+                cash = cash + relativedelta(months=1)
                 query_values = (method, accrual, cash, descr, cat_0, t_val)
                 cur.execute(('INSERT INTO '+ query_str), query_values)
         elif method == form_words['outsourced']:

@@ -1,6 +1,5 @@
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import *
 
 from .finerplan import app
 
@@ -15,18 +14,6 @@ def date_converter(_date):
         raise Exception('Wrong Date Type: {}'.format(type(_date)))
     return _date
 
-def next_month(_date, start=False):
-    """Returns the last day of the month for a given date
-    by default. If start=True then returns the 1st day of
-    the given date's next month.
-    """
-    _date = date_converter(_date).replace(day=1)
-    next_month = improved_delta(_date, months=1).replace(day=1)
-    if start:
-        return next_month
-    else:
-        return next_month - timedelta(days=1)
-
 def cash(_date):
     """Returns the date when a certain expense will be
     paid (cash date) for a given date instance (usually
@@ -36,25 +23,8 @@ def cash(_date):
     _date = date_converter(_date)
     cash_date = _date.replace(day=app.config['CREDIT_PAYMENT'])
     if _date.day > app.config['CREDIT_CLOSING']:
-        cash_date = improved_delta(cash_date, months=1)
+        cash_date = cash_date + relativedelta(months=1)
     return cash_date
-
-def improved_delta(_date, years=0, months=0, weeks=0, days=0):
-    """Improves standard timedelta to add new deltas (years,
-    months and weeks). This is better suited for dealing
-    with bigger time periods.
-    """
-    _date = date_converter(_date)
-    new_date = _date + timedelta(days=(weeks*7 + days))
-    dMonth = new_date.month + months
-    dYear = new_date.year + years
-    while dMonth > 12:
-        dMonth = dMonth - 12
-        dYear = dYear + 1
-    while dMonth < 1:
-        dMonth = dMonth + 12
-        dYear = dYear - 1
-    return date(dYear, dMonth, new_date.day)
 
 def credit_state():
     if ((date.today().day > app.config['CREDIT_CLOSING'])
@@ -67,14 +37,14 @@ def sdate():
     """Creates a dictionary of special dates that is
     updated everytime one of these dates is required
     """
-    
+
     SOCM = date.today().replace(day=1)  # Start Of Current Month
-    EOM = next_month(date.today())  # End Of [current] Month
-    SOM = next_month(date.today(), start=True)  # Start Of [next] Month
+    EOM = date.today() + relativedelta(day=31)  # End Of [current] Month
+    SOM = date.today() + relativedelta(months=1, day=1)  # Start Of [next] Month
     # Date of credit card's next payment
     NEXT_PAY = date.today().replace(day=app.config['CREDIT_PAYMENT'])
     if date.today().day > app.config['CREDIT_PAYMENT']:
-        NEXT_PAY = improved_delta(NEXT_PAY, months=1)
+        NEXT_PAY = NEXT_PAY + relativedelta(months=1)
 
     return {'TODAY': date.today(),
             'SOCM': SOCM,

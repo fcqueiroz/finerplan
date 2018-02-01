@@ -10,7 +10,6 @@ def index():
     form = AddTransactionForm()
     #if form.validate_on_submit():
     if form.submit.data:
-        flash("Form submitted")
         if form.transaction.data:
             err = sql.insert_entry(form)
         if err:
