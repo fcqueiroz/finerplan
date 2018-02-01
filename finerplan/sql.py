@@ -28,22 +28,26 @@ def last_expenses(num=10):
 
 def last_earnings():
     """Get all the current month earnings"""
+    sdate = dates.sdate()
+    SOCM, SOM = sdate['SOCM'], sdate['SOM']
     cur.execute(
         ('SELECT accrual_date,cash_date,description,category,value '
          'FROM earnings '
          'WHERE accrual_date >= ? and accrual_date < ? '
          'ORDER BY accrual_date DESC, id DESC;'),
-        (dates.SOCM,dates.SOM))
+        (SOCM, SOM))
     return cur.fetchall()
 
 def last_investments():
     """Get all the current month investments"""
+    sdate = dates.sdate()
+    SOCM, SOM = sdate['SOCM'], sdate['SOM']
     cur.execute(
         ('SELECT accrual_date,cash_date,description,value '
          'FROM assets '
          'WHERE accrual_date >= ? and accrual_date < ? '
          'ORDER BY accrual_date DESC, id DESC;'),
-        (dates.SOCM,dates.SOM))
+        (SOCM, SOM))
     return cur.fetchall()
 
 def insert_entry(form):

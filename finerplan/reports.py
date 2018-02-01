@@ -14,7 +14,11 @@ def basic():
     Savings Rate of the past 12 months based on accrual accounting.
     """
 
-    values = (dates.SOCM, dates.SOM,)
+    sdate = dates.sdate()
+    SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
+    TODAY = sdate['TODAY']
+
+    values = (SOCM, SOM,)
     query = 'earnings WHERE ((? <= accrual_date) and (accrual_date < ?));'
     earnings = sum_query(query, values)
     query = 'expenses WHERE ((? <= accrual_date) and (accrual_date < ?));'
@@ -22,7 +26,7 @@ def basic():
 
     savings = earnings - expenses
 
-    values = (dates.SOM, '-12 month', dates.SOCM)
+    values = (SOM, '-12 month', SOCM)
     query = ('expenses WHERE ((SELECT date(?, ?) <= accrual_date) '
             'and (accrual_date < ?));')
     out_12m = sum_query(query, values)
@@ -39,10 +43,10 @@ def basic():
     else:
         invoice_state = "Open"
     query = 'expenses WHERE pay_method="Crédito" and cash_date=?'
-    values = (dates.NEXT_PAY,)
+    values = (NEXT_PAY,)
     invoice_value = sum_query(query, values)
 
-    values = (dates.TODAY,)
+    values = (TODAY,)
     query = 'expenses WHERE (cash_date <= ?);'
     t_gasto = sum_query(query, values)
     query = 'earnings WHERE (cash_date <= ?);'
@@ -56,6 +60,6 @@ def basic():
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,
             'balance': locale.currency(balance, grouping=True),
-            'credit_date': dates.NEXT_PAY,
+            'credit_date': NEXT_PAY,
             'credit_value': locale.currency(invoice_value, grouping=True),
             'credit_state': invoice_state}

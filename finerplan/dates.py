@@ -5,7 +5,6 @@ from datetime import timedelta
 from .finerplan import app
 
 __MODEL = '%Y-%m-%d'
-TODAY = date.today()
 
 def date_converter(_date):
     if type(_date)==str:
@@ -58,16 +57,27 @@ def improved_delta(_date, years=0, months=0, weeks=0, days=0):
     return date(dYear, dMonth, new_date.day)
 
 def credit_state():
-    if ((TODAY.day > app.config['CREDIT_CLOSING'])
-        and (TODAY.day <= app.config['CREDIT_PAYMENT'])):
+    if ((date.today().day > app.config['CREDIT_CLOSING'])
+        and (date.today().day <= app.config['CREDIT_PAYMENT'])):
         return True
     else:
         return False
 
-SOCM = TODAY.replace(day=1)  # Start Of Current Month
-EOM = next_month(TODAY)  # End Of [current] Month
-SOM = next_month(TODAY, start=True)  # Start Of [next] Month
-# Date of credit card's next payment
-NEXT_PAY = TODAY.replace(day=app.config['CREDIT_PAYMENT'])
-if TODAY.day > app.config['CREDIT_PAYMENT']:
-    NEXT_PAY = improved_delta(NEXT_PAY, months=1)
+def sdate():
+    """Creates a dictionary of special dates that is
+    updated everytime one of these dates is required
+    """
+    
+    SOCM = date.today().replace(day=1)  # Start Of Current Month
+    EOM = next_month(date.today())  # End Of [current] Month
+    SOM = next_month(date.today(), start=True)  # Start Of [next] Month
+    # Date of credit card's next payment
+    NEXT_PAY = date.today().replace(day=app.config['CREDIT_PAYMENT'])
+    if date.today().day > app.config['CREDIT_PAYMENT']:
+        NEXT_PAY = improved_delta(NEXT_PAY, months=1)
+
+    return {'TODAY': date.today(),
+            'SOCM': SOCM,
+            'EOM': EOM,
+            'SOM': SOM,
+            'NEXT_PAY': NEXT_PAY}
