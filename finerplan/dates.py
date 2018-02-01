@@ -21,7 +21,7 @@ def next_month(_date, start=False):
     by default. If start=True then returns the 1st day of
     the given date's next month.
     """
-    _date = date_converter(_date)
+    _date = date_converter(_date).replace(day=1)
     next_month = improved_delta(_date, months=1).replace(day=1)
     if start:
         return next_month
