@@ -45,6 +45,8 @@ def basic():
     query = 'expenses WHERE pay_method="Crédito" and cash_date=?'
     values = (NEXT_PAY,)
     invoice_value = sum_query(query, values)
+    query = 'expenses WHERE pay_method="Crédito" and cash_date>=?'
+    total_invoice_debt = sum_query(query, values)
 
     values = (TODAY,)
     query = 'expenses WHERE (cash_date <= ?);'
@@ -54,12 +56,14 @@ def basic():
     query = 'assets WHERE (cash_date <= ?);'
     t_assets = sum_query(query, values)
     balance = t_renda - t_gasto - t_assets
+    free_balance = balance - total_invoice_debt
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,
             'balance': locale.currency(balance, grouping=True),
+            'free_balance': locale.currency(free_balance, grouping=True),
             'credit_date': NEXT_PAY,
             'credit_value': locale.currency(invoice_value, grouping=True),
             'credit_state': invoice_state}
