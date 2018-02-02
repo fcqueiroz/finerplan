@@ -13,7 +13,7 @@ def index():
         if form.transaction.data:
             err = sql.insert_entry(form)
         if err:
-            flash("The new entry wasn't inserted correctly")
+            flash("The new entry wasn't inserted correctly. Error {}".format(err))
         else:
             flash("Successfully added new {}".format(form.transaction.data.lower()))
     tables = {'expenses':sql.last_expenses(),
