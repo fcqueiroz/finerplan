@@ -5,7 +5,11 @@
   <div class="basic">
     <div class="basic-report">
       <h1>Hi, {{ report.name }}!</h1>
-      <div><p>Your current balance is <b>{{ report.balance }}</b></p></div>
+      <div><p>
+        Your current balance is <b>{{ report.balance }}</b><br>
+        Your balance after paying all debts will be
+            <b>{{ report.free_balance }}</b>
+      </p></div>
       <div>
         <p>
           Your next credit card payment is due {{ report.credit_date }}.<br>
@@ -13,11 +17,11 @@
           ({{ report.credit_state }})
         </p>
       </div>
-      <div><p>
-          Your balance after paying all debts is <b>{{ report.free_balance }}</b>
-      </p></div>
       <div><p>Current month earnings: <b>{{ report.earnings }}</b></p></div>
-      <div><p>Current month expenses: <b>{{ report.expenses }}</b></p></div>
+      <div><p>
+          Current month expenses: <b>{{ report.expenses }}</b><br>
+          Last 12 months average expenses: <b>{{ report.yr_avg_expenses }}</b>
+      </p></div>
       <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
       <div>
         <p>Last 12 months savings rate: <b>{{ report.savings_rate }}</b></p>
