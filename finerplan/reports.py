@@ -1,6 +1,6 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')
-from finerplan.sql import sum_query
+from finerplan.sql import sum_query, ema
 
 from finerplan import dates
 
@@ -61,6 +61,7 @@ def basic():
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
+            'ema': locale.currency(ema(alpha=0.15), grouping=True),
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,
             'balance': locale.currency(balance, grouping=True),

@@ -17,6 +17,39 @@ def sum_query(query_str, query_values):
         result = 0
     return result
 
+def ema(alpha=0.15):
+    sdate = dates.sdate()
+    SOCM = sdate['SOCM']
+    query = 'select accrual_date from expenses order by accrual_date;'
+    cur.execute(query)
+    oldest_date = cur.fetchone()[0]
+    if not isinstance(oldest_date, (str,)):
+        return 0
+    month_start = dates.date_converter(oldest_date)
+    month_ending = month_start + relativedelta(day=31)
+
+    cur.execute('SELECT sum(value) FROM expenses '
+                'WHERE accrual_date>=? AND accrual_date <=?;',
+                (month_start, month_ending))
+    mov_avg = cur.fetchone()[0]
+    if not isinstance(mov_avg, (int, float)):
+        return 0
+    while (True):
+        month_start = month_ending + relativedelta(days=1)
+        month_ending = month_start + relativedelta(day=31)
+
+        cur.execute('SELECT sum(value) FROM expenses '
+                    'WHERE accrual_date>=? AND accrual_date <=?;',
+                    (month_start, month_ending))
+        result = cur.fetchone()[0]
+        if not isinstance(result, (int, float)):
+            return mov_avg
+        else:
+            if month_start == SOCM:
+                return mov_avg
+                #result = result * ((month_ending - month_start).days + 1) / (date.today() - month_start).days
+            mov_avg = alpha*result + (1-alpha)*mov_avg
+
 def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
     cur.execute(
