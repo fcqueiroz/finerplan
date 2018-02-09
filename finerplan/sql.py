@@ -53,9 +53,10 @@ def ema(alpha=0.15):
 def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
     cur.execute(
-        ('SELECT pay_method,accrual_date,cash_date,'
-            'description,category_0,value '
+        ('SELECT pay_method,accrual_date,'
+            'description,category_0,sum(value) '
          'FROM expenses '
+         'GROUP BY accrual_date, description '
          'ORDER BY accrual_date DESC, id DESC LIMIT ?;'),
         (num,))
     return cur.fetchall()
