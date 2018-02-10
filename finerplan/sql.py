@@ -95,15 +95,15 @@ def insert_entry(form):
     accrual = form.date.data
     cash = accrual
     descr = form.description.data
-    cat_0 = form.category_0.data
-    cat_1 = "Outras Despesas"
-    cat_2 = "Outras Despesas"
     t_val = float(form.value.data.replace(',','.'))
     table = form.transaction.data
     if table == 'expenses':
         query_str = (table+' ( pay_method, accrual_date, cash_date, '
                     'description, category_0, value) Values(?, ?, ?, ?, ?, ?)')
         method = form.pay_method.data
+        cat_0 = form.category_0.data
+        cat_1 = "Outras Despesas"
+        cat_2 = "Outras Despesas"
         if method == form_words['credit']:
             cash = dates.cash(accrual)
             installments = form.installments.data
@@ -125,7 +125,13 @@ def insert_entry(form):
                     'accrual_date, cash_date, description, category, value) '
                  'Values(?, ?, ?, ?, ?)'),
                 (accrual, accrual, descr, "Subsídio", t_val))
-    elif (table == 'earnings' or table == 'assets'):
+    elif table == 'earnings':
+        cat = form.cat_earning.data
+        query_str = (table+' (accrual_date, cash_date, description, '
+                    'category, value) Values(?, ?, ?, ?, ?)')
+        query_values = (accrual, cash, descr, cat, t_val)
+        cur.execute(('INSERT INTO '+ query_str), query_values)
+    elif table == 'assets':
         query_str = (table+' (accrual_date, cash_date, description, '
                     'value) Values(?, ?, ?, ?)')
         query_values = (accrual, cash, descr, t_val)
@@ -135,17 +141,19 @@ def insert_entry(form):
     try: con.commit()
     except: return 1  # Failed to commit changes to database
 
-def generate_categories():
+def generate_categories(table='expenses'):
     """Generate a tuple containing all the unique categories."""
-    query = [('SELECT Category_0,count(Category_0) AS cont FROM expenses '
-              'GROUP BY Category_0 ORDER BY cont DESC;'),
-             ('SELECT Category_1,count(Category_1) AS cont FROM expenses '
-              'GROUP BY Category_1 ORDER BY cont DESC;'),
-             ('SELECT Category_2,count(Category_2) AS cont FROM expenses '
-              'GROUP BY Category_2 ORDER BY cont DESC;')]
-    super_cat=[]
-    for q in query:
-        cur.execute(q)
-        c = [(row[0], row[0]) for row in cur.fetchall()]
-        super_cat.append(c)
+    
+    # For future: Option to return a default list of categories
+    # This is specially important when a user is initianing a database
+    if table == 'expenses':
+        query = ('SELECT Category_0,count(Category_0) AS cont FROM expenses '
+                 'GROUP BY Category_0 ORDER BY cont DESC;')
+    elif table == 'earnings':
+        query = ('SELECT Category,count(Category) AS cont FROM earnings '
+                 'GROUP BY Category ORDER BY cont DESC;')
+
+    cur.execute(query)
+    super_cat = [(row[0], row[0]) for row in cur.fetchall()]
+
     return super_cat

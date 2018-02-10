@@ -51,10 +51,17 @@
           <span style="color: red;">[{{ error }}]</span>
         {% endfor %}<br>
       </li>
-      <li id="category" class="form-row">
+      <li id="expenses_category" class="form-row">
         {{ form.category_0.label }}<br>
         {{ form.category_0 }}
         {% for error in form.category_0.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
+      <li id="earnings_category" class="form-row">
+        {{ form.cat_earning.label }}<br>
+        {{ form.cat_earning }}
+        {% for error in form.cat_earning.errors %}
           <span style="color: red;">[{{ error }}]</span>
         {% endfor %}<br>
       </li>

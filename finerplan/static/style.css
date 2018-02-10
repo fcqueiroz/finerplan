@@ -42,7 +42,8 @@ th, td          { padding: 2px; text-align: left;}
 .activity       { margin-left:25px; }
 
 #basic          { visibility: hidden }
-#category       { visibility: hidden }
+#expenses_category       { visibility: hidden; }
+#earnings_category       { visibility: hidden; display: none; }
 #category_1     { display: none }
 #pay_method     { visibility: hidden }
 #credit_inst    { visibility: hidden; }
