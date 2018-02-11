@@ -10,7 +10,7 @@
  - Expenses paid in credit (and their installments) automatically get the cash date assigned to the payment dates according to the period when the expense ocurred and the date when the invoice closes. 
  - The 'Terceiros' pay method is a way of keeping track of expenses that don't change the cash flow because another person paid for it. When used, an entry of equal value is created on the earnings table
  - Overview now shows debt free balance, last 12 months average expending and  exponential moving average (calculated for all periods) expending.
- - Earnings now accepts to add categories also
+ - Earnings now accepts categories
 
 ### Changed
  - 'Last expenses' view presents entries by the accrual date in reverse order (most recent on top) and doesn't show the id numbers column anymore

@@ -36,3 +36,10 @@ def earnings():
         flash("date: {}. Type: {}".format(form.date.data, type(form.date.data)))
         flash("categoria: {}. Type: {}".format(form.category_0.data, type(form.category_0.data)))
     return render_template('earnings.html', title='Test Zone', form=form)
+
+@app.route('/expenses', methods=['GET'])
+def expenses():
+    expenses_table = sql.expenses_table()
+    expenses = sql.transactions_table(kind='expenses')
+    return render_template('expenses.html', title='Expenses',
+                           tables=expenses_table, expenses=expenses)

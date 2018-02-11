@@ -6,6 +6,8 @@ h2              { font-size: 1.2em; }
 table, th, td   { border: 1px solid black; border-collapse: collapse;}
 table           { margin: 2em auto;}
 th, td          { padding: 2px; text-align: left;}
+tr:nth-child(odd)		{ background-color:#eee; }
+tr:nth-child(even)	{ background-color:#fff; }
 .page           { margin: 1em auto; width: 35em; border: 5px solid #ccc;
                   padding: 0.8em; background: white; }
 .entries        { list-style: none; margin: 0; padding: 0; }

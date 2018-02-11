@@ -1,6 +1,7 @@
 import sys
 import math
 import sqlite3
+import pandas as pd
 from dateutil.relativedelta import *
 
 from .finerplan import app, form_words
@@ -49,6 +50,53 @@ def ema(alpha=0.15):
                 return mov_avg
                 #result = result * ((month_ending - month_start).days + 1) / (date.today() - month_start).days
             mov_avg = alpha*result + (1-alpha)*mov_avg
+
+def transactions_table(kind=None, monthly=True, num=50):
+    """Get last transaction entries in any database.
+
+    Parameters
+    ----------
+    kind : str
+        Name of the table in the database
+    monthly : bool, default True
+        Limits the table to the current month transactions
+    num : int, default 50
+        Maximum number of transactions to show
+    """
+
+    if monthly:
+        sdate = dates.sdate()
+        SOCM = sdate['SOCM'].strftime(dates.__MODEL)
+        SOM = sdate['SOM'].strftime(dates.__MODEL)
+        data_range = ('WHERE accrual_date >= "' + SOCM +
+                      '" and accrual_date < "' + SOM + '" ')
+    else:
+        data_range = ''
+
+    if kind == 'expenses':
+        query = ('SELECT pay_method,accrual_date,'
+                     'description,category_0,sum(value) '
+                 'FROM expenses '
+                 + data_range +
+                 'GROUP BY accrual_date, description '
+                 'ORDER BY accrual_date DESC, id DESC '
+                 'LIMIT ?;')
+    elif kind == 'earnings':
+        query = ('SELECT accrual_date,cash_date,description,category,value '
+                 'FROM earnings '
+                 + data_range +
+                 'ORDER BY accrual_date DESC, id DESC '
+                 'LIMIT ?;')
+    elif kind == 'assets':
+        query = ('SELECT accrual_date,cash_date,description,value '
+                 'FROM assets '
+                 + data_range +
+                 'ORDER BY accrual_date DESC, id DESC '
+                 'LIMIT ?;')
+
+    cur.execute(query, (num,))
+    return cur.fetchall()
+
 
 def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
@@ -143,7 +191,7 @@ def insert_entry(form):
 
 def generate_categories(table='expenses'):
     """Generate a tuple containing all the unique categories."""
-    
+
     # For future: Option to return a default list of categories
     # This is specially important when a user is initianing a database
     if table == 'expenses':
@@ -157,3 +205,24 @@ def generate_categories(table='expenses'):
     super_cat = [(row[0], row[0]) for row in cur.fetchall()]
 
     return super_cat
+
+def expenses_table(months=6):
+    df = pd.DataFrame(columns=['Category'])
+    for num in range (months-1, -1, -1):
+        sdate = dates.date.today() + relativedelta(day=1, months= - num)
+        fdate = sdate + relativedelta(months=1)
+        query = ("SELECT category_0,sum(value) "
+                 "FROM expenses "
+                 "WHERE accrual_date >= ? and accrual_date < ? "
+                 "GROUP BY category_0;")
+        cur.execute(query, (sdate, fdate))
+        result = cur.fetchall()
+        label = sdate.strftime('%m/%y')
+        tmp = pd.DataFrame(result, columns=['Category', label])
+        df = pd.merge(df, tmp, left_on='Category', right_on='Category', how='outer')
+
+    df.fillna(value=0, inplace=True)
+    df["Soma"] = df.sum(axis=1)
+    df = df.sort_values(by="Soma", ascending=False)
+
+    return df.to_html(classes='expenses', index=False)
