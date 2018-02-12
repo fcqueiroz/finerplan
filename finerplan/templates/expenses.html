@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="activity">
+  {{ tables|safe }}
+  {% if expenses %}
+    <table>
+    <caption><h2>Monthly Expenses</h2></caption>
+    <tr>
+      <th>Category</th>
+      <th>Accrual Date</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Value</th>
+    </tr>
+    {% for row in expenses %}
+      <tr>
+      {% for elem in row %}
+        <td>{{ elem }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+</div>
+
+{% endblock %}

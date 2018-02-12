@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 ### Added
+- Assets page now shows the balance on each brokerage account
+
+## [0.0.2] - 2018-02-11
+### Added
  - Overview shows how much is owed in the next credit card invoice, current month earnings and investments made
  - 'last expenses' view shows the payment method
  - 'add transaction' form accepts investments and earnings
@@ -11,6 +15,7 @@
  - The 'Terceiros' pay method is a way of keeping track of expenses that don't change the cash flow because another person paid for it. When used, an entry of equal value is created on the earnings table
  - Overview now shows debt free balance, last 12 months average expending and  exponential moving average (calculated for all periods) expending.
  - Earnings now accepts categories
+ - Expenses page now shows current month transactions and past 6 months expendings separated by category
 
 ### Changed
  - 'Last expenses' view presents entries by the accrual date in reverse order (most recent on top) and doesn't show the id numbers column anymore

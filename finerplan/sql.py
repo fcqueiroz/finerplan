@@ -75,7 +75,7 @@ def transactions_table(kind=None, monthly=True, num=50):
 
     if kind == 'expenses':
         query = ('SELECT pay_method,accrual_date,'
-                     'description,category_0,sum(value) '
+                     'description,category,sum(value) '
                  'FROM expenses '
                  + data_range +
                  'GROUP BY accrual_date, description '
@@ -87,9 +87,9 @@ def transactions_table(kind=None, monthly=True, num=50):
                  + data_range +
                  'ORDER BY accrual_date DESC, id DESC '
                  'LIMIT ?;')
-    elif kind == 'assets':
+    elif kind == 'brokerage_transfers':
         query = ('SELECT accrual_date,cash_date,description,value '
-                 'FROM assets '
+                 'FROM brokerage_transfers '
                  + data_range +
                  'ORDER BY accrual_date DESC, id DESC '
                  'LIMIT ?;')
@@ -102,7 +102,7 @@ def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
     cur.execute(
         ('SELECT pay_method,accrual_date,'
-            'description,category_0,sum(value) '
+            'description,category,sum(value) '
          'FROM expenses '
          'GROUP BY accrual_date, description '
          'ORDER BY accrual_date DESC, id DESC LIMIT ?;'),
@@ -127,7 +127,7 @@ def last_investments():
     SOCM, SOM = sdate['SOCM'], sdate['SOM']
     cur.execute(
         ('SELECT accrual_date,cash_date,description,value '
-         'FROM assets '
+         'FROM brokerage_transfers '
          'WHERE accrual_date >= ? and accrual_date < ? '
          'ORDER BY accrual_date DESC, id DESC;'),
         (SOCM, SOM))
@@ -147,9 +147,9 @@ def insert_entry(form):
     table = form.transaction.data
     if table == 'expenses':
         query_str = (table+' ( pay_method, accrual_date, cash_date, '
-                    'description, category_0, value) Values(?, ?, ?, ?, ?, ?)')
+                    'description, category, value) Values(?, ?, ?, ?, ?, ?)')
         method = form.pay_method.data
-        cat_0 = form.category_0.data
+        cat_0 = form.cat_expense.data
         cat_1 = "Outras Despesas"
         cat_2 = "Outras Despesas"
         if method == form_words['credit']:
@@ -179,7 +179,7 @@ def insert_entry(form):
                     'category, value) Values(?, ?, ?, ?, ?)')
         query_values = (accrual, cash, descr, cat, t_val)
         cur.execute(('INSERT INTO '+ query_str), query_values)
-    elif table == 'assets':
+    elif table == 'brokerage_transfers':
         query_str = (table+' (accrual_date, cash_date, description, '
                     'value) Values(?, ?, ?, ?)')
         query_values = (accrual, cash, descr, t_val)
@@ -195,8 +195,8 @@ def generate_categories(table='expenses'):
     # For future: Option to return a default list of categories
     # This is specially important when a user is initianing a database
     if table == 'expenses':
-        query = ('SELECT Category_0,count(Category_0) AS cont FROM expenses '
-                 'GROUP BY Category_0 ORDER BY cont DESC;')
+        query = ('SELECT category,count(category) AS cont FROM expenses '
+                 'GROUP BY category ORDER BY cont DESC;')
     elif table == 'earnings':
         query = ('SELECT Category,count(Category) AS cont FROM earnings '
                  'GROUP BY Category ORDER BY cont DESC;')
@@ -211,18 +211,45 @@ def expenses_table(months=6):
     for num in range (months-1, -1, -1):
         sdate = dates.date.today() + relativedelta(day=1, months= - num)
         fdate = sdate + relativedelta(months=1)
-        query = ("SELECT category_0,sum(value) "
+        query = ("SELECT category,sum(value) "
                  "FROM expenses "
                  "WHERE accrual_date >= ? and accrual_date < ? "
-                 "GROUP BY category_0;")
+                 "GROUP BY category;")
         cur.execute(query, (sdate, fdate))
         result = cur.fetchall()
         label = sdate.strftime('%m/%y')
         tmp = pd.DataFrame(result, columns=['Category', label])
-        df = pd.merge(df, tmp, left_on='Category', right_on='Category', how='outer')
+        df = pd.merge(df, tmp, how='outer',
+                      left_on='Category', right_on='Category')
 
     df.fillna(value=0, inplace=True)
     df["Soma"] = df.sum(axis=1)
     df = df.sort_values(by="Soma", ascending=False)
 
     return df.to_html(classes='expenses', index=False)
+
+
+def brokerage_balance():
+    query = ('SELECT custodian,sum(value) '
+         'FROM brokerage_transfers '
+         'GROUP BY custodian;')
+    cur.execute(query)
+    result = cur.fetchall()
+    brokerage_in = pd.DataFrame(result, columns=['custodian', 'input'])
+    query = ('SELECT custodian,sum(value) '
+             'FROM investments '
+             'GROUP BY custodian;')
+    cur.execute(query)
+    result = cur.fetchall()
+    brokerage_out = pd.DataFrame(result, columns=['custodian', 'output'])
+
+    brokerage = pd.merge(brokerage_in, brokerage_out, how='outer',
+                         left_on='custodian', right_on='custodian')
+    brokerage.custodian.fillna(value="Não declarado", inplace=True)
+    brokerage.rename(columns={'custodian': "Custodiante"}, inplace=True)
+    brokerage.fillna(value = 0, inplace=True)
+    brokerage["Saldo"] = brokerage.input - brokerage.output
+    brokerage.drop(['input', 'output'], axis=1, inplace=True)
+    brokerage = brokerage.sort_values(by="Saldo", ascending=False)
+
+    return brokerage.to_html(classes='brokerage_balance', index=False)

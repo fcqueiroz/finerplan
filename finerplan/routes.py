@@ -28,13 +28,13 @@ def index():
 def earnings():
     form = TestForm()
 
-    if (form.category_0.data):
-        flash("Voce selecionou {}".format(form.category_0.data))
+    if (form.cat_expense.data):
+        flash("Voce selecionou {}".format(form.cat_expense.data))
     if form.pay_method.data == 'Dinheiro':
         flash("Voce selecionou {}".format(form.pay_method.data))
     if form.submit.data:
         flash("date: {}. Type: {}".format(form.date.data, type(form.date.data)))
-        flash("categoria: {}. Type: {}".format(form.category_0.data, type(form.category_0.data)))
+        flash("categoria: {}. Type: {}".format(form.cat_expense.data, type(form.cat_expense.data)))
     return render_template('earnings.html', title='Test Zone', form=form)
 
 @app.route('/expenses', methods=['GET'])
@@ -43,3 +43,10 @@ def expenses():
     expenses = sql.transactions_table(kind='expenses')
     return render_template('expenses.html', title='Expenses',
                            tables=expenses_table, expenses=expenses)
+
+@app.route('/assets', methods=['GET'])
+def assets():
+    brokerage_balance = sql.brokerage_balance()
+
+    return render_template('assets.html', title='Assets',
+                           tables=brokerage_balance)

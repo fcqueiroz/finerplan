@@ -17,7 +17,7 @@ app.config.update(dict(
 # Defines common words used in the forms
 form_words = {'earnings': "Receita",
               'expenses': "Gasto",
-              'assets': "Investimento",
+              'brokerage_transfers': "Investimento",
               'cash': "Dinheiro",
               'credit': "Crédito",
               'outsourced': "Terceiros"}

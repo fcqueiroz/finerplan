@@ -52,9 +52,9 @@
         {% endfor %}<br>
       </li>
       <li id="expenses_category" class="form-row">
-        {{ form.category_0.label }}<br>
-        {{ form.category_0 }}
-        {% for error in form.category_0.errors %}
+        {{ form.cat_expense.label }}<br>
+        {{ form.cat_expense }}
+        {% for error in form.cat_expense.errors %}
           <span style="color: red;">[{{ error }}]</span>
         {% endfor %}<br>
       </li>

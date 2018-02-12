@@ -53,9 +53,9 @@ def basic():
     t_gasto = sum_query(query, values)
     query = 'earnings WHERE (cash_date <= ?);'
     t_renda = sum_query(query, values)
-    query = 'assets WHERE (cash_date <= ?);'
-    t_assets = sum_query(query, values)
-    balance = t_renda - t_gasto - t_assets
+    query = 'brokerage_transfers WHERE (cash_date <= ?);'
+    t_brokerage_transfers = sum_query(query, values)
+    balance = t_renda - t_gasto - t_brokerage_transfers
     free_balance = balance - total_invoice_debt
 
     return {'earnings': locale.currency(earnings, grouping=True),
@@ -69,24 +69,3 @@ def basic():
             'credit_date': NEXT_PAY,
             'credit_value': locale.currency(invoice_value, grouping=True),
             'credit_state': invoice_state}
-
-def expenses_table(months=6):
-    df = pd.DataFrame(columns=['category'])
-    for num in range (months-1, -1, -1):
-        sdate = date.today() + relativedelta(day=1, months= - num)
-        fdate = sdate + relativedelta(months=1)
-        query = ("SELECT category_0,sum(value) "
-                 "FROM expenses "
-                 "WHERE accrual_date >= ? and accrual_date < ? "
-                 "GROUP BY category_0;")
-        cur.execute(query, (sdate, fdate))
-        result = cur.fetchall()
-        label = sdate.strftime('%m/%y')
-        tmp = pd.DataFrame(result, columns=['category', label])
-        df = pd.merge(df, tmp, left_on='category', right_on='category', how='outer')
-
-    df.fillna(value=0, inplace=True)
-    df.set_index('category', inplace=True)
-    df['soma'] = df.sum(axis=1)
-
-    return df.sort_values(by='soma', ascending=False)
