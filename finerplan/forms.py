@@ -37,5 +37,5 @@ class AddTransactionForm(FlaskForm):
 #class AddInvestmentForm(AddTransactionForm):
 
 class TestForm(AddTransactionForm):
-
-	category_2 = SelectField("Category", choices = generate_categories()[2])
+	pass
+	#category_2 = SelectField("Category", choices = generate_categories()[2])

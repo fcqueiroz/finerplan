@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Assets page now shows the balance on each brokerage account
+- New categories can be added using the regular interface
 
 ## [0.0.2] - 2018-02-11
 ### Added

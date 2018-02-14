@@ -23,8 +23,10 @@ def ema(alpha=0.15):
     SOCM = sdate['SOCM']
     query = 'select accrual_date from expenses order by accrual_date;'
     cur.execute(query)
-    oldest_date = cur.fetchone()[0]
-    if not isinstance(oldest_date, (str,)):
+    try:
+        oldest_date = cur.fetchone()[0]
+    except TypeError:
+        # The database is probably empty
         return 0
     month_start = dates.date_converter(oldest_date)
     month_ending = month_start + relativedelta(day=31)
@@ -226,6 +228,10 @@ def expenses_table(months=6):
         df = pd.merge(df, tmp, how='outer',
                       left_on='Category', right_on='Category')
 
+    cols = list(df.columns)
+    cols.pop(cols.index('Category'))
+    cols = ['Category'] + cols
+    df = df[cols]
     df.fillna(value=0, inplace=True)
     df["Soma"] = df.sum(axis=1)
     df = df.sort_values(by="Soma", ascending=False)

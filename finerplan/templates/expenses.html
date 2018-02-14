@@ -2,7 +2,6 @@
 
 {% block content %}
 <div class="activity">
-  {{ tables|safe }}
   {% if expenses %}
     <table>
     <caption><h2>Monthly Expenses</h2></caption>
@@ -21,7 +20,12 @@
       </tr>
     {% endfor %}
     </table>
+  {% else %}
+      <h2><center>There are no expenses registered yet.</center></h2>
   {% endif %}
+
+  <caption><h2><center>Past 6 months expenses</center></h2></caption>
+  {{ tables|safe }}
 </div>
 
 {% endblock %}
