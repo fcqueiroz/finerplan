@@ -149,7 +149,9 @@ def insert_entry(form):
         query_str = (table+' ( pay_method, accrual_date, cash_date, '
                     'description, category, value) Values(?, ?, ?, ?, ?, ?)')
         method = form.pay_method.data
-        cat_0 = form.cat_expense.data
+        cat_0 = form.new_cat.data
+        if cat_0 == "":
+            cat_0 = form.cat_expense.data
         cat_1 = "Outras Despesas"
         cat_2 = "Outras Despesas"
         if method == form_words['credit']:
@@ -174,7 +176,9 @@ def insert_entry(form):
                  'Values(?, ?, ?, ?, ?)'),
                 (accrual, accrual, descr, "Subsídio", t_val))
     elif table == 'earnings':
-        cat = form.cat_earning.data
+        cat = form.new_cat.data
+        if cat == "":
+            cat = form.cat_earning.data
         query_str = (table+' (accrual_date, cash_date, description, '
                     'category, value) Values(?, ?, ?, ?, ?)')
         query_values = (accrual, cash, descr, cat, t_val)

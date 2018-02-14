@@ -51,6 +51,17 @@
           <span style="color: red;">[{{ error }}]</span>
         {% endfor %}<br>
       </li>
+      <div class="checkbox" id="new_cat_div" >
+          <input type="checkbox" id="new_cat_check" value="edit">
+          <label>Add new category</label>
+      </div>
+      <li id="new_category" class="form-row">
+        {{ form.new_cat.label }}<br>
+        {{ form.new_cat }}
+        {% for error in form.new_cat.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}<br>
+      </li>
       <li id="expenses_category" class="form-row">
         {{ form.cat_expense.label }}<br>
         {{ form.cat_expense }}
