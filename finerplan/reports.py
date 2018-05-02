@@ -63,12 +63,13 @@ def basic():
     balance = t_renda - t_gasto - t_brokerage_transfers
     free_balance = balance - total_invoice_debt
     sugg_invest = max((balance - invoice_value
-                       - ema(alpha=0.15) - MIN_TG_BALANCE), 0)
+                       - ema(kind='double') - MIN_TG_BALANCE), 0)
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
             'ema': locale.currency(ema(alpha=0.15), grouping=True),
+            'dema': locale.currency(ema(kind='double'), grouping=True),
             'suggested_investment': locale.currency(sugg_invest, grouping=True),
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,

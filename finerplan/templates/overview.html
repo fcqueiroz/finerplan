@@ -29,8 +29,11 @@
       </div>
       <div><p>
           Current month expenses: <b>{{ report.expenses }}</b><br>
+          <!--
           Last 12 months average expenses: <b>{{ report.yr_avg_expenses }}</b>
-          <br>Exponential Moving Average Expending: <b>{{ report.ema }}</b>
+          -->
+          Exponential Moving Average Expending: <b>{{ report.ema }}</b><br>
+          Double Exponential Moving Average Expending: <b>{{ report.dema }}</b>
       </p></div>
       <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
       <div>

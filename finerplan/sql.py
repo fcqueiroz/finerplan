@@ -18,7 +18,13 @@ def sum_query(query_str, query_values):
         result = 0
     return result
 
-def ema(alpha=0.15):
+def ema(alpha=0.15, beta=0.5, kind='simple'):
+    """Calculates Exponential Moving Average
+    for monthly expenses. The EMA can be simple or double
+    """
+
+    # Include code to check if kind == simple/Double
+    
     sdate = dates.sdate()
     SOCM = sdate['SOCM']
     query = 'select accrual_date from expenses order by accrual_date;'
@@ -37,6 +43,23 @@ def ema(alpha=0.15):
     mov_avg = cur.fetchone()[0]
     if not isinstance(mov_avg, (int, float)):
         return 0
+    if kind == 'double':
+        month_start = month_ending + relativedelta(days=1)
+        if month_start == SOCM:
+            # Not enough data for making a double EMA
+            return mov_avg
+        month_ending = month_start + relativedelta(day=31)
+        cur.execute('SELECT sum(value) FROM expenses '
+                    'WHERE accrual_date>=? AND accrual_date <=?;',
+                    (month_start, month_ending))
+        result = cur.fetchone()[0]
+        if not isinstance(result, (int, float)):
+            # Not enough data for making a double EMA
+            return mov_avg
+        else:
+            trend = result - mov_avg
+            mov_avg = result
+
     while (True):
         month_start = month_ending + relativedelta(days=1)
         month_ending = month_start + relativedelta(day=31)
@@ -45,13 +68,18 @@ def ema(alpha=0.15):
                     'WHERE accrual_date>=? AND accrual_date <=?;',
                     (month_start, month_ending))
         result = cur.fetchone()[0]
-        if not isinstance(result, (int, float)):
-            return mov_avg
-        else:
-            if month_start == SOCM:
+        if (not isinstance(result, (int, float))) or (month_start == SOCM):
+            if kind == 'simple':
                 return mov_avg
-                #result = result * ((month_ending - month_start).days + 1) / (date.today() - month_start).days
+            elif kind == 'double':
+                return mov_avg + 1 * trend
+        if kind == 'simple':
+            #result = result * ((month_ending - month_start).days + 1) / (date.today() - month_start).days
             mov_avg = alpha*result + (1-alpha)*mov_avg
+        elif kind == 'double':
+            tmp = mov_avg
+            mov_avg = alpha * result + (1 - alpha) * (tmp + trend)
+            trend = beta * (mov_avg - tmp) + (1 - beta) * trend
 
 def transactions_table(kind=None, monthly=True, num=50):
     """Get last transaction entries in any database.
