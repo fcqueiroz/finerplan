@@ -28,7 +28,7 @@ def cash(_date):
 
 def credit_state():
     if ((date.today().day > app.config['CREDIT_CLOSING'])
-        and (date.today().day <= app.config['CREDIT_PAYMENT'])):
+        and (date.today().day < app.config['CREDIT_PAYMENT'])):
         return True
     else:
         return False
@@ -43,11 +43,13 @@ def sdate():
     SOM = date.today() + relativedelta(months=1, day=1)  # Start Of [next] Month
     # Date of credit card's next payment
     NEXT_PAY = date.today().replace(day=app.config['CREDIT_PAYMENT'])
-    if date.today().day > app.config['CREDIT_PAYMENT']:
+    if date.today().day >= app.config['CREDIT_PAYMENT']:
         NEXT_PAY = NEXT_PAY + relativedelta(months=1)
+    FOLLOWING_NEXT_PAY = NEXT_PAY + relativedelta(months=1)
 
     return {'TODAY': date.today(),
             'SOCM': SOCM,
             'EOM': EOM,
             'SOM': SOM,
-            'NEXT_PAY': NEXT_PAY}
+            'NEXT_PAY': NEXT_PAY,
+            'FOLLOWING_NEXT_PAY': FOLLOWING_NEXT_PAY}

@@ -259,6 +259,7 @@ def brokerage_balance():
     brokerage.rename(columns={'custodian': "Custodiante"}, inplace=True)
     brokerage.fillna(value = 0, inplace=True)
     brokerage["Saldo"] = brokerage.input - brokerage.output
+    brokerage.Saldo = brokerage.Saldo.apply(lambda x: math.ceil(100*x)/100 )
     brokerage.drop(['input', 'output'], axis=1, inplace=True)
     brokerage = brokerage.sort_values(by="Saldo", ascending=False)
 

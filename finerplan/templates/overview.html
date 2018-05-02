@@ -14,10 +14,19 @@
         <p>
           Your next credit card payment is due {{ report.credit_date }}.<br>
           The current value is <b>{{ report.credit_value }}</b>
-          ({{ report.credit_state }})
+          ({{ report.credit_state }})<br>
+          {% if report.credit_state == 'Closed' %}
+            The current value for the following open invoice is
+            <b>{{ report.credit_nvalue }}</b>
+          {% endif %}
         </p>
       </div>
-      <div><p>Current month earnings: <b>{{ report.earnings }}</b></p></div>
+      <div>
+        <p>
+            Current month earnings: <b>{{ report.earnings }}</b><br>
+            Available for investing: <b>{{ report.suggested_investment}}</b>
+        </p>
+      </div>
       <div><p>
           Current month expenses: <b>{{ report.expenses }}</b><br>
           Last 12 months average expenses: <b>{{ report.yr_avg_expenses }}</b>

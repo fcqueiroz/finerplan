@@ -16,7 +16,9 @@ def basic():
 
     sdate = dates.sdate()
     SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
-    TODAY = sdate['TODAY']
+    TODAY, FOLLOWING_NEXT_PAY = sdate['TODAY'], sdate['FOLLOWING_NEXT_PAY']
+    # This variable holds the user preference for the minimum desired balance
+    MIN_TG_BALANCE = 500
 
     values = (SOCM, SOM)
     query = 'earnings WHERE ((? <= accrual_date) and (accrual_date < ?));'
@@ -43,6 +45,8 @@ def basic():
     else:
         invoice_state = "Open"
     query = 'expenses WHERE pay_method="Crédito" and cash_date=?'
+    values = (FOLLOWING_NEXT_PAY,)
+    next_invoice_value = sum_query(query, values)
     values = (NEXT_PAY,)
     invoice_value = sum_query(query, values)
     query = 'expenses WHERE pay_method="Crédito" and cash_date>=?'
@@ -53,19 +57,24 @@ def basic():
     t_gasto = sum_query(query, values)
     query = 'earnings WHERE (cash_date <= ?);'
     t_renda = sum_query(query, values)
-    query = 'brokerage_transfers WHERE (cash_date <= ?);'
+    query = 'brokerage_transfers WHERE (cash_date <= ?) AND (origin = ?);'
+    values = (TODAY, 'Personal')
     t_brokerage_transfers = sum_query(query, values)
     balance = t_renda - t_gasto - t_brokerage_transfers
     free_balance = balance - total_invoice_debt
+    sugg_invest = max((balance - invoice_value
+                       - ema(alpha=0.15) - MIN_TG_BALANCE), 0)
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
             'ema': locale.currency(ema(alpha=0.15), grouping=True),
+            'suggested_investment': locale.currency(sugg_invest, grouping=True),
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,
             'balance': locale.currency(balance, grouping=True),
             'free_balance': locale.currency(free_balance, grouping=True),
             'credit_date': NEXT_PAY,
             'credit_value': locale.currency(invoice_value, grouping=True),
+            'credit_nvalue': locale.currency(next_invoice_value, grouping=True),
             'credit_state': invoice_state}
