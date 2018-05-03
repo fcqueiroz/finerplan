@@ -17,8 +17,19 @@ def basic():
     sdate = dates.sdate()
     SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
     TODAY, FOLLOWING_NEXT_PAY = sdate['TODAY'], sdate['FOLLOWING_NEXT_PAY']
+    M_PROGRESS = sdate['M_PROGRESS']
     # This variable holds the user preference for the minimum desired balance
     MIN_TG_BALANCE = 500
+    # This variable holds the user preference for maximum expending in luxyry
+    LUXURY_BUDGET = 320
+
+    values = (SOCM, SOM)
+    query = """expenses WHERE ((? <= accrual_date)
+                               and (accrual_date < ?)
+                               and (category = 'Restaurantes'
+                                    or category = 'Lazer'));"""
+    lux_expenses = sum_query(query, values)
+    lux_rate = lux_expenses / (LUXURY_BUDGET * M_PROGRESS)
 
     values = (SOCM, SOM)
     query = 'earnings WHERE ((? <= accrual_date) and (accrual_date < ?));'
@@ -67,6 +78,9 @@ def basic():
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
+            'lux_budget': locale.currency(LUXURY_BUDGET - lux_expenses,
+                                          grouping=True),
+            'lux_rate': locale.format_string('%.2f %%', 100*lux_rate),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
             'ema': locale.currency(ema(alpha=0.15), grouping=True),
             'dema': locale.currency(ema(kind='double'), grouping=True),

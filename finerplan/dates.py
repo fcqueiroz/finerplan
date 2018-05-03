@@ -46,10 +46,12 @@ def sdate():
     if date.today().day >= app.config['CREDIT_PAYMENT']:
         NEXT_PAY = NEXT_PAY + relativedelta(months=1)
     FOLLOWING_NEXT_PAY = NEXT_PAY + relativedelta(months=1)
+    MONTH_PROGRESS = date.today().day / EOM.day
 
     return {'TODAY': date.today(),
             'SOCM': SOCM,
             'EOM': EOM,
             'SOM': SOM,
+            'M_PROGRESS': MONTH_PROGRESS,
             'NEXT_PAY': NEXT_PAY,
             'FOLLOWING_NEXT_PAY': FOLLOWING_NEXT_PAY}
