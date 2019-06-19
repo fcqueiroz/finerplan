@@ -24,7 +24,6 @@ def ema(alpha=0.15, beta=0.5, kind='simple'):
     """
 
     # Include code to check if kind == simple/Double
-    
     sdate = dates.sdate()
     SOCM = sdate['SOCM']
     query = 'select accrual_date from expenses order by accrual_date;'
@@ -240,7 +239,7 @@ def generate_categories(table='expenses'):
 
     return super_cat
 
-def expenses_table(months=6):
+def expenses_table(months=13):
     df = pd.DataFrame(columns=['Category'])
     for num in range (months-1, -1, -1):
         sdate = dates.date.today() + relativedelta(day=1, months= - num)
@@ -261,8 +260,18 @@ def expenses_table(months=6):
     cols = ['Category'] + cols
     df = df[cols]
     df.fillna(value=0, inplace=True)
-    df["Soma"] = df.sum(axis=1)
-    df = df.sort_values(by="Soma", ascending=False)
+    df["Média"] = df.iloc[:,:-1].mean(axis=1)
+    df["Média"] = df["Média"].apply(lambda x: round(x,2))
+    df = df.sort_values(by="Média", ascending=False)
+
+    df["Peso Ac."] = df["Média"].cumsum() / df["Média"].sum()
+    df["Peso Ac."] = df["Peso Ac."].apply(lambda x: "{0:.1f} %".format(100*x))
+
+    soma = df.sum()
+    soma.name = 'Soma'
+    soma['Category'] = soma.name
+    soma[-1] = ""
+    df = df.append(soma)
 
     return df.to_html(classes='expenses', index=False)
 

@@ -1,10 +1,7 @@
-finerplan.db
+*.db
 .eggs/
 notebooks/
 ref/
 BACKLOG_PRODUCT.ods
 .~lock*
 __pycache__/
-finerplan/__pycache__/
-test/__pycache__/
-

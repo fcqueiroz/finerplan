@@ -5,7 +5,7 @@
 - Assets page now shows the balance on each brokerage account
 - New categories can be added using the regular interface
 
-## [0.0.2] - 2018-02-11
+## [0.2] - 2018-02-11
 ### Added
  - Overview shows how much is owed in the next credit card invoice, current month earnings and investments made
  - 'last expenses' view shows the payment method
@@ -27,7 +27,7 @@
  - Overview gathers information from database AFTER new expenses are added, so the user can immediatly see the new entry on 'last expenses' view
  - App couldn't open in certain dates close to the month ending
  
-## [0.0.1] - 2017-12-26
+## [0.1] - 2017-12-26
 ### Added
  - Overview shows all categories ordened by the most used first
  - Form to insert new expenses
