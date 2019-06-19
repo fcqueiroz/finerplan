@@ -1,36 +1,42 @@
 <!doctype html>
+<html lang="pt-br">
 <head>
-    <title>FinerPlan - {{ title }}</title>
-    <link rel="stylesheet"
-        type=text/css
-        href="{{ url_for('static', filename='style.css') }}">
-    <!-- START - jQuery Reference -->
-    <script type="text/javascript" language="Javascript"
-    	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-    </script>
-    <script type='text/javascript'>//<![CDATA[
-        if (typeof jQuery == 'undefined') {
-            document.write(unescape("%3Cscript
-        src='/static/jquery-3.2.1.js' type='text/javascript' %3E%3C/script%3E"));
-        }//]]>
-    </script>
-    <!-- END - jQuery Reference -->
-    
+  <meta charset="utf-8">
+  <title>{{ title }} - FinerPlan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/icon/favicon.png') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-4.3.1.min.js') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome-5.9.0.min.js') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- START - jQuery Reference -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type='text/javascript'>//<![CDATA[
+    if (typeof jQuery == 'undefined') {
+        document.write(unescape("%3Cscript
+    src='/static/js/jquery-3.4.1.min.js' type='text/javascript' %3E%3C/script%3E"));
+    }//]]>
+  </script>
+  <!-- END - jQuery Reference -->
+
+  <script src="{{ url_for('static', filename='js/bootstrap-4.3.1.bundle.min.js') }}"></script>
+
 </head>
 <body>
-    <div class=metanav>
-        FinerPlan:
-        <a href="/">Overview</a>
-        <a href="/earnings">Earnings</a>
-        <a href="/expenses">Expenses</a>
-        <a href="/assets">Assets</a>
-        <a href="/settings">Settings</a>
-    </div>
-    <hr>
-    <ul>
-        {% for message in get_flashed_messages() %}
-        <li class=flash>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% block content %}{% endblock %}
+<div class=metanav>
+  FinerPlan:
+  <a href="/">Overview</a>
+  <a href="/earnings">Earnings</a>
+  <a href="/expenses">Expenses</a>
+  <a href="/assets">Assets</a>
+  <a href="/settings">Settings</a>
+</div>
+<hr>
+<ul>
+  {% for message in get_flashed_messages() %}
+  <li class=flash>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% block content %}{% endblock %}
 </body>
