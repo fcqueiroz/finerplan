@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row">
-  <div class="col-12 col-md-6 py-3">
+  <div class="col-12 col-md-6 col-xl-5 py-3">
     <div class="card">
       <div class="card-body">
         <h2>Basic Report</h2>
@@ -27,7 +27,7 @@
       </div>
     </div>
   </div>
-  <div class="col-12 col-md-6 py-3">
+  <div class="col-12 col-md-6 col-xl-4 py-3">
     <div class="card">
       <div class="card-body">
         <form action="#" method="post" name="transaction">
@@ -122,82 +122,103 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12 col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h2 class="header-title">Recent Expenses</h2>
-          <div class="data-tables">
-          {% if tables.expenses %}
-            <table id="dataTable" class="text-center">
-              <thead class="bg-light text-capitalize">
-                <tr>
-                  <th>Payment Method</th>
-                  <th>Accrual Date</th>
-                  <th>Description</th>
-                  <th>Category</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-              {% for row in tables.expenses %}
+  <div class="col-12 col-md-8 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Expenses</h2>
+        <div class="data-tables">
+        {% if tables.expenses %}
+          <table id="dataTable" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Payment Method</th>
+                <th>Accrual Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in tables.expenses %}
+              <tr>
+              {% for elem in row %}
+                <td>{{ elem }}</td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no expenses registered yet.</p>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Earnings</h2>
+        <div class="data-tables">
+        {% if tables.earnings %}
+          <table id="dataTable2" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Accrual Date</th>
+                <th>Cash Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in tables.earnings %}
+              <tr>
+              {% for elem in row %}
+                <td>{{ elem }}</td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no earnings registered yet.</p>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Investments</h2>
+        <div class="data-tables">
+        {% if tables.investments %}
+          <table id="dataTable3" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Accrual Date</th>
+                <th>Cash Date</th>
+                <th>Description</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in tables.investments %}
                 <tr>
                 {% for elem in row %}
                   <td>{{ elem }}</td>
                 {% endfor %}
-                </tr>
+                  </tr>
               {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <p>There are no expenses registered yet.</p>
-          {% endif %}
-          </div>
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no investments registered yet.</p>
+        {% endif %}
         </div>
       </div>
     </div>
-    {% if tables.earnings %}
-      <table>
-      <caption><h2>Current Month Earnings</h2></caption>
-      <tr>
-        <th>Accrual Date</th>
-        <th>Cash Date</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Value</th>
-      </tr>
-      {% for row in tables.earnings %}
-        <tr>
-        {% for elem in row %}
-          <td>{{ elem }}</td>
-        {% endfor %}
-        </tr>
-      {% endfor %}
-      </table>
-    {% else %}
-      <h2><center>There are no earnings registered for this month yet.</center></h2>
-    {% endif %}
-    {% if tables.investments %}
-      <table>
-      <caption><h2>Current Month  Investments</h2></caption>
-      <tr>
-        <th>Accrual Date</th>
-        <th>Cash Date</th>
-        <th>Description</th>
-        <th>Value</th>
-      </tr>
-      {% for row in tables.investments %}
-        <tr>
-        {% for elem in row %}
-          <td>{{ elem }}</td>
-        {% endfor %}
-          </tr>
-      {% endfor %}
-      </table>
-    {% else %}
-      <h2><center>There are no investments registered for this month yet.</center></h2>
-    {% endif %}
   </div>
 </div>
-
 {% endblock %}
