@@ -122,28 +122,40 @@
       </div>
     </div>
   </div>
-  <div class="activity">
-    {% if tables.expenses %}
-      <table>
-      <caption><h2>Recent Expenses</h2></caption>
-      <tr>
-        <th>Payment Method</th>
-        <th>Accrual Date</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Value</th>
-      </tr>
-      {% for row in tables.expenses %}
-        <tr>
-        {% for elem in row %}
-          <td>{{ elem }}</td>
-        {% endfor %}
-        </tr>
-      {% endfor %}
-      </table>
-    {% else %}
-      <h2><center>There are no expenses registered yet.</center></h2>
-    {% endif %}
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="header-title">Recent Expenses</h2>
+          <div class="data-tables">
+          {% if tables.expenses %}
+            <table id="dataTable" class="text-center">
+              <thead class="bg-light text-capitalize">
+                <tr>
+                  <th>Payment Method</th>
+                  <th>Accrual Date</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for row in tables.expenses %}
+                <tr>
+                {% for elem in row %}
+                  <td>{{ elem }}</td>
+                {% endfor %}
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>There are no expenses registered yet.</p>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
     {% if tables.earnings %}
       <table>
       <caption><h2>Current Month Earnings</h2></caption>
