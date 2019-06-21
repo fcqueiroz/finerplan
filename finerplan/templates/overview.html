@@ -1,131 +1,127 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="overview">
-  <div class="basic">
-    <div class="basic-report">
-      <h1>Hi, {{ report.name }}!</h1>
-      <div><p>
-        Your current balance is <b>{{ report.balance }}</b><br>
-        Your balance after paying all debts will be
-            <b>{{ report.free_balance }}</b>
-      </p></div>
-      <div>
-        <p>
+<div class="row">
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2>Basic Report</h2>
+        <p id="basic-report">
+          Your current balance is <b>{{ report.balance }}</b><br>
+          Your balance after paying all debts will be<b>{{ report.free_balance }}</b><br>
           Your next credit card payment is due {{ report.credit_date }}.<br>
-          The current value is <b>{{ report.credit_value }}</b>
-          ({{ report.credit_state }})<br>
+          The current value is <b>{{ report.credit_value }}</b>({{ report.credit_state }})<br>
           {% if report.credit_state == 'Closed' %}
             The current value for the following open invoice is
-            <b>{{ report.credit_nvalue }}</b>
+            <b>{{ report.credit_nvalue }}</b><br>
           {% endif %}
-        </p>
-      </div>
-      <div>
-        <p>
-            Current month earnings: <b>{{ report.earnings }}</b><br>
-            Available for investing: <b>{{ report.suggested_investment}}</b><br>
-            Available for luxury expending: <b>{{ report.lux_budget}}</b>
-            ({{ report.lux_rate}})
-        </p>
-      </div>
-      <div><p>
+          Current month earnings: <b>{{ report.earnings }}</b><br>
+          Available for investing: <b>{{ report.suggested_investment}}</b><br>
+          Available for luxury expending: <b>{{ report.lux_budget}}</b>({{ report.lux_rate}})<br>
           Current month expenses: <b>{{ report.expenses }}</b><br>
-          <!--
-          Last 12 months average expenses: <b>{{ report.yr_avg_expenses }}</b>
-          -->
           Exponential Moving Average Expending: <b>{{ report.ema }}</b><br>
-          Double Exponential Moving Average Expending: <b>{{ report.dema }}</b>
-      </p></div>
-      <div><p>This month savings: <b>{{ report.savings }}</b></p></div>
-      <div>
-        <p>Last 12 months savings rate: <b>{{ report.savings_rate }}</b></p>
+          Double Exponential Moving Average Expending: <b>{{ report.dema }}</b><br>
+          This month savings: <b>{{ report.savings }}</b><br>
+          Last 12 months savings rate: <b>{{ report.savings_rate }}</b>
+        </p>
       </div>
     </div>
-    <br><br>
-    <form action="" method="post" name="transaction" class="basic-form">
-      {{ form.hidden_tag() }}
-      <li class="flex-header">
-        <h2>Add transaction</h2>
-      </li>
-      <li id='transaction_type' class="form-row">
-          {% for subfield in form.transaction %}
-            <tr>
-                <td>{{ subfield }}{{ subfield.label }}</td>
-            </tr>
-          {% endfor %}{% for error in form.transaction.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <div id='basic'>
-      <li class="form-row">
-        {{ form.description.label }}<br>
-        {{ form.description(size=32) }}<br>
-        {% for error in form.description.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <div class="checkbox" id="new_cat_div" >
-          <input type="checkbox" id="new_cat_check" value="edit">
-          <label>Add new category</label>
-      </div>
-      <li id="new_category" class="form-row">
-        {{ form.new_cat.label }}<br>
-        {{ form.new_cat }}
-        {% for error in form.new_cat.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li id="expenses_category" class="form-row">
-        {{ form.cat_expense.label }}<br>
-        {{ form.cat_expense }}
-        {% for error in form.cat_expense.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li id="earnings_category" class="form-row">
-        {{ form.cat_earning.label }}<br>
-        {{ form.cat_earning }}
-        {% for error in form.cat_earning.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li class="form-row">
-        {{ form.date.label }}<br>
-        {{ form.date(size=32) }}<br>
-        {% for error in form.date.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li class="form-row">
-        {{ form.value.label }}<br>
-        {{ form.value(size=32) }}<br><br>
-        {% for error in form.value.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li id="pay_method" class="form-row">
-        {% for subfield in form.pay_method %}
-          <tr>
-              <td>{{ subfield }}{{ subfield.label }}</td>
-          </tr>
-        {% endfor %}
-        {% for error in form.pay_method.errors %}
-          <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}<br>
-      </li>
-      <li id=credit_inst class="form-row">
-          {{ form.installments.label }}<br>
-          {{ form.installments(size=32) }}<br><br>
-          {% for error in form.installments.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}<br>
-      </li>
-      {{ form.submit() }}
-      </div>
-    </form>
   </div>
-  <hr>
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <form action="#" method="post" name="transaction">
+          {{ form.hidden_tag() }}
+
+          <h2>Add transaction</h2>
+          <!-- Transaction kind -->
+          <div class="form-row">
+            {% for subfield in form.transaction %}
+              <div class="custom-control custom-radio custom-control-inline">
+                {{ subfield(class_="custom-control-input") }}
+                {{ subfield.label(class_="custom-control-label") }}
+              </div>
+            {% endfor %}
+            {% for error in form.transaction.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Description -->
+          <div class="form-row form-group">
+            {{ form.description.label(class_="col-form-label") }}
+            {{ form.description(class_="form-control") }}
+            {% for error in form.description.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Category -->
+          <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="newCategoryCheck">
+              <label class="form-check-label" for="newCategoryCheck">Add new category</label>
+          </div>
+          <div class="form-row form-group">
+            {{ form.new_cat.label(class_="col-form-label") }}
+            {{ form.new_cat(class_="form-control") }}
+            {% for error in form.new_cat.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-row form-group">
+            {{ form.cat_expense.label(class_="col-form-label") }}
+            {{ form.cat_expense(class_="custom-select") }}
+            {% for error in form.cat_expense.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-row form-group">
+            {{ form.cat_earning.label(class_="col-form-label") }}
+            {{ form.cat_earning(class_="custom-select") }}
+            {% for error in form.cat_earning.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Date -->
+          <div class="form-row form-group">
+            {{ form.date.label(class_="col-form-label") }}
+            {{ form.date(class_="form-control", type="date") }}
+            {% for error in form.date.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Value -->
+          <div class="form-row form-group">
+            {{ form.value.label(class_="col-form-label") }}
+            {{ form.value(class_="form-control") }}
+            {% for error in form.value.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction payment method -->
+          <div class="form-row">
+            {% for subfield in form.pay_method %}
+              <div class="custom-control custom-radio custom-control-inline">
+                {{ subfield(class_="custom-control-input") }}
+                {{ subfield.label(class_="custom-control-label") }}
+              </div>
+            {% endfor %}
+            {% for error in form.pay_method.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Credit card installments -->
+          <div id=credit_inst class="form-row form-group">
+              {{ form.installments.label(class_="col-form-label") }}
+              {{ form.installments(class_="form-control", type="number") }}
+              {% for error in form.installments.errors %}
+                <span>[{{ error }}]</span>
+              {% endfor %}
+          </div>
+
+          {{ form.submit(class_="btn btn-primary mt-4 pr-4 pl-4") }}
+        </form>
+      </div>
+    </div>
+  </div>
   <div class="activity">
     {% if tables.expenses %}
       <table>
@@ -191,7 +187,5 @@
     {% endif %}
   </div>
 </div>
-
-<script src="static/jquery.js"></script>
 
 {% endblock %}

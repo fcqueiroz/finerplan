@@ -1,3 +1,9 @@
+.form-row span {
+  color: red;
+}
+
+
+/*
 body            { font-family: sans-serif; background: #eee; }
 a, h1, h2       { color: #377ba8; }
 h1, h2          { font-family: 'Georgia', serif; margin: 0; }
@@ -50,3 +56,4 @@ tr:nth-child(even)	{ background-color:#fff; }
 #category_1     { display: none }
 #pay_method     { visibility: hidden }
 #credit_inst    { visibility: hidden; }
+*/
