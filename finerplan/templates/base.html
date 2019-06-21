@@ -4,38 +4,38 @@
   <meta charset="utf-8">
   <title>{{ title }} - FinerPlan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/icon/favicon.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='vendor/images/author/avatar.png') }}">
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-4.3.1.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome-4.7.0.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/themify-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/bootstrap-4.3.1.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/font-awesome-4.7.0.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/themify-icons.css') }}">
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/metisMenu.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/metisMenu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/slicknav.min.css') }}">
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/srtdash-1.0.default.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/srtdash-1.0.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/typography.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/srtdash-1.0.default.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/srtdash-1.0.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/responsive.css') }}">
 
   <!-- START - jQuery Reference -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
   <script type='text/javascript'>//<![CDATA[
     if (typeof jQuery == 'undefined') {
         document.write(unescape("%3Cscript
-    src='/static/js/jquery-3.4.1.min.js' type='text/javascript' %3E%3C/script%3E"));
+    src='/static/vendor/js/jquery-3.4.1.min.js' type='text/javascript' %3E%3C/script%3E"));
     }//]]>
   </script>
   <!-- END - jQuery Reference -->
 
-  <script src="{{ url_for('static', filename='js/bootstrap-4.3.1.bundle.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/bootstrap-4.3.1.bundle.min.js') }}" defer></script>
 
-  <script src="{{ url_for('static', filename='js/metisMenu.min.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/jquery.slimscroll.min.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/jquery.slicknav.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/metisMenu.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/jquery.slimscroll.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/jquery.slicknav.min.js') }}" defer></script>
   <!-- others plugins -->
-  <script src="{{ url_for('static', filename='js/plugins.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/plugins.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/scripts.js') }}" defer></script>
 
 </head>
 <body>
@@ -49,7 +49,7 @@
     <div class="sidebar-menu">
       <div class="sidebar-header">
         <div class="logo">
-          <a href="index.html"><img src="/static/images/icon/logo.png" alt="logo"></a>
+          <a href="index.html"><img src="{{ url_for('static', filename='vendor/images/icon/logo.png') }}" alt="logo"></a>
         </div>
       </div>
       <div class="main-menu">
