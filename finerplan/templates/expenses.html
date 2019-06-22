@@ -7,30 +7,47 @@
 
 {% block content %}
 <div class="row">
-  {% if expenses %}
-    <table>
-    <caption><h2>Monthly Expenses</h2></caption>
-    <tr>
-      <th>Category</th>
-      <th>Accrual Date</th>
-      <th>Description</th>
-      <th>Category</th>
-      <th>Value</th>
-    </tr>
-    {% for row in expenses %}
-      <tr>
-      {% for elem in row %}
-        <td>{{ elem }}</td>
-      {% endfor %}
-      </tr>
-    {% endfor %}
-    </table>
-  {% else %}
-      <h2><center>There are no expenses registered yet.</center></h2>
-  {% endif %}
-
-  <caption><h2><center>Past 6 months expenses</center></h2></caption>
-  {{ tables|safe }}
+  <div class="col-12 col-md-8 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Monthly Expenses</h2>
+        <div class="data-tables">
+        {% if expenses %}
+          <table id="dataTable" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Category</th>
+                <th>Accrual Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in expenses %}
+              <tr>
+              {% for elem in row %}
+                <td>{{ elem }}</td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <h2>There are no expenses registered this month yet.</h2>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-10 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Past 12 months expenses</h2>
+        {{ tables | safe }}
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
