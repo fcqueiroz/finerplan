@@ -1,14 +1,14 @@
 from flask import render_template, flash
 from .forms import AddTransactionForm, TestForm
 
-from finerplan import sql, dates, reports
+from finerplan import sql, reports
 from .finerplan import app
 
+
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
-def index():
+@app.route('/overview', methods=['GET', 'POST'])
+def overview():
     form = AddTransactionForm()
-    #if form.validate_on_submit():
     if form.submit.data:
         if form.transaction.data:
             err = sql.insert_entry(form)
@@ -22,13 +22,14 @@ def index():
     basic_report = reports.basic()
     basic_report['name'] = app.config['NAME']
     return render_template('overview.html', title='Overview', form=form,
-                            tables=tables, report=basic_report)
+                           tables=tables, report=basic_report)
+
 
 @app.route('/earnings', methods=['GET', 'POST'])
 def earnings():
     form = TestForm()
 
-    if (form.cat_expense.data):
+    if form.cat_expense.data:
         flash("Voce selecionou {}".format(form.cat_expense.data))
     if form.pay_method.data == 'Dinheiro':
         flash("Voce selecionou {}".format(form.pay_method.data))
@@ -37,12 +38,14 @@ def earnings():
         flash("categoria: {}. Type: {}".format(form.cat_expense.data, type(form.cat_expense.data)))
     return render_template('earnings.html', title='Test Zone', form=form)
 
+
 @app.route('/expenses', methods=['GET'])
 def expenses():
     expenses_table = sql.expenses_table()
     expenses = sql.transactions_table(kind='expenses')
     return render_template('expenses.html', title='Expenses',
                            tables=expenses_table, expenses=expenses)
+
 
 @app.route('/assets', methods=['GET'])
 def assets():
