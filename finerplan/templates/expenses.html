@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
+
+{% block title %}
+<h4 class="page-title pull-left">Expenses</h4>
+{% endblock %}
+
 {% block content %}
-<div class="activity">
+<div class="row">
   {% if expenses %}
     <table>
     <caption><h2>Monthly Expenses</h2></caption>
