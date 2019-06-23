@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/form-visibility.js') }}" defer></script>
+{% endblock %}
+
 {% block title %}
 <h4 class="page-title pull-left">Overview</h4>
 {% endblock %}
