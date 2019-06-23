@@ -2,6 +2,9 @@
   color: red;
 }
 
+.field-wobbly {
+  display: none;
+}
 
 /*
 body            { font-family: sans-serif; background: #eee; }

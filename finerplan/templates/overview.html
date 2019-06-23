@@ -43,7 +43,7 @@
 
           <h2>Add transaction</h2>
           <!-- Transaction kind -->
-          <div class="form-row">
+          <div id="transactionRadios" class="form-row justify-content-center">
             {% for subfield in form.transaction %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
@@ -59,32 +59,6 @@
             {{ form.description.label(class_="col-form-label") }}
             {{ form.description(class_="form-control") }}
             {% for error in form.description.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-          <!-- Transaction Category -->
-          <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="newCategoryCheck">
-              <label class="form-check-label" for="newCategoryCheck">Add new category</label>
-          </div>
-          <div class="form-row form-group">
-            {{ form.new_cat.label(class_="col-form-label") }}
-            {{ form.new_cat(class_="form-control") }}
-            {% for error in form.new_cat.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-          <div class="form-row form-group">
-            {{ form.cat_expense.label(class_="col-form-label") }}
-            {{ form.cat_expense(class_="custom-select") }}
-            {% for error in form.cat_expense.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-          <div class="form-row form-group">
-            {{ form.cat_earning.label(class_="col-form-label") }}
-            {{ form.cat_earning(class_="custom-select") }}
-            {% for error in form.cat_earning.errors %}
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
@@ -104,8 +78,34 @@
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
+          <!-- Transaction Category -->
+          <div class="form-check field-wobbly field-earnings field-expenses">
+              <input type="checkbox" class="form-check-input" id="newCategoryCheck">
+              <label class="form-check-label" for="newCategoryCheck">Add new category</label>
+          </div>
+          <div class="form-row form-group field-wobbly">
+            {{ form.new_cat.label(class_="col-form-label") }}
+            {{ form.new_cat(class_="form-control") }}
+            {% for error in form.new_cat.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-row form-group field-wobbly field-expenses">
+            {{ form.cat_expense.label(class_="col-form-label") }}
+            {{ form.cat_expense(class_="custom-select") }}
+            {% for error in form.cat_expense.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-row form-group field-wobbly field-earnings">
+            {{ form.cat_earning.label(class_="col-form-label") }}
+            {{ form.cat_earning(class_="custom-select") }}
+            {% for error in form.cat_earning.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
           <!-- Transaction payment method -->
-          <div class="form-row">
+          <div class="form-row field-wobbly field-expenses">
             {% for subfield in form.pay_method %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
@@ -117,7 +117,7 @@
             {% endfor %}
           </div>
           <!-- Credit card installments -->
-          <div id=credit_inst class="form-row form-group">
+          <div class="form-row form-group field-wobbly field-expenses">
               {{ form.installments.label(class_="col-form-label") }}
               {{ form.installments(class_="form-control", type="number") }}
               {% for error in form.installments.errors %}
