@@ -43,7 +43,7 @@
 
           <h2>Add transaction</h2>
           <!-- Transaction kind -->
-          <div id="transactionRadios" class="form-row justify-content-center">
+          <div id="transactionKind" class="form-row justify-content-center">
             {% for subfield in form.transaction %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
@@ -105,7 +105,7 @@
             {% endfor %}
           </div>
           <!-- Transaction payment method -->
-          <div class="form-row field-wobbly field-expenses">
+          <div id="paymentMethod" class="form-row justify-content-center field-wobbly field-expenses">
             {% for subfield in form.pay_method %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
@@ -117,7 +117,7 @@
             {% endfor %}
           </div>
           <!-- Credit card installments -->
-          <div class="form-row form-group field-wobbly field-expenses">
+          <div id="paymentInstallments" class="form-row form-group field-wobbly field-expenses">
               {{ form.installments.label(class_="col-form-label") }}
               {{ form.installments(class_="form-control", type="number") }}
               {% for error in form.installments.errors %}
