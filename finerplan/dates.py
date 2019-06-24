@@ -1,13 +1,13 @@
 from datetime import date, datetime
 from dateutil.relativedelta import *
 
-from .finerplan import app
+from finerplan import app
 
 __MODEL = '%Y-%m-%d'
 
 
 def date_converter(_date):
-    if type(_date)==str:
+    if type(_date) == str:
         _date = datetime.strptime(_date, __MODEL).date()
     elif type(_date)==date:
         _date = _date

@@ -5,7 +5,7 @@ from wtforms import SubmitField, StringField, SelectField, IntegerField
 from wtforms import RadioField, DateField
 from wtforms.validators import DataRequired
 
-from .finerplan import form_words
+from finerplan import form_words
 from finerplan.sql import generate_categories
 
 

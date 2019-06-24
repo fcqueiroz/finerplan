@@ -3,8 +3,7 @@ import sqlite3
 import pandas as pd
 from dateutil.relativedelta import *
 
-from .finerplan import app, form_words
-from finerplan import dates
+from finerplan import app, dates, form_words
 
 con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
 cur = con.cursor()
