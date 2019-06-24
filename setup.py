@@ -7,6 +7,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'flask',
+        'flask-wtf',
+        'python-dotenv',
     ],
     python_requires='>=3',
     setup_requires=[
