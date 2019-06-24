@@ -1,5 +1,5 @@
 from flask import render_template, flash
-from .forms import AddTransactionForm, TestForm
+from .forms import AddTransactionForm
 
 from finerplan import sql, reports
 from .finerplan import app
@@ -23,20 +23,6 @@ def overview():
     basic_report['name'] = app.config['NAME']
     return render_template('overview.html', title='Overview', form=form,
                            tables=tables, report=basic_report)
-
-
-@app.route('/earnings', methods=['GET', 'POST'])
-def earnings():
-    form = TestForm()
-
-    if form.cat_expense.data:
-        flash("Voce selecionou {}".format(form.cat_expense.data))
-    if form.pay_method.data == 'Dinheiro':
-        flash("Voce selecionou {}".format(form.pay_method.data))
-    if form.submit.data:
-        flash("date: {}. Type: {}".format(form.date.data, type(form.date.data)))
-        flash("categoria: {}. Type: {}".format(form.cat_expense.data, type(form.cat_expense.data)))
-    return render_template('earnings.html', title='Test Zone', form=form)
 
 
 @app.route('/expenses', methods=['GET'])

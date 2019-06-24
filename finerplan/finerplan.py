@@ -7,11 +7,11 @@ app.config.from_object(__name__) # load config from this file
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
-    NAME = os.getenv("LOGNAME").capitalize(),
-    DATABASE = os.path.join(app.root_path, 'finerplan.db'),
-    CREDIT_CLOSING = 11, # Day of month when the credit card invoice closes
-    CREDIT_PAYMENT = 25, # Day of month when the credit card invoice is paid
-    SECRET_KEY = (os.environ.get('SECRET_KEY') or "you-will-never-guess"),
+    NAME=os.getenv("LOGNAME").capitalize(),
+    DATABASE=os.path.join(app.root_path, 'finerplan.db'),
+    CREDIT_CLOSING=11,  # Day of month when the credit card invoice closes
+    CREDIT_PAYMENT=25,  # Day of month when the credit card invoice is paid
+    SECRET_KEY=(os.environ.get('SECRET_KEY') or "you-will-never-guess"),
 ))
 
 # Defines common words used in the forms

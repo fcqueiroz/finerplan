@@ -1,9 +1,10 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from dateutil.relativedelta import *
 
 from .finerplan import app
 
 __MODEL = '%Y-%m-%d'
+
 
 def date_converter(_date):
     if type(_date)==str:
@@ -13,6 +14,7 @@ def date_converter(_date):
     else:
         raise Exception('Wrong Date Type: {}'.format(type(_date)))
     return _date
+
 
 def cash(_date):
     """Returns the date when a certain expense will be
@@ -26,12 +28,14 @@ def cash(_date):
         cash_date = cash_date + relativedelta(months=1)
     return cash_date
 
+
 def credit_state():
     if ((date.today().day > app.config['CREDIT_CLOSING'])
-        and (date.today().day < app.config['CREDIT_PAYMENT'])):
+            and (date.today().day < app.config['CREDIT_PAYMENT'])):
         return True
     else:
         return False
+
 
 def sdate():
     """Creates a dictionary of special dates that is

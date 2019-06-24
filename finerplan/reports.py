@@ -1,8 +1,9 @@
 import locale
-locale.setlocale(locale.LC_ALL, '')
 from finerplan.sql import sum_query, ema
-
 from finerplan import dates
+
+locale.setlocale(locale.LC_ALL, '')
+
 
 def basic():
     """Generates basic reports for Overview page.
@@ -82,7 +83,6 @@ def basic():
                                           grouping=True),
             'lux_rate': locale.format_string('%.2f %%', 100*lux_rate),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
-            'ema': locale.currency(ema(alpha=0.15), grouping=True),
             'dema': locale.currency(ema(kind='double'), grouping=True),
             'suggested_investment': locale.currency(sugg_invest, grouping=True),
             'savings': locale.currency(savings, grouping=True),

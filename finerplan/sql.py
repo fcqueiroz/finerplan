@@ -1,4 +1,3 @@
-import sys
 import math
 import sqlite3
 import pandas as pd
@@ -8,8 +7,8 @@ from .finerplan import app, form_words
 from finerplan import dates
 
 con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
-#con.row_factory = sqlite3.Row
 cur = con.cursor()
+
 
 def sum_query(query_str, query_values):
     cur.execute('SELECT sum(value) FROM ' + query_str, query_values)
@@ -17,6 +16,7 @@ def sum_query(query_str, query_values):
     if not isinstance(result, (int, float)):
         result = 0
     return result
+
 
 def ema(alpha=0.15, beta=0.5, kind='simple'):
     """Calculates Exponential Moving Average
@@ -59,7 +59,7 @@ def ema(alpha=0.15, beta=0.5, kind='simple'):
             trend = result - mov_avg
             mov_avg = result
 
-    while (True):
+    while True:
         month_start = month_ending + relativedelta(days=1)
         month_ending = month_start + relativedelta(day=31)
 
@@ -73,12 +73,12 @@ def ema(alpha=0.15, beta=0.5, kind='simple'):
             elif kind == 'double':
                 return mov_avg + 1 * trend
         if kind == 'simple':
-            #result = result * ((month_ending - month_start).days + 1) / (date.today() - month_start).days
             mov_avg = alpha*result + (1-alpha)*mov_avg
         elif kind == 'double':
             tmp = mov_avg
             mov_avg = alpha * result + (1 - alpha) * (tmp + trend)
             trend = beta * (mov_avg - tmp) + (1 - beta) * trend
+
 
 def transactions_table(kind=None, monthly=True, num=50):
     """Get last transaction entries in any database.
@@ -103,8 +103,7 @@ def transactions_table(kind=None, monthly=True, num=50):
         data_range = ''
 
     if kind == 'expenses':
-        query = ('SELECT pay_method,accrual_date,'
-                     'description,category,sum(value) '
+        query = ('SELECT pay_method,accrual_date,description,category,sum(value) '
                  'FROM expenses '
                  + data_range +
                  'GROUP BY accrual_date, description '
@@ -138,6 +137,7 @@ def last_expenses(num=10):
         (num,))
     return cur.fetchall()
 
+
 def last_earnings():
     """Get all the current month earnings"""
     sdate = dates.sdate()
@@ -150,6 +150,7 @@ def last_earnings():
         (SOCM, SOM))
     return cur.fetchall()
 
+
 def last_investments():
     """Get all the current month investments"""
     sdate = dates.sdate()
@@ -161,6 +162,7 @@ def last_investments():
          'ORDER BY accrual_date DESC, id DESC;'),
         (SOCM, SOM))
     return cur.fetchall()
+
 
 def insert_entry(form):
     """This function takes the information provided
@@ -176,7 +178,7 @@ def insert_entry(form):
     table = form.transaction.data
     if table == 'expenses':
         query_str = (table+' ( pay_method, accrual_date, cash_date, '
-                    'description, category, value) Values(?, ?, ?, ?, ?, ?)')
+                     'description, category, value) Values(?, ?, ?, ?, ?, ?)')
         method = form.pay_method.data
         cat_0 = form.new_cat.data
         if cat_0 == "":
@@ -209,18 +211,21 @@ def insert_entry(form):
         if cat == "":
             cat = form.cat_earning.data
         query_str = (table+' (accrual_date, cash_date, description, '
-                    'category, value) Values(?, ?, ?, ?, ?)')
+                     'category, value) Values(?, ?, ?, ?, ?)')
         query_values = (accrual, cash, descr, cat, t_val)
         cur.execute(('INSERT INTO '+ query_str), query_values)
     elif table == 'brokerage_transfers':
         query_str = (table+' (accrual_date, cash_date, description, '
-                    'value) Values(?, ?, ?, ?)')
+                     'value) Values(?, ?, ?, ?)')
         query_values = (accrual, cash, descr, t_val)
         cur.execute(('INSERT INTO '+ query_str), query_values)
     else:
         return 2  # Unknown table
-    try: con.commit()
-    except: return 1  # Failed to commit changes to database
+    try:
+        con.commit()
+    except:
+        return 1  # Failed to commit changes to database
+
 
 def generate_categories(table='expenses'):
     """Generate a tuple containing all the unique categories."""
@@ -238,6 +243,7 @@ def generate_categories(table='expenses'):
     super_cat = [(row[0], row[0]) for row in cur.fetchall()]
 
     return super_cat
+
 
 def expenses_table(months=13):
     df = pd.DataFrame(columns=['Category'])
@@ -278,8 +284,8 @@ def expenses_table(months=13):
 
 def brokerage_balance():
     query = ('SELECT custodian,sum(value) '
-         'FROM brokerage_transfers '
-         'GROUP BY custodian;')
+             'FROM brokerage_transfers '
+             'GROUP BY custodian;')
     cur.execute(query)
     result = cur.fetchall()
     brokerage_in = pd.DataFrame(result, columns=['custodian', 'input'])
@@ -296,7 +302,7 @@ def brokerage_balance():
     brokerage.rename(columns={'custodian': "Custodiante"}, inplace=True)
     brokerage.fillna(value = 0, inplace=True)
     brokerage["Saldo"] = brokerage.input - brokerage.output
-    brokerage.Saldo = brokerage.Saldo.apply(lambda x: math.ceil(100*x)/100 )
+    brokerage.Saldo = brokerage.Saldo.apply(lambda x: math.ceil(100*x)/100)
     brokerage.drop(['input', 'output'], axis=1, inplace=True)
     brokerage = brokerage.sort_values(by="Saldo", ascending=False)
 
