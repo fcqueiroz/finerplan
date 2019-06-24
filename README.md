@@ -6,9 +6,8 @@ you can focus on how to improve your savings rate and predict when you can set F
 
 ## Disclaimer
 This is my first big project and the program is still in a really early 
-development stage. It's not well suited for any kind of serious work. My main 
-goals are to solve a personal need while I develop skills in programming, 
-project management and other areas.
+development stage. It's not well suited for any kind of serious work. This is a
+learning project before anything else.
 
 ## Getting Started
 
@@ -17,10 +16,13 @@ project management and other areas.
 Create a local copy of the repository in the current folder
 > git clone https://github.com/fcqueiroz/finerplan.git
 
-Export the path to the finerplan.py
+Export the path to reach the application
 > export FLASK_APP=$PWD/finerplan/finerplan.py
 
-Run flask on port 5001
+Install project (running in virtual environment is recommended)
+> pip install finerplan/.
+
+Run flask on port 5001 (or any other port you like)
 > flask run --host=0.0.0.0 --port=5001  
 
 The application will greet you on _http://localhost:5001/_
