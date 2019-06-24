@@ -1,8 +1,7 @@
-*.db
 .eggs/
-notebooks/
-ref/
-BACKLOG_PRODUCT.ods
 .~lock*
 __pycache__/
-srtdash-admin-dashboard
+
+*.db
+notebooks/
+ref/
