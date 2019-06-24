@@ -1,5 +1,6 @@
 import math
 import sqlite3
+from sqlite3 import OperationalError
 import pandas as pd
 from dateutil.relativedelta import *
 
@@ -12,7 +13,7 @@ cur = con.cursor()
 
 def sum_query(query_str, query_values):
     cur.execute('SELECT sum(value) FROM ' + query_str, query_values)
-    result =  cur.fetchone()[0]
+    result = cur.fetchone()[0]
     if not isinstance(result, (int, float)):
         result = 0
     return result
@@ -230,19 +231,16 @@ def insert_entry(form):
 def generate_categories(table='expenses'):
     """Generate a tuple containing all the unique categories."""
 
-    # For future: Option to return a default list of categories
-    # This is specially important when a user is initianing a database
-    if table == 'expenses':
-        query = ('SELECT category,count(category) AS cont FROM expenses '
+    if table in ['expenses', 'earnings']:
+        query = ('SELECT category,count(category) AS cont FROM ? '
                  'GROUP BY category ORDER BY cont DESC;')
-    elif table == 'earnings':
-        query = ('SELECT Category,count(Category) AS cont FROM earnings '
-                 'GROUP BY Category ORDER BY cont DESC;')
 
-    cur.execute(query)
-    super_cat = [(row[0], row[0]) for row in cur.fetchall()]
-
-    return super_cat
+        try:
+            cur.execute(query, table)
+            super_cat = [(row[0], row[0]) for row in cur.fetchall()]
+        except OperationalError:
+            super_cat = ['Category 1', 'Category 2', 'Category 3']
+        return super_cat
 
 
 def expenses_table(months=13):

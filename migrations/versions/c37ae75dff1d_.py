@@ -1,8 +1,8 @@
-"""schema.sql to models.py
+"""empty message
 
-Revision ID: b13b0e28fddb
-Revises: 
-Create Date: 2019-06-24 01:08:28.818178
+Revision ID: c37ae75dff1d
+Revises: 7a9ba651ab5b
+Create Date: 2019-06-24 01:42:47.062261
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b13b0e28fddb'
-down_revision = None
+revision = 'c37ae75dff1d'
+down_revision = '7a9ba651ab5b'
 branch_labels = None
 depends_on = None
 
