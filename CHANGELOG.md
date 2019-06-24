@@ -1,22 +1,40 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.3] - 2019-06-23
 ### Added
-- Assets page now shows the balance on each brokerage account
-- New categories can be added using the regular interface
+- The UI was updated using 
+[SRTdash admin dashboard](https://github.com/puikinsh/srtdash-admin-dashboard) template.
+- New expenses/earnings categories can be added while including a new transaction.
+
+### Fixed
+- The installments variable resets to 1 whenever the payment method or the 
+transaction kind is changed
+
+### Removed
+- Some infos in **Basic Report** (amount available for investing, ema calculation)
 
 ## [0.2] - 2018-02-11
 ### Added
- - Overview shows how much is owed in the next credit card invoice, current month earnings and investments made
+ - Overview shows how much is owed in the next credit card invoice, current month 
+ earnings and investments made
  - 'last expenses' view shows the payment method
  - 'add transaction' form accepts investments and earnings
- - Three payment methods are available; 'Dinheiro' for cash transactions, 'Crédito' for transactions with a credit card and 'Terceiros' (explained below).
+ - Three payment methods are available; 'Dinheiro' for cash transactions, 
+ 'Crédito' for transactions with a credit card and 'Terceiros' (explained below).
  - When using the credit payment method, the number of installments can be included.
- - Expenses paid in credit (and their installments) automatically get the cash date assigned to the payment dates according to the period when the expense ocurred and the date when the invoice closes. 
- - The 'Terceiros' pay method is a way of keeping track of expenses that don't change the cash flow because another person paid for it. When used, an entry of equal value is created on the earnings table
- - Overview now shows debt free balance, last 12 months average expending and  exponential moving average (calculated for all periods) expending.
+ - Expenses paid in credit (and their installments) automatically get the 
+ cash date assigned to the payment dates according to the period when the 
+ expense ocurred and the date when the invoice closes. 
+ - The 'Terceiros' pay method is a way of keeping track of expenses that 
+ don't change the cash flow because another person paid for it. When used, 
+ an entry of equal value is created on the earnings table
+ - Overview now shows debt free balance, last 12 months average expending and 
+ exponential moving average (calculated for all periods) expending.
  - Earnings now accepts categories
- - Expenses page now shows current month transactions and past 6 months expendings separated by category
+ - Expenses page now shows current month transactions and past 6 months 
+ expendings separated by category
 
 ### Changed
  - 'Last expenses' view presents entries by the accrual date in reverse order (most recent on top) and doesn't show the id numbers column anymore
