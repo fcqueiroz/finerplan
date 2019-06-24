@@ -7,7 +7,10 @@ setup(
     include_package_data=True,
     install_requires=[
         'flask',
+        'flask-migrate',
+        'flask-sqlalchemy',
         'flask-wtf',
+        'pandas',
         'python-dotenv',
     ],
     python_requires='>=3',
