@@ -1,12 +1,19 @@
 from datetime import date
 
 from flask_wtf import FlaskForm
-from wtforms import DateField, IntegerField, RadioField, SelectField, \
+from wtforms import BooleanField, DateField, IntegerField, PasswordField, RadioField, SelectField, \
     StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from config import form_words
 from finerplan.sql import generate_categories
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')
 
 
 class AddTransactionForm(FlaskForm):
