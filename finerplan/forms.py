@@ -31,7 +31,7 @@ class AddTransactionForm(FlaskForm):
                                      (form_words['outsourced'], form_words['outsourced'])])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
     new_cat = StringField("New Category")
-    cat_expense = SelectField("Category", default="Mercado", choices = generate_categories('expenses'))
-    cat_earning = SelectField("Category", default="Mercado", choices = generate_categories('earnings'))
+    cat_expense = SelectField("Category", default="Mercado", choices=generate_categories('expenses'))
+    cat_earning = SelectField("Category", default="Mercado", choices=generate_categories('earnings'))
 
     submit = SubmitField("Add it")

@@ -79,8 +79,7 @@ def basic():
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
-            'lux_budget': locale.currency(LUXURY_BUDGET - lux_expenses,
-                                          grouping=True),
+            'lux_budget': locale.currency(LUXURY_BUDGET - lux_expenses, grouping=True),
             'lux_rate': locale.format_string('%.2f %%', 100*lux_rate),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
             'dema': locale.currency(ema(kind='double'), grouping=True),
