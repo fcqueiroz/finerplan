@@ -232,14 +232,13 @@ def generate_categories(table='expenses'):
     """Generate a tuple containing all the unique categories."""
 
     if table in ['expenses', 'earnings']:
-        query = ('SELECT category,count(category) AS cont FROM ? '
-                 'GROUP BY category ORDER BY cont DESC;')
+        query = f'SELECT category,count(category) AS cont FROM {table} GROUP BY category ORDER BY cont DESC;'
 
         try:
-            cur.execute(query, table)
+            cur.execute(query)
             super_cat = [(row[0], row[0]) for row in cur.fetchall()]
         except OperationalError:
-            super_cat = ['Category 1', 'Category 2', 'Category 3']
+            super_cat = [(el, el) for el in ['Category 1', 'Category 2', 'Category 3']]
         return super_cat
 
 
