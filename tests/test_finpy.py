@@ -1,9 +1,10 @@
 # Standard Library
+import os
 import unittest
-# 3rd Party Livraries
+# 3rd Party Libraries
 import sqlite3
 # Local Imports
-from finerplan import app, reports, sql
+from finerplan import app, create_app, reports, sql
 
 
 class TestHome(unittest.TestCase):
@@ -24,6 +25,8 @@ class TestHome(unittest.TestCase):
 
 
 class TestSQL(unittest.TestCase):
+
+    con = None
 
     @classmethod
     def setUpClass(cls):
@@ -90,6 +93,22 @@ class TestReports(unittest.TestCase):
         basic_report = reports.basic()
         self.assertIsInstance(basic_report, dict)
         self.assertEqual(len(basic_report.keys()), 15)
+
+
+class TestAppCreation(unittest.TestCase):
+    def test_environment_creation(self):
+        """For each environment check whether the app loaded the correct configuration"""
+        correct_config = {
+            'testing': {'TESTING': True, 'DEBUG': True},
+            'development': {'TESTING': False, 'DEBUG': True},
+            'production': {'TESTING': False, 'DEBUG': False}
+        }
+        for app_env in correct_config.keys():
+            with self.subTest(app_env=app_env):
+                _app = create_app(config_name=app_env)
+
+                for cfg in correct_config['testing'].keys():
+                    self.assertEqual(_app.config[cfg], correct_config[app_env][cfg])
 
 
 if __name__ == '__main__':

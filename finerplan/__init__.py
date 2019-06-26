@@ -1,13 +1,21 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
-from config import Config
+from config import app_config
 
-app = Flask(__name__)  # create the application instance
-app.config.from_object(Config)  # load config from this file
 
-db = SQLAlchemy(app)
+def create_app(config_name=None):
+    _app = Flask(__name__)
+    _app.config.from_object(app_config(config_name))
+    db.init_app(_app)
+
+    return _app
+
+
+db = SQLAlchemy()
+app = create_app()
 migrate = Migrate(app, db)
+
 
 from finerplan import routes, models

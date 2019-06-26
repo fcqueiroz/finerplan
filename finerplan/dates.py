@@ -1,15 +1,14 @@
 from datetime import date, datetime
 from dateutil.relativedelta import *
 
+from config import date_model
 from finerplan import app
-
-__MODEL = '%Y-%m-%d'
 
 
 def date_converter(_date):
     if type(_date) == str:
-        _date = datetime.strptime(_date, __MODEL).date()
-    elif type(_date)==date:
+        _date = datetime.strptime(_date, date_model).date()
+    elif type(_date) == date:
         _date = _date
     else:
         raise Exception('Wrong Date Type: {}'.format(type(_date)))

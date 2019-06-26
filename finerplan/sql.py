@@ -4,7 +4,7 @@ from sqlite3 import OperationalError
 import pandas as pd
 from dateutil.relativedelta import *
 
-from config import form_words
+from config import date_model, form_words
 from finerplan import app, dates
 
 con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
@@ -96,8 +96,8 @@ def transactions_table(kind=None, monthly=True, num=50):
 
     if monthly:
         sdate = dates.sdate()
-        SOCM = sdate['SOCM'].strftime(dates.__MODEL)
-        SOM = sdate['SOM'].strftime(dates.__MODEL)
+        SOCM = sdate['SOCM'].strftime(date_model)
+        SOM = sdate['SOM'].strftime(date_model)
         data_range = ('WHERE accrual_date >= "' + SOCM +
                       '" and accrual_date < "' + SOM + '" ')
     else:
