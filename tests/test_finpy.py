@@ -7,17 +7,20 @@ from finerplan import app, reports, sql
 
 
 class TestHome(unittest.TestCase):
+
+    pages = ['/', '/overview', '/expenses']
+
     def test_get(self):
-        response = app.test_client().get('/')
-        self.assertEqual(200, response.status_code)
+        for page in self.pages:
+            with self.subTest(page=page):
+                response = app.test_client().get(page)
+                self.assertEqual(200, response.status_code)
 
-    def test_overview(self):
-        response = app.test_client().get('/overview')
-        self.assertEqual(200, response.status_code)
-
-    def test_expenses(self):
-        response = app.test_client().get('/expenses')
-        self.assertEqual(200, response.status_code)
+    def test_content_type(self):
+        for page in self.pages:
+            with self.subTest(page=page):
+                response = app.test_client().get(page)
+                self.assertIn('text/html', response.content_type)
 
 
 class TestSQL(unittest.TestCase):
