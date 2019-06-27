@@ -5,6 +5,7 @@ import unittest
 import sqlite3
 # Local Imports
 from finerplan import app, create_app, db, reports, sql
+from finerplan.models import User
 
 _test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 correct_config = {
@@ -17,6 +18,14 @@ correct_config = {
 }
 
 
+def _check_is_testing_database(database):
+    """Returns true if the database engine is pointing to the testing database"""
+    testing_sqlalchemy_database_uri = 'sqlite:///' + os.path.join(_test_basedir, 'test_fp.db')
+    context_uri = str(database.engine.url)
+
+    return testing_sqlalchemy_database_uri == context_uri
+
+
 class TestHome(unittest.TestCase):
 
     pages = ['/', '/overview', '/expenses']
@@ -25,13 +34,13 @@ class TestHome(unittest.TestCase):
         for page in self.pages:
             with self.subTest(page=page):
                 response = app.test_client().get(page)
-                self.assertEqual(200, response.status_code)
+                self.assertEqual(200, response.status_code, msg=f"wrong status code for '{page}' page")
 
     def test_content_type(self):
         for page in self.pages:
             with self.subTest(page=page):
                 response = app.test_client().get(page)
-                self.assertIn('text/html', response.content_type)
+                self.assertIn('text/html', response.content_type, msg=f"wrong content type for '{page}' page")
 
 
 class TestSQL(unittest.TestCase):
@@ -122,6 +131,39 @@ class TestAppCreation(unittest.TestCase):
                 with _app.app_context():
                     sqlalchemy_database_uri = 'sqlite:///' + correct_config[app_env]['DATABASE']
                     self.assertEqual(str(db.engine.url), sqlalchemy_database_uri)
+
+
+class TestDatabaseOperation(unittest.TestCase):
+    ctx = None
+
+    @classmethod
+    def setUp(cls):
+        _app = create_app('testing')
+        cls.ctx = _app.app_context()
+        cls.ctx.push()
+        db.create_all()
+
+    @classmethod
+    def tearDown(cls):
+        if _check_is_testing_database(db):
+            db.session.remove()
+            db.drop_all()
+        cls.ctx.pop()
+
+    def test_user_table(self):
+        u1 = User(username="john", email="john@example.com")
+        u2 = User(username='susan', email='susan@example.com')
+
+        self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
+
+        db.session.add(u1)
+        db.session.commit()
+        db.session.add(u2)
+        db.session.commit()
+
+        users = User.query.all()
+
+        self.assertEqual(str(users), '[<User john>, <User susan>]', msg="Wrong users representation")
 
 
 if __name__ == '__main__':
