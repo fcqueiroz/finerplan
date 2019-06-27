@@ -1,14 +1,17 @@
 # Standard Library
 import os
 import unittest
+from warnings import warn
 # 3rd Party Libraries
-from flask import url_for, current_app
+from flask import url_for
 import sqlite3
 # Local Imports
-from app import app, create_app, db, reports, sql, routes, models
+from app import create_app, db, reports
 from app.models import User
+from app.sql import SqliteOps
 
 _test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+sql = SqliteOps()
 correct_config = {
     'testing': {'TESTING': True, 'DEBUG': True,
                 'DATABASE': os.path.join(_test_basedir, 'test_fp.db')},
@@ -30,15 +33,19 @@ def _check_is_testing_database(database):
 class TestRouting(unittest.TestCase):
 
     urls = ['/', '/overview', '/expenses']
-    pages = ['overview', 'expenses']
+    pages = ['simple_page.' + p for p in ['overview', 'expenses']]
+
+    @classmethod
+    def setUpClass(cls):
+        _app = create_app('testing')
+        cls.app = _app
 
     def test_get_url(self):
         """Check the 'GET' response is correct based on url route"""
         for url in self.urls:
             with self.subTest(url=url):
-                with app.app_context():
-                    response = app.test_client().get(url)
-
+                with self.app.app_context():
+                    response = self.app.test_client().get(url)
                 self.assertEqual(200, response.status_code, msg=f"wrong status code for '{url}'")
                 self.assertIn('text/html', response.content_type, msg=f"wrong content type for '{url}'")
 
@@ -46,35 +53,30 @@ class TestRouting(unittest.TestCase):
         """Check the 'GET' response is correct based on view name using url_for"""
         for page in self.pages:
             with self.subTest(page=page):
-                with app.app_context():
-                    response = app.test_client().get(url_for(page))
+                with self.app.app_context():
+                    response = self.app.test_client().get(url_for(page))
 
                 self.assertEqual(200, response.status_code, msg=f"wrong status code for '{page}' page")
                 self.assertIn('text/html', response.content_type, msg=f"wrong content type for '{page}' page")
 
 
 class TestSQL(unittest.TestCase):
-
-    con = None
-
     @classmethod
     def setUpClass(cls):
-        cls.con = sqlite3.connect(correct_config['development']['DATABASE'], check_same_thread=False)
+        con = sqlite3.connect(correct_config['development']['DATABASE'], check_same_thread=False)
+        cur = con.cursor()
+        cls.table_category_len = cls.read_from_db(cur)
+        con.close()
 
-        cls.read_from_db(cls.con.cursor())
-
-    @classmethod
-    def read_from_db(cls, cur):
-        cls.table_category_len = {}
+    @staticmethod
+    def read_from_db(cur):
+        table_category_len = {}
         for table in ['expenses', 'earnings']:
             query = f'SELECT category FROM {table} GROUP BY category;'
             cur.execute(query)
             r = cur.fetchall()
-            cls.table_category_len[table] = len(r)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.con.close()
+            table_category_len[table] = len(r)
+        return table_category_len
 
     def test_last_expenses(self):
         r = sql.last_expenses(num=10)
@@ -83,6 +85,8 @@ class TestSQL(unittest.TestCase):
         self.assertLessEqual(len(r), 10)
         if len(r) > 0:
             self.assertEqual(len(r[0]), 5)
+        else:
+            warn(f"Nothing was returned in '{self.test_last_expenses.__name__}' query")
 
     def test_last_earnings(self):
         r = sql.last_earnings()
@@ -90,6 +94,8 @@ class TestSQL(unittest.TestCase):
         self.assertIsInstance(r, list)
         if len(r) > 0:
             self.assertEqual(len(r[0]), 5)
+        else:
+            warn(f"Nothing was returned in '{self.test_last_earnings.__name__}' query")
 
     def test_last_investments(self):
         r = sql.last_investments()
@@ -97,6 +103,8 @@ class TestSQL(unittest.TestCase):
         self.assertIsInstance(r, list)
         if len(r) > 0:
             self.assertEqual(len(r[0]), 4)
+        else:
+            warn(f"Nothing was returned in '{self.test_last_investments.__name__}' query")
 
     def test_generate_categories(self):
         for table in ['expenses', 'earnings']:

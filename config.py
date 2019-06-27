@@ -2,11 +2,15 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-class BaseConfig(object):
-    """Parent configuration class."""
+class UserInfo(object):
+    """Regular information about the default user"""
     NAME = os.getenv("LOGNAME").capitalize()
     CREDIT_CLOSING = 11  # Day of month when the credit card invoice closes
     CREDIT_PAYMENT = 25  # Day of month when the credit card invoice is paid
+
+
+class BaseConfig(object):
+    """Parent configuration class."""
     DEBUG = False
     TESTING = False
     SERVER_NAME = 'localhost:5001'

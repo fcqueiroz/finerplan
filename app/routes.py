@@ -1,10 +1,15 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for, Blueprint
 
-from app import app, sql, reports
+from app import reports
 from app.forms import AddTransactionForm, LoginForm
+from app.sql import SqliteOps
+from config import UserInfo
+
+simple_page = Blueprint('simple_page', __name__, template_folder='templates')
+sql = SqliteOps()
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@simple_page.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -14,8 +19,8 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/overview', methods=['GET', 'POST'])
+@simple_page.route('/', methods=['GET', 'POST'])
+@simple_page.route('/overview', methods=['GET', 'POST'])
 def overview():
     form = AddTransactionForm()
     if form.submit.data:
@@ -29,22 +34,22 @@ def overview():
               'earnings': sql.last_earnings(),
               'investments': sql.last_investments()}
     basic_report = reports.basic()
-    basic_report['name'] = app.config['NAME']
+    basic_report['name'] = UserInfo.NAME
     return render_template('overview.html', title='Overview', form=form,
                            tables=tables, report=basic_report)
 
 
-@app.route('/expenses', methods=['GET'])
+@simple_page.route('/expenses', methods=['GET'])
 def expenses():
-    expenses_table = sql.expenses_table()
-    expenses = sql.transactions_table(kind='expenses')
+    et1 = sql.expenses_table()
+    et2 = sql.transactions_table(kind='expenses')
     return render_template('expenses.html', title='Expenses',
-                           tables=expenses_table, expenses=expenses)
+                           tables=et1, expenses=et2)
 
 
-@app.route('/assets', methods=['GET'])
+@simple_page.route('/assets', methods=['GET'])
 def assets():
-    brokerage_balance = sql.brokerage_balance()
+    balance = sql.brokerage_balance()
 
     return render_template('assets.html', title='Assets',
-                           tables=brokerage_balance)
+                           tables=balance)

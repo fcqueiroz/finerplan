@@ -1,6 +1,6 @@
 import locale
 from app import dates
-from app.sql import sum_query, ema
+from app.sql import SqliteOps
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -16,6 +16,7 @@ def basic():
     """
 
     sdate = dates.sdate()
+    sql = SqliteOps()
     SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
     TODAY, FOLLOWING_NEXT_PAY = sdate['TODAY'], sdate['FOLLOWING_NEXT_PAY']
     M_PROGRESS = sdate['M_PROGRESS']
@@ -29,24 +30,24 @@ def basic():
                                and (accrual_date < ?)
                                and (category = 'Restaurantes'
                                     or category = 'Lazer'));"""
-    lux_expenses = sum_query(query, values)
+    lux_expenses = sql.sum_query(query, values)
     lux_rate = lux_expenses / (LUXURY_BUDGET * M_PROGRESS)
 
     values = (SOCM, SOM)
     query = 'earnings WHERE ((? <= accrual_date) and (accrual_date < ?));'
-    earnings = sum_query(query, values)
+    earnings = sql.sum_query(query, values)
     query = 'expenses WHERE ((? <= accrual_date) and (accrual_date < ?));'
-    expenses = sum_query(query, values)
+    expenses = sql.sum_query(query, values)
 
     savings = earnings - expenses
 
     values = (SOM, '-12 month', SOCM)
     query = ('expenses WHERE ((SELECT date(?, ?) <= accrual_date) '
             'and (accrual_date < ?));')
-    out_12m = sum_query(query, values)
+    out_12m = sql.sum_query(query, values)
     query = ('earnings WHERE ((SELECT date(?, ?) <= accrual_date) '
             'and (accrual_date < ?));')
-    in_12m = sum_query(query, values)
+    in_12m = sql.sum_query(query, values)
     if in_12m == 0:
         savings_rate = "Not available"
     else:
@@ -58,31 +59,31 @@ def basic():
         invoice_state = "Open"
     query = 'expenses WHERE pay_method="Crédito" and cash_date=?'
     values = (FOLLOWING_NEXT_PAY,)
-    next_invoice_value = sum_query(query, values)
+    next_invoice_value = sql.sum_query(query, values)
     values = (NEXT_PAY,)
-    invoice_value = sum_query(query, values)
+    invoice_value = sql.sum_query(query, values)
     query = 'expenses WHERE pay_method="Crédito" and cash_date>=?'
-    total_invoice_debt = sum_query(query, values)
+    total_invoice_debt = sql.sum_query(query, values)
 
     values = (TODAY,)
     query = 'expenses WHERE (cash_date <= ?);'
-    t_gasto = sum_query(query, values)
+    t_gasto = sql.sum_query(query, values)
     query = 'earnings WHERE (cash_date <= ?);'
-    t_renda = sum_query(query, values)
+    t_renda = sql.sum_query(query, values)
     query = 'brokerage_transfers WHERE (cash_date <= ?) AND (origin = ?);'
     values = (TODAY, 'Personal')
-    t_brokerage_transfers = sum_query(query, values)
+    t_brokerage_transfers = sql.sum_query(query, values)
     balance = t_renda - t_gasto - t_brokerage_transfers
     free_balance = balance - total_invoice_debt
     sugg_invest = max((balance - invoice_value
-                       - ema(kind='double') - MIN_TG_BALANCE), 0)
+                       - sql.ema(kind='double') - MIN_TG_BALANCE), 0)
 
     return {'earnings': locale.currency(earnings, grouping=True),
             'expenses': locale.currency(expenses, grouping=True),
             'lux_budget': locale.currency(LUXURY_BUDGET - lux_expenses, grouping=True),
             'lux_rate': locale.format_string('%.2f %%', 100*lux_rate),
             'yr_avg_expenses': locale.currency(out_12m / 12, grouping=True),
-            'dema': locale.currency(ema(kind='double'), grouping=True),
+            'dema': locale.currency(sql.ema(kind='double'), grouping=True),
             'suggested_investment': locale.currency(sugg_invest, grouping=True),
             'savings': locale.currency(savings, grouping=True),
             'savings_rate': savings_rate,
