@@ -9,6 +9,7 @@ class BaseConfig(object):
     CREDIT_PAYMENT = 25  # Day of month when the credit card invoice is paid
     DEBUG = False
     TESTING = False
+    SERVER_NAME = 'localhost:5001'
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

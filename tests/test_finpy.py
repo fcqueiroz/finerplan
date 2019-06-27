@@ -2,6 +2,7 @@
 import os
 import unittest
 # 3rd Party Libraries
+from flask import url_for, current_app
 import sqlite3
 # Local Imports
 from app import app, create_app, db, reports, sql, routes, models
@@ -26,20 +27,29 @@ def _check_is_testing_database(database):
     return testing_sqlalchemy_database_uri == context_uri
 
 
-class TestHome(unittest.TestCase):
+class TestRouting(unittest.TestCase):
 
-    pages = ['/', '/overview', '/expenses']
+    urls = ['/', '/overview', '/expenses']
+    pages = ['overview', 'expenses']
 
-    def test_get(self):
+    def test_get_url(self):
+        """Check the 'GET' response is correct based on url route"""
+        for url in self.urls:
+            with self.subTest(url=url):
+                with app.app_context():
+                    response = app.test_client().get(url)
+
+                self.assertEqual(200, response.status_code, msg=f"wrong status code for '{url}'")
+                self.assertIn('text/html', response.content_type, msg=f"wrong content type for '{url}'")
+
+    def test_get_view(self):
+        """Check the 'GET' response is correct based on view name using url_for"""
         for page in self.pages:
             with self.subTest(page=page):
-                response = app.test_client().get(page)
+                with app.app_context():
+                    response = app.test_client().get(url_for(page))
+
                 self.assertEqual(200, response.status_code, msg=f"wrong status code for '{page}' page")
-
-    def test_content_type(self):
-        for page in self.pages:
-            with self.subTest(page=page):
-                response = app.test_client().get(page)
                 self.assertIn('text/html', response.content_type, msg=f"wrong content type for '{page}' page")
 
 
