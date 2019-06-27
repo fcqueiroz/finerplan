@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, url_for
 
-from finerplan import app, sql, reports
-from finerplan.forms import AddTransactionForm, LoginForm
+from app import app, sql, reports
+from app.forms import AddTransactionForm, LoginForm
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -19,4 +19,4 @@ app = create_app(config_name='development')
 migrate = Migrate(app, db)
 
 
-from finerplan import routes, models
+from app import routes, models

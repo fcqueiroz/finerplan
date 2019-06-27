@@ -1,8 +1,8 @@
 from datetime import date, datetime
 from dateutil.relativedelta import *
 
+from app import app
 from config import date_model
-from finerplan import app
 
 
 def date_converter(_date):

@@ -1,6 +1,6 @@
 import locale
-from finerplan.sql import sum_query, ema
-from finerplan import dates
+from app import dates
+from app.sql import sum_query, ema
 
 locale.setlocale(locale.LC_ALL, '')
 

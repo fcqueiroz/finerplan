@@ -5,8 +5,8 @@ from wtforms import BooleanField, DateField, IntegerField, PasswordField, RadioF
     StringField, SubmitField
 from wtforms.validators import DataRequired
 
+from app.sql import generate_categories
 from config import form_words
-from finerplan.sql import generate_categories
 
 
 class LoginForm(FlaskForm):

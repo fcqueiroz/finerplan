@@ -4,8 +4,8 @@ import unittest
 # 3rd Party Libraries
 import sqlite3
 # Local Imports
-from finerplan import app, create_app, db, reports, sql
-from finerplan.models import User
+from app import app, create_app, db, reports, sql
+from app.models import User
 
 _test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 correct_config = {
