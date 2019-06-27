@@ -17,6 +17,3 @@ def create_app(config_name):
 db = SQLAlchemy()
 app = create_app(config_name='development')
 migrate = Migrate(app, db)
-
-
-from app import routes, models

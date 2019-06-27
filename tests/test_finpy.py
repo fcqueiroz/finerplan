@@ -4,7 +4,7 @@ import unittest
 # 3rd Party Libraries
 import sqlite3
 # Local Imports
-from app import app, create_app, db, reports, sql
+from app import app, create_app, db, reports, sql, routes, models
 from app.models import User
 
 _test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))

@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, routes, models
 from app.models import User
 
 
