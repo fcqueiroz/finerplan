@@ -10,27 +10,30 @@ class BaseConfig(object):
     DEBUG = False
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    DATABASE = os.path.join(basedir, 'finerplan.db')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + DATABASE
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(BaseConfig):
     """Configurations for Development."""
     DEBUG = True
+    DATABASE = os.path.join(basedir, 'dev_fp.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE
 
 
 class TestingConfig(BaseConfig):
     """Configurations for Testing, with a separate test database."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_db'
     DEBUG = True
+    DATABASE = os.path.join(basedir, 'test_fp.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE
 
 
 class ProductionConfig(BaseConfig):
     """Configurations for Production."""
     DEBUG = False
     TESTING = False
+    DATABASE = os.path.join(basedir, 'finerplan.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + DATABASE
 
 
 def app_config(config_name=None):

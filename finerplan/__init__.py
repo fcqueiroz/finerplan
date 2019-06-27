@@ -8,7 +8,8 @@ from config import app_config
 def create_app(config_name=None):
     _app = Flask(__name__)
     _app.config.from_object(app_config(config_name))
-    db.init_app(_app)
+    with _app.app_context():
+        db.init_app(_app)
 
     return _app
 

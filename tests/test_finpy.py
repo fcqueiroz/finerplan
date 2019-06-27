@@ -4,7 +4,17 @@ import unittest
 # 3rd Party Libraries
 import sqlite3
 # Local Imports
-from finerplan import app, create_app, reports, sql
+from finerplan import app, create_app, db, reports, sql
+
+_test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+correct_config = {
+    'testing': {'TESTING': True, 'DEBUG': True,
+                'DATABASE': os.path.join(_test_basedir, 'test_fp.db')},
+    'development': {'TESTING': False, 'DEBUG': True,
+                    'DATABASE': os.path.join(_test_basedir, 'dev_fp.db')},
+    'production': {'TESTING': False, 'DEBUG': False,
+                   'DATABASE': os.path.join(_test_basedir, 'finerplan.db')}
+}
 
 
 class TestHome(unittest.TestCase):
@@ -30,7 +40,7 @@ class TestSQL(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.con = sqlite3.connect('../finerplan.db', check_same_thread=False)
+        cls.con = sqlite3.connect(correct_config['development']['DATABASE'], check_same_thread=False)
 
         cls.read_from_db(cls.con.cursor())
 
@@ -98,17 +108,20 @@ class TestReports(unittest.TestCase):
 class TestAppCreation(unittest.TestCase):
     def test_environment_creation(self):
         """For each environment check whether the app loaded the correct configuration"""
-        correct_config = {
-            'testing': {'TESTING': True, 'DEBUG': True},
-            'development': {'TESTING': False, 'DEBUG': True},
-            'production': {'TESTING': False, 'DEBUG': False}
-        }
         for app_env in correct_config.keys():
             with self.subTest(app_env=app_env):
                 _app = create_app(config_name=app_env)
-
-                for cfg in correct_config['testing'].keys():
+                for cfg in ['TESTING', 'DEBUG']:
                     self.assertEqual(_app.config[cfg], correct_config[app_env][cfg])
+
+    def test_database_engines(self):
+        """Check we are connected to the right database in each environment"""
+        for app_env in correct_config.keys():
+            with self.subTest(app_env=app_env):
+                _app = create_app(config_name=app_env)
+                with _app.app_context():
+                    sqlalchemy_database_uri = 'sqlite:///' + correct_config[app_env]['DATABASE']
+                    self.assertEqual(str(db.engine.url), sqlalchemy_database_uri)
 
 
 if __name__ == '__main__':
