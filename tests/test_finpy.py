@@ -1,4 +1,5 @@
 # Standard Library
+from datetime import datetime
 import os
 import unittest
 from warnings import warn
@@ -7,8 +8,9 @@ from flask import url_for
 import sqlite3
 # Local Imports
 from app import create_app, db, reports
-from app.models import User
+from app.models import User, Transaction
 from app.sql import SqliteOps
+from config import date_model
 
 _test_basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 sql = SqliteOps()
@@ -155,7 +157,7 @@ class TestDatabaseOperation(unittest.TestCase):
     ctx = None
 
     @classmethod
-    def setUp(cls):
+    def setUpClass(cls):
         _app = create_app('testing')
         cls.ctx = _app.app_context()
         cls.ctx.push()
@@ -163,6 +165,10 @@ class TestDatabaseOperation(unittest.TestCase):
 
     @classmethod
     def tearDown(cls):
+        db.session.rollback()
+
+    @classmethod
+    def tearDownClass(cls):
         if _check_is_testing_database(db):
             db.session.remove()
             db.drop_all()
@@ -175,13 +181,32 @@ class TestDatabaseOperation(unittest.TestCase):
         self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
 
         db.session.add(u1)
-        db.session.commit()
         db.session.add(u2)
-        db.session.commit()
 
         users = User.query.all()
 
         self.assertEqual(str(users), '[<User john>, <User susan>]', msg="Wrong users representation")
+
+    def test_transactions_table(self):
+        dt = datetime.strptime('2019-06-25', date_model)
+        t1 = Transaction(value=4.20, accrual_date=dt, description="Bus ticket")
+        t2 = Transaction(value=81.35, accrual_date=dt,
+                         description="I'm a really long but really useful transaction description")
+
+        self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
+
+        db.session.add(t1)
+        db.session.add(t2)
+
+        # Check representation
+        # Descriptions smaller than 24 characters should be printed as they are
+        short_transaction = Transaction.query.get(1)
+        _description = str(short_transaction)
+        self.assertEqual(_description, "<Bus ticket\t(4.2)>")
+        # Descriptions longer than 24 characters should be truncated
+        long_transaction = Transaction.query.get(2)
+        _description = str(long_transaction)
+        self.assertEqual(_description, "<I'm a really long but re..\t(81.35)>")
 
 
 if __name__ == '__main__':

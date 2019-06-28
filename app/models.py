@@ -11,6 +11,17 @@ class User(db.Model):
         return '<User {}>'.format(self.username)
 
 
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Float)
+    description = db.Column(db.Text)
+    accrual_date = db.Column(db.DateTime)
+    cash_date = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
+
+
 class Expenses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pay_method = db.Column(db.String(128))
