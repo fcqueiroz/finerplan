@@ -8,7 +8,7 @@ from flask import url_for
 import sqlite3
 # Local Imports
 from app import create_app, db, reports
-from app.models import User, Transaction
+from app.models import User, Transaction, Account
 from app.sql import SqliteOps
 from config import date_model
 
@@ -22,6 +22,7 @@ correct_config = {
     'production': {'TESTING': False, 'DEBUG': False,
                    'DATABASE': os.path.join(_test_basedir, 'finerplan.db')}
 }
+basic_accounts = ['Generic income sources', 'Generic expenses']
 
 
 def _check_is_testing_database(database):
@@ -163,6 +164,11 @@ class TestDatabaseOperation(unittest.TestCase):
         cls.ctx.push()
         db.create_all()
 
+        # Create table sample data
+        cls.users = cls.create_users()
+        cls.accounts = cls.create_accounts(cls.users)
+        cls.transactions = cls.create_transactions()
+
     @classmethod
     def tearDown(cls):
         db.session.rollback()
@@ -174,29 +180,85 @@ class TestDatabaseOperation(unittest.TestCase):
             db.drop_all()
         cls.ctx.pop()
 
-    def test_user_table(self):
-        u1 = User(username="john", email="john@example.com")
-        u2 = User(username='susan', email='susan@example.com')
+    @staticmethod
+    def create_users():
+        u = [User(username="john", email="john@example.com"),
+             User(username='susan', email='susan@example.com')]
+        return u
 
+    @staticmethod
+    def create_accounts(users):
+        """Create some accounts"""
+        acc = [Account(name='Wallet', owner=users[0]),
+               Account(name='Checking account', owner=users[0]),
+               Account(name='Saving account', owner=users[1])]
+        return acc
+
+    @staticmethod
+    def create_transactions():
+        dt = datetime.strptime('2019-06-25', date_model)
+        t = [Transaction(value=4.20, accrual_date=dt, description="Bus ticket"),
+             Transaction(value=81.35, accrual_date=dt,
+                         description="I'm a really long but really useful transaction description")]
+        return t
+
+    def test_user_table(self):
         self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
 
-        db.session.add(u1)
-        db.session.add(u2)
+        # Include accounts in database
+        for u in self.users:
+            db.session.add(u)
+        db.session.commit()
 
         users = User.query.all()
 
         self.assertEqual(str(users), '[<User john>, <User susan>]', msg="Wrong users representation")
 
-    def test_transactions_table(self):
-        dt = datetime.strptime('2019-06-25', date_model)
-        t1 = Transaction(value=4.20, accrual_date=dt, description="Bus ticket")
-        t2 = Transaction(value=81.35, accrual_date=dt,
-                         description="I'm a really long but really useful transaction description")
-
+    def test_account_ownership(self):
         self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
 
-        db.session.add(t1)
-        db.session.add(t2)
+        # Include accounts in database
+        for acc in self.accounts:
+            db.session.add(acc)
+        db.session.commit()
+
+        # Check accounts owned by the user1
+        u = User.query.get(1)
+        accounts = str(u.accounts.all())
+        self.assertIn('<Account Wallet>', accounts)
+        self.assertIn('<Account Checking account>', accounts)
+        self.assertNotIn('<Account Saving account>', accounts)
+
+        # Check accounts owned by the user2
+        u = User.query.get(2)
+        accounts = str(u.accounts.all())
+        self.assertNotIn('<Account Wallet>', accounts)
+        self.assertNotIn('<Account Checking account>', accounts)
+        self.assertIn('<Account Saving account>', accounts)
+
+    @unittest.skip("Basic account binding not implemented yet")
+    def test_user_basic_account(self):
+        """Ensure that whenever a user is created, some basic accounts are created together"""
+        # Create a user
+        user = self.users[0]
+        db.session.add(user)
+
+        accs = Account.query.all()
+        for a in accs:
+            print(a.id, a.owner.username, a.name)
+
+        # Check these accounts are correctly listed
+        u = User.query.get(1)
+        accounts = str(u.accounts.all())
+        for acc in basic_accounts:
+            self.assertIn(acc, accounts)
+
+    def test_transaction_table(self):
+        self.assertTrue(_check_is_testing_database(db), msg="NOT using test database")
+
+        # Include transactions in database
+        for t in self.transactions:
+            db.session.add(t)
 
         # Check representation
         # Descriptions smaller than 24 characters should be printed as they are

@@ -6,17 +6,33 @@ class User(db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    accounts = db.relationship('Account', backref='owner', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
 
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    #transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Account {self.name}>'
+
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    #account_id_origin = db.Column(db.Integer, db.ForeignKey('account.id'))
+    #account_id_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
+    # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
+    # category_id = db.Column(db.Integer, db.ForeignKey('transaction_category.id'))
     value = db.Column(db.Float)
-    description = db.Column(db.Text)
+    installments = db.Column(db.Integer)
     accrual_date = db.Column(db.DateTime)
     cash_date = db.Column(db.DateTime)
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
