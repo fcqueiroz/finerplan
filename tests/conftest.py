@@ -1,7 +1,7 @@
 # 3rd Party Libraries
 import pytest
 # Local Imports
-from app import create_app, db as _db
+from app import create_app, db
 
 
 @pytest.fixture()
@@ -12,13 +12,13 @@ def app():
 
 @pytest.fixture()
 def client(app):
-    client = app.test_client()
-    yield client
+    with app.app_context():
+        client = app.test_client()
+        yield client
 
 
 @pytest.fixture()
-def db(app):
-    db = _db
+def app_db(app):
     with app.app_context():
         db.create_all()
         yield db

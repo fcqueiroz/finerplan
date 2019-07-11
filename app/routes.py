@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, url_for, Blueprint, request
 
 from app import reports
-from app.forms import AddTransactionForm, LoginForm
+from app.forms import AddTransactionForm, LoginForm, RegisterForm
 from app.sql import SqliteOps
 from config import UserInfo, TestingConfig
 
@@ -23,6 +23,12 @@ def login():
             flash('Login requested for user {}. You were logged in.'.format(username))
             return redirect(url_for('simple_page.overview'))
     return render_template('login.html', title='Sign In', form=form)
+
+
+@simple_page.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    return render_template('register.html', title='Sign Up', form=form)
 
 
 @simple_page.route('/', methods=['GET', 'POST'])

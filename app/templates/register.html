@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }} - FinerPlan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='vendor/images/author/avatar.png') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/bootstrap-4.3.1.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/font-awesome-4.7.0.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/themify-icons.css') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/metisMenu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/slicknav.min.css') }}">
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/typography.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/srtdash-1.0.default.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/srtdash-1.0.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/responsive.css') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <!-- START - jQuery Reference -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
+  <script type='text/javascript'>//<![CDATA[
+    if (typeof jQuery == 'undefined') {
+        document.write(unescape("%3Cscript
+    src='/static/vendor/js/jquery-3.4.1.min.js' type='text/javascript' %3E%3C/script%3E"));
+    }//]]>
+
+  </script>
+  <!-- END - jQuery Reference -->
+
+  <script src="{{ url_for('static', filename='vendor/js/bootstrap-4.3.1.bundle.min.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='vendor/js/metisMenu.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/jquery.slimscroll.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/jquery.slicknav.min.js') }}" defer></script>
+
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js" defer></script>
+  <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js" defer></script>
+  <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js" defer></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js" defer></script>
+  <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js" defer></script>
+
+  <!-- others plugins -->
+  <script src="{{ url_for('static', filename='vendor/js/plugins.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='vendor/js/scripts.js') }}" defer></script>
+</head>
+<body>
+  <div class="login-area">
+    <div class="container">
+      <div class="login-box ptb--100">
+        <form action="" method="post">
+          {{ form.hidden_tag() }}
+          <div class="login-form-head text-white">
+            <h2 class="mb-3">Sign In - FinerPlan</h2>
+            <p>Sign in and start planning your FIRE!</p>
+          </div>
+          <div class="login-form-body">
+            <div class="form-gp">
+              {{ form.username.label }}
+              {{ form.username(size=32) }}
+              {% for error in form.username.errors %}
+                <span>[{{ error }}]</span>
+              {% endfor %}
+            </div>
+            <div class="form-gp">
+              {{ form.email.label }}
+              {{ form.email(size=32) }}
+              {% for error in form.email.errors %}
+                <span>[{{ error }}]</span>
+              {% endfor %}
+            </div>
+            <div class="form-gp">
+              {{ form.password.label }}
+              {{ form.password(size=32) }}
+              {% for error in form.password.errors %}
+                <span>[{{ error }}]</span>
+              {% endfor %}
+            </div>
+            <div class="form-gp">
+              {{ form.password2.label }}
+              {{ form.password2(size=32) }}
+              {% for error in form.password2.errors %}
+                <span>[{{ error }}]</span>
+              {% endfor %}
+            </div>
+
+            {% for message in get_flashed_messages() %}
+              <div class="text-center">{{ message }}</div><br>
+            {% endfor %}
+            <div class="submit-btn-area">
+              {{ form.submit() }}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -30,6 +30,16 @@ class BasicAuth(object):
         ), follow_redirects=True)
 
 
+class RoutingMixin(object):
+    @staticmethod
+    def check_200_status_code(response, url):
+        assert 200 == response.status_code, f"wrong status code for '{url}'"
+
+    @staticmethod
+    def check_content_type(response, url):
+        assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
+
+
 class TestUserAuth(BasicAuth):
     def test_successful_login(self, app, client):
         """Test login using helper functions"""
@@ -51,12 +61,18 @@ class TestUserAuth(BasicAuth):
         assert b'Invalid password' in rv.data
 
 
-class TestUserRegister(BasicAuth):
-    def test_successful_register(self, client, db):
+class TestUserRegister(RoutingMixin, BasicAuth):
+    def test_register_page_exists(self, client):
+        url = '/register'
+        response = client.get(url)
+        self.check_200_status_code(response, url)
+        self.check_content_type(response, url)
+
+    def test_successful_register(self, client, app_db):
         """Tests that a user can register in app"""
         user = 'tester'
         email = user + '@app.com'
         _ = self.register(client, username=user, password='nicepassword', email=email)
 
-        user = db.session.query(User).filter_by(username=user).first()
+        user = app_db.session.query(User).filter_by(username=user).first()
         assert user is not None

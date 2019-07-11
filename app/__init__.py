@@ -3,7 +3,6 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 from config import app_config
-from app.routes import simple_page
 
 # Globally accessible libraries
 db = SQLAlchemy()
@@ -27,3 +26,5 @@ def create_app(config_name):
         _app.register_blueprint(simple_page)
 
     return _app
+
+from app.routes import simple_page
