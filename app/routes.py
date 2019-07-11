@@ -1,9 +1,9 @@
-from flask import flash, redirect, render_template, url_for, Blueprint
+from flask import flash, redirect, render_template, url_for, Blueprint, request
 
 from app import reports
 from app.forms import AddTransactionForm, LoginForm
 from app.sql import SqliteOps
-from config import UserInfo
+from config import UserInfo, TestingConfig
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
 sql = SqliteOps()
@@ -12,10 +12,16 @@ sql = SqliteOps()
 @simple_page.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect(url_for('overview'))
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username != TestingConfig.USERNAME:
+            flash('Invalid username')
+        elif password != TestingConfig.PASSWORD:
+            flash('Invalid password')
+        else:
+            flash('Login requested for user {}. You were logged in.'.format(username))
+            return redirect(url_for('simple_page.overview'))
     return render_template('login.html', title='Sign In', form=form)
 
 

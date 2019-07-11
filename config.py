@@ -1,4 +1,5 @@
 import os
+import tempfile
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -13,7 +14,6 @@ class BaseConfig(object):
     """Parent configuration class."""
     DEBUG = False
     TESTING = False
-    SERVER_NAME = 'localhost:5001'
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -21,22 +21,26 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     """Configurations for Development."""
     DEBUG = True
-    DATABASE = os.path.join(basedir, 'dev_fp.db')
+    DATABASE = os.path.join(basedir, 'old.db')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE
 
 
 class TestingConfig(BaseConfig):
     """Configurations for Testing, with a separate test database."""
-    TESTING = True
     DEBUG = True
-    DATABASE = os.path.join(basedir, 'test_fp.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE
+    TESTING = True
+    SERVER_NAME = 'localhost.localdomain'
+    DATABASE = tempfile.NamedTemporaryFile(suffix='_test.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE.name
+    USERNAME = 'admin'
+    PASSWORD = 'admin'
 
 
 class ProductionConfig(BaseConfig):
     """Configurations for Production."""
     DEBUG = False
     TESTING = False
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     DATABASE = os.path.join(basedir, 'finerplan.db')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + DATABASE
 

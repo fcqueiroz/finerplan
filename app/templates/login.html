@@ -89,6 +89,9 @@
                 <a href="#">Forgot Password?</a>
               </div>
             </div>
+            {% for message in get_flashed_messages() %}
+              <div class="text-center">{{ message }}</div><br>
+            {% endfor %}
             <div class="submit-btn-area">
               {{ form.submit() }}
             </div>

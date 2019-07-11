@@ -9,8 +9,8 @@ import pandas as pd
 from app import dates
 from config import date_model, form_words, basedir
 
-# Temporarily connects only to development database
-database = os.path.join(basedir, 'dev_fp.db')
+# Temporarily connects only to the old database (until we can move all functions to new database)
+database = os.path.join(basedir, 'old.db')
 con = sqlite3.connect(database, check_same_thread=False)
 cur = con.cursor()
 
