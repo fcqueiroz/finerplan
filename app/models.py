@@ -16,16 +16,16 @@ class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    #transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
+    # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Account {self.name}>'
+        return f'<Account {self.owner.username}\'s {self.name}>'
 
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    #account_id_origin = db.Column(db.Integer, db.ForeignKey('account.id'))
-    #account_id_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
+    # account_id_origin = db.Column(db.Integer, db.ForeignKey('account.id'))
+    # account_id_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     # category_id = db.Column(db.Integer, db.ForeignKey('transaction_category.id'))
     value = db.Column(db.Float)
