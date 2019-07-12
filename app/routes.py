@@ -1,8 +1,10 @@
 from flask import flash, redirect, render_template, url_for, Blueprint, request
-
+from flask_login import current_user
 from app import reports
+from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
 from app.sql import SqliteOps
+from app.models import User
 from config import UserInfo, TestingConfig
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
@@ -27,7 +29,15 @@ def login():
 
 @simple_page.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('simple_page.overview'))
     form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('simple_page.login'))
     return render_template('register.html', title='Sign Up', form=form)
 
 

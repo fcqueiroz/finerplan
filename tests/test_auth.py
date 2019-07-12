@@ -26,6 +26,7 @@ class BasicAuth(object):
         return client.post('/register', data=dict(
             username=username,
             password=password,
+            password2=password,
             email=email
         ), follow_redirects=True)
 
@@ -72,7 +73,10 @@ class TestUserRegister(RoutingMixin, BasicAuth):
         """Tests that a user can register in app"""
         user = 'tester'
         email = user + '@app.com'
-        _ = self.register(client, username=user, password='nicepassword', email=email)
+        password = 'nicepassword'
+        _ = self.register(client, username=user, password=password, email=email)
 
         user = app_db.session.query(User).filter_by(username=user).first()
         assert user is not None
+
+

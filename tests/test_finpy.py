@@ -48,9 +48,10 @@ class TestRouting(unittest.TestCase):
 
 
 class TestSQL(unittest.TestCase):
+    """This class tests the code used for managing the old database, currently in production"""
     @classmethod
     def setUpClass(cls):
-        con = sqlite3.connect(app_config(config_name='development').DATABASE, check_same_thread=False)
+        con = sqlite3.connect(app_config(config_name='production').DATABASE, check_same_thread=False)
         cur = con.cursor()
         cls.table_category_len = cls.read_from_db(cur)
         con.close()
@@ -68,8 +69,8 @@ class TestSQL(unittest.TestCase):
     def test_last_expenses(self):
         r = sql.last_expenses(num=10)
 
-        self.assertIsInstance(r, list)
-        self.assertLessEqual(len(r), 10)
+        assert isinstance(r, list)
+        assert len(r) <= 10
         if len(r) > 0:
             assert len(r[0]) == 5
         else:
@@ -78,7 +79,7 @@ class TestSQL(unittest.TestCase):
     def test_last_earnings(self):
         r = sql.last_earnings()
 
-        self.assertIsInstance(r, list)
+        assert isinstance(r, list)
         if len(r) > 0:
             assert len(r[0]) == 5
         else:
@@ -87,7 +88,7 @@ class TestSQL(unittest.TestCase):
     def test_last_investments(self):
         r = sql.last_investments()
 
-        self.assertIsInstance(r, list)
+        assert isinstance(r, list)
         if len(r) > 0:
             assert len(r[0]) == 4
         else:
@@ -97,13 +98,13 @@ class TestSQL(unittest.TestCase):
         for table in ['expenses', 'earnings']:
             with self.subTest(table=table):
                 r = sql.generate_categories(table)
-                self.assertIsInstance(r, list)
+                assert isinstance(r, list)
                 assert len(r) == self.table_category_len[table]
 
                 if self.table_category_len[table] > 0:
                     row = r[0]
 
-                    self.assertIsInstance(row, tuple)
+                    assert isinstance(row, tuple)
                     assert len(row) == 2
                     assert row[0] == row[1]
                 else:
@@ -115,7 +116,7 @@ class TestSQL(unittest.TestCase):
 class TestReports(unittest.TestCase):
     def test_basic(self):
         basic_report = reports.basic()
-        self.assertIsInstance(basic_report, dict)
+        assert isinstance(basic_report, dict)
         assert len(basic_report.keys()) == 15
 
 
@@ -165,16 +166,6 @@ class TestDatabaseOperation(unittest.TestCase):
              Transaction(value=81.35, accrual_date=dt,
                          description="I'm a really long but really useful transaction description")]
         return t
-
-    def test_user_table(self):
-        # Include accounts in database
-        for u in self.users:
-            db.session.add(u)
-        db.session.commit()
-
-        users = User.query.all()
-
-        assert str(users) == '[<User john>, <User susan>]', "Wrong users representation"
 
     @unittest.skip("This method is being refatored")
     def test_account_ownership(self):

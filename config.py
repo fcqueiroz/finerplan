@@ -21,7 +21,7 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     """Configurations for Development."""
     DEBUG = True
-    DATABASE = os.path.join(basedir, 'old.db')
+    DATABASE = os.path.join(basedir, 'dev.db')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE
 
 
@@ -34,6 +34,7 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE.name
     USERNAME = 'admin'
     PASSWORD = 'admin'
+    WTF_CSRF_ENABLED = False
 
 
 class ProductionConfig(BaseConfig):
@@ -41,7 +42,7 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    DATABASE = os.path.join(basedir, 'finerplan.db')
+    DATABASE = os.path.join(basedir, 'old.db')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + DATABASE
 
 
