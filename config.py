@@ -32,8 +32,6 @@ class TestingConfig(BaseConfig):
     SERVER_NAME = 'localhost.localdomain'
     DATABASE = tempfile.NamedTemporaryFile(suffix='_test.db')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE.name
-    USERNAME = 'admin'
-    PASSWORD = 'admin'
     WTF_CSRF_ENABLED = False
 
 

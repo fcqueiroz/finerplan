@@ -1,11 +1,12 @@
 from flask import flash, redirect, render_template, url_for, Blueprint, request
-from flask_login import current_user
+from flask_login import current_user, login_user
+from werkzeug.urls import url_parse
 from app import reports
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
 from app.sql import SqliteOps
 from app.models import User
-from config import UserInfo, TestingConfig
+from config import UserInfo
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
 sql = SqliteOps()
@@ -13,17 +14,23 @@ sql = SqliteOps()
 
 @simple_page.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('simple_page.overview'))
     form = LoginForm()
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username != TestingConfig.USERNAME:
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None:
             flash('Invalid username')
-        elif password != TestingConfig.PASSWORD:
+            next_page = url_for('simple_page.login')
+        elif not user.check_password(form.password.data):
             flash('Invalid password')
+            next_page = url_for('simple_page.login')
         else:
-            flash('Login requested for user {}. You were logged in.'.format(username))
-            return redirect(url_for('simple_page.overview'))
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('simple_page.overview')
+        return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
 

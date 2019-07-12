@@ -1,18 +1,10 @@
-from setuptools import setup
+import setuptools
 
-setup(
+setuptools.setup(
     name='finerplan',
     version='0.3',
-    packages=['app'],
+    packages=setuptools.find_packages(),
     include_package_data=True,
-    install_requires=[
-        'flask',
-        'flask-migrate',
-        'flask-sqlalchemy',
-        'flask-wtf',
-        'pandas',
-        'python-dotenv',
-    ],
     python_requires='>=3',
     setup_requires=[
         'pytest-runner',
