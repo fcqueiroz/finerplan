@@ -12,11 +12,39 @@ from config import form_words
 sql = SqliteOps()
 
 
+class CorrectPassword(object):
+    """
+    Checks if the password is correct when the username is valid.
+
+    :param username:
+        The name of the username field.
+    :param message:
+        Error message to raise in case of a validation error.
+    """
+    def __init__(self, username, message=None):
+        self.username = username
+        if not message:
+            message = u'Invalid password'
+        self.message = message
+
+    def __call__(self, form, field):
+        username = form[self.username]
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            if not user.check_password(field.data):
+                raise ValidationError(self.message)
+
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), CorrectPassword('username')])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is None:
+            raise ValidationError('Invalid username')
 
 
 class RegisterForm(FlaskForm):
