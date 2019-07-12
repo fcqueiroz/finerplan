@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, url_for, Blueprint, request
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from app import reports
 from app import db
@@ -32,6 +32,12 @@ def login():
                 next_page = url_for('simple_page.overview')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
+
+
+@simple_page.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('simple_page.login'))
 
 
 @simple_page.route('/register', methods=['GET', 'POST'])

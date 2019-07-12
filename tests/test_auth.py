@@ -56,7 +56,6 @@ class TestUserAuth(BasicAuth):
             self.login(client, self.user, self.password)
             assert self.user in str(current_user)
 
-    @pytest.mark.skip()
     def test_successful_logout(self, client, db_with_created_user):
         with client:
             self.login(client, self.user, self.password)
