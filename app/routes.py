@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, url_for, Blueprint, request
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import reports
 from app import db
@@ -56,6 +56,7 @@ def register():
 
 @simple_page.route('/', methods=['GET', 'POST'])
 @simple_page.route('/overview', methods=['GET', 'POST'])
+@login_required
 def overview():
     form = AddTransactionForm()
     if form.submit.data:
@@ -75,6 +76,7 @@ def overview():
 
 
 @simple_page.route('/expenses', methods=['GET'])
+@login_required
 def expenses():
     et1 = sql.expenses_table()
     et2 = sql.transactions_table(kind='expenses')
@@ -83,6 +85,7 @@ def expenses():
 
 
 @simple_page.route('/assets', methods=['GET'])
+@login_required
 def assets():
     balance = sql.brokerage_balance()
 

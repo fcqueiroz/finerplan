@@ -9,6 +9,7 @@ from config import app_config
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
+login.login_view = 'simple_page.login'
 
 
 def create_app(config_name):
