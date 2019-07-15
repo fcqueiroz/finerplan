@@ -34,3 +34,4 @@ nosetests.xml
 *.db
 notebooks/
 ref/
+logs/
