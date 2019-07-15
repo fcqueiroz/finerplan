@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+  <div class="sidebar-menu">
+    <div class="sidebar-header">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='images/icon/logo.png') }}" alt="FinerPlan">
+      </div>
+    </div>
+    <div class="main-menu">
+      <div class="menu-inner">
+        <nav>
+          <ul class="metismenu" id="menu">
+            <li class="active">
+              <a href="javascript:void(0)" aria-expanded="true"><i class="ti-dashboard"></i><span>dashboard</span></a>
+              <ul class="collapse">
+                <li><a href="{{ url_for('simple_page.overview') }}">Overview</a></li>
+                <li><a href="{{ url_for('simple_page.expenses') }}">Expenses</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="header-area">
+      <div class="row align-items-center">
+        <div class="col-md-6 col-sm-8 clearfix">
+          <div class="nav-btn pull-left">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="search-box pull-left">
+            <form action="#">
+              <input type="text" name="search" placeholder="Search..." required>
+              <i class="ti-search"></i>
+            </form>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-4 clearfix">
+          <div class="notification-area pull-right">
+            <div class="dropdown">
+              <div class="dropdown-toggle" data-toggle="dropdown">
+                <img class="avatar" src="{{ url_for('static', filename='vendor/images/author/avatar.png') }}" alt="avatar">
+                {% if get_flashed_messages()|length > 0 %}
+                <span>{{get_flashed_messages()|length}}</span>
+                {% endif %}
+              </div>
+              <div class="dropdown-menu bell-notify-box notify-box">
+                <span class="notify-title">You have {{get_flashed_messages()|length}} new notifications <a href="#">view all</a></span>
+                <div class="nofity-list">
+                  <ul>
+                    {% for message in get_flashed_messages() %}
+                    <li class=flash>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown pl-3">
+              <h4 class="dropdown-toggle" data-toggle="dropdown">{{ current_user.username }} <i class="fa fa-angle-down"></i></h4>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Settings</a>
+                <a class="dropdown-item" href="{{ url_for('simple_page.logout') }}">Log Out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="main-content-inner">
+      {% block dashboard %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
