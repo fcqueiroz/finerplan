@@ -24,9 +24,10 @@ def create_app(config_name):
 
     with _app.app_context():
         # Include routes
-        from . import routes
+        from . import routes, error_handlers
 
         # Register blueprints
         _app.register_blueprint(routes.simple_page)
+        _app.register_blueprint(error_handlers.blueprint)
 
     return _app
