@@ -30,8 +30,7 @@ class TestingConfig(BaseConfig):
     DEBUG = True
     TESTING = True
     SERVER_NAME = 'localhost.localdomain'
-    DATABASE = tempfile.NamedTemporaryFile(suffix='_test.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE.name
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
     WTF_CSRF_ENABLED = False
 
 

@@ -18,16 +18,46 @@ class User(UserMixin, db.Model):
         self.username = username
         self.email = email
 
+        # Create fundamental accounts
+        for account in fundamental_accounts().values():
+            self.create_account(account)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def create_account(self, account):
+        if not self.has_account(account):
+            self.accounts.append(account)
+
+    def owned_accounts(self):
+        return Account.query.filter_by(user_id=self.id)
+
+    def has_account(self, other_account):
+        accounts = self.owned_accounts()
+        return accounts.filter_by(name=other_account.name).count() == 1
+
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+def fundamental_accounts():
+    """Creates the 5 fundamental accounts according to basic accounting rules
+
+    ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
+    """
+    accounts = {
+        'assets': Account(name='Assets'),
+        'liabilities': Account(name='Liabilities'),
+        'equity': Account(name='Equity'),
+        'income': Account(name='Income'),
+        'expenses': Account(name='Expenses')
+    }
+    return accounts
 
 
 class Account(db.Model):
@@ -37,7 +67,10 @@ class Account(db.Model):
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
     def __repr__(self):
-        return f'<Account {self.owner.username}\'s {self.name}>'
+        try:
+            return f'<Account {self.owner.username}\'s {self.name}>'
+        except AttributeError:
+            return f'<Account Unclaimed {self.name}>'
 
 
 class Transaction(db.Model):

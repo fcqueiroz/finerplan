@@ -167,44 +167,6 @@ class TestDatabaseOperation(unittest.TestCase):
                          description="I'm a really long but really useful transaction description")]
         return t
 
-    @unittest.skip("This method is being refatored")
-    def test_account_ownership(self):
-        # Include accounts in database
-        for acc in self.accounts:
-            db.session.add(acc)
-        db.session.commit()
-
-        # Check accounts owned by the user1
-        u = User.query.get(1)
-        accounts = str(u.accounts.all())
-        assert '<Account Wallet>' in accounts
-        assert '<Account Checking account>' in accounts
-        assert '<Account Saving account>' not in accounts
-
-        # Check accounts owned by the user2
-        u = User.query.get(2)
-        accounts = str(u.accounts.all())
-        assert '<Account Wallet>' not in accounts
-        assert '<Account Checking account>' not in accounts
-        assert '<Account Saving account>' in accounts
-
-    @unittest.skip("Basic account binding not implemented yet")
-    def test_user_basic_account(self):
-        """Ensure that whenever a user is created, some basic accounts are created together"""
-        # Create a user
-        user = self.users[0]
-        db.session.add(user)
-
-        accs = Account.query.all()
-        for a in accs:
-            print(a.id, a.owner.username, a.name)
-
-        # Check these accounts are correctly listed
-        u = User.query.get(1)
-        accounts = str(u.accounts.all())
-        for acc in basic_accounts:
-            assert acc in accounts
-
     def test_transaction_table(self):
         # Include transactions in database
         for t in self.transactions:
