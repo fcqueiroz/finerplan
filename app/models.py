@@ -82,8 +82,9 @@ class Transaction(db.Model):
     value = db.Column(db.Float)
     installments = db.Column(db.Integer)
     accrual_date = db.Column(db.DateTime)
-    cash_date = db.Column(db.DateTime)
+    # cash_date = db.Column(db.DateTime)
     description = db.Column(db.Text)
+    kind = db.Column(db.String(64))
 
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
