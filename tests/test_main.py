@@ -15,6 +15,15 @@ class TestUserAccounting(BasicAuth):
         user = User.query.filter_by(username=self.test_user['username']).first()
         assert user.accounts.count() == 5
 
+    @pytest.mark.parametrize('kind', ('expenses', 'income'))
+    def test_get_categories(self, app_db, kind):
+        """Ensures that any user has a list of transaction's categories"""
+        self.create_test_user(app_db)
+        user = User.query.filter_by(username=self.test_user['username']).first()
+
+        categories = user.get_categories(kind=kind)
+        assert len(categories) > 0
+
 
 class TestTransaction(object):
     @pytest.mark.parametrize(('kind', 'value', 'date', 'description'), [

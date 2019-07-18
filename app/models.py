@@ -39,6 +39,28 @@ class User(UserMixin, db.Model):
         accounts = self.owned_accounts()
         return accounts.filter_by(name=other_account.name).count() == 1
 
+    def get_categories(self, kind):
+        """Returns a list of already created categories by the user for a certain kind of transaction"""
+
+        # Temporarily uses a hard-coded list of categories (until the other functionalities are implemented
+        hard_categories = {
+            'expenses': [
+                'Housing - Rent', 'Housing - Furniture', 'Housing - Maintenance', 'Housing - Utilities',
+                'Electronic devices - Phone', 'Electronic devices - Computer',
+                'Personal care - Cosmetics', 'Personal care - Hairdresser', 'Personal care - Hair removal',
+                'Personal care - Clothing',
+                'Education - Courses', 'Education - Supplies', 'Education - Books',
+                'Business',
+                'Leisure - General', 'Leisure - Hobbies', 'Leisure - Vacation',
+                'Food - Groceries', 'Food - Restaurants',
+                'Other - Uncategorized', 'Other - Gifts and donations',
+                'Health - Pharmacy', 'Health - Special care', 'Health - Doctors', 'Health - Medicine',
+                'Transportation - Auto', 'Transportation - Public', 'Transportation - Taxi', 'Transportation - Travel'
+            ],
+            'income': ['Scholarship', 'Paycheck', 'Subsidy', 'Other', 'Business']
+        }
+        return hard_categories[kind]
+
 
 @login.user_loader
 def load_user(id):
