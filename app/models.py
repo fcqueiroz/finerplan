@@ -19,8 +19,15 @@ class User(UserMixin, db.Model):
         self.email = email
 
         # Create fundamental accounts
-        for account in fundamental_accounts().values():
-            self.create_account(account)
+        for account_name, account_object in fundamental_accounts().items():
+            self.create_account(account_object)
+            setattr(self, account_name, account_object)
+
+    @db.reconstructor
+    def init_on_load(self):
+        for account_name in fundamental_accounts().keys():
+            account_object = Account.query.filter_by(user_id=self.id, name=account_name.capitalize())
+            setattr(self, account_name, account_object)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -76,13 +83,9 @@ def fundamental_accounts():
 
     ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
     """
-    accounts = {
-        'assets': Account(name='Assets'),
-        'liabilities': Account(name='Liabilities'),
-        'equity': Account(name='Equity'),
-        'income': Account(name='Income'),
-        'expenses': Account(name='Expenses')
-    }
+
+    accounts = {name: Account(name=name.capitalize())
+                for name in ['assets', 'liabilities', 'equity', 'income', 'expenses']}
     return accounts
 
 

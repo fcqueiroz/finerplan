@@ -3,15 +3,14 @@ from datetime import datetime, timedelta
 # 3rd Party Libraries
 import pytest
 # Local Imports
-from app.models import User, Transaction
+from app.models import User, Transaction, fundamental_accounts
 from tests.test_auth import BasicAuth
 
 
 class TestUserAccounting(BasicAuth):
     def test_user_has_5_fundamental_accounts(self, app_db):
-        """Ensure that whenever a user is created, the 5 fundamental accounts are created as well"""
+        """Ensures that whenever a user is created, the 5 fundamental accounts are created as well"""
         self.create_test_user(app_db)
-
         user = User.query.filter_by(username=self.test_user['username']).first()
         assert user.accounts.count() == 5
 
@@ -23,6 +22,23 @@ class TestUserAccounting(BasicAuth):
 
         categories = user.get_categories(kind=kind)
         assert len(categories) > 0
+
+    def test_user_has_fundamental_accounts_as_permanent_categories(self, app_db):
+        """Ensures that the fundamental accounts are available as user instance's properties"""
+        self.create_test_user(app_db)
+
+        # Test within session
+        user = User.query.filter_by(username=self.test_user['username']).first()
+        for account in fundamental_accounts().keys():
+            assert hasattr(user, account)
+            print(user.__getattribute__(account))
+
+        # Test outside session
+        app_db.session.commit()
+        app_db.session.remove()
+        user = User.query.filter_by(username=self.test_user['username']).first()
+        for account in fundamental_accounts().keys():
+            assert hasattr(user, account)
 
 
 class TestTransaction(object):
