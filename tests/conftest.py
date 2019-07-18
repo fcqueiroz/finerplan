@@ -21,7 +21,7 @@ def app_db(app):
     with app.app_context():
         db.create_all()
         yield db
-        db.session.rollback()
+        db.drop_all()
 
 
 class RoutingMixin(object):
