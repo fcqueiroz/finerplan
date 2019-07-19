@@ -1,3 +1,4 @@
+import logging
 from flask import flash, redirect, render_template, url_for, Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
@@ -5,7 +6,7 @@ from app import reports
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
 from app.sql import SqliteOps
-from app.models import User
+from app.models import User, Transaction
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
 sql = SqliteOps()
@@ -55,11 +56,24 @@ def register():
 @login_required
 def overview():
     form = AddTransactionForm()
+    form.transaction_kind.choices = [(kind.lower(), kind) for kind in ['Income', 'Expenses']]
+    user_accounts = current_user.get_subaccounts(['Equity', 'Assets', 'Liabilities', 'Expenses', 'Income'])
+    user_accounts_choices = [(account.id, '') for account in user_accounts]
+    form.account_source.choices = user_accounts_choices
+    form.account_destination.choices = user_accounts_choices
 
-    # Dinamically populate
-    form.transaction.choices = [(kind.lower(), kind) for kind in ['Income', 'Expenses']]
-
+    if request.method == 'POST':
+        form.validate()
+        errors = form.errors
+        if errors:
+            logging.error(errors)
+            print(form.data)
     if form.validate_on_submit():
+        transaction = form.data
+        del transaction['transaction_kind']
+        del transaction['submit']
+        transaction = Transaction(**transaction)
+        db.session.add(transaction)
         return redirect(url_for('simple_page.overview'))
 
     tables = {'expenses': sql.last_expenses(),

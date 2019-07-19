@@ -2,7 +2,7 @@
 import pytest
 # Local Imports
 from app import create_app, db
-from app.models import User
+from app.models import User, Transaction
 
 
 @pytest.fixture(scope='session')
@@ -35,12 +35,16 @@ class RoutingMixin(object):
         assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
 
 
-class UserMixin(object):
+class DatabaseMixin(object):
     test_user = {
         'username': 'tester',
         'email': 'tester@app.com',
-        'password': 'nicepassword'
-    }
+        'password': 'nicepassword'}
+    transaction = {
+        'value': 1200,
+        'description': 'Regular Salary',
+        'account_source': 1,
+        'account_destination': 2}
 
     def create_test_user(self, _db, test_user=None):
         if test_user is None:
@@ -67,3 +71,8 @@ class UserMixin(object):
             self.create_test_user(db)
             yield db
             db.session.rollback()
+
+    def create_transaction(self, _db, transaction=None):
+        if transaction is None:
+            transaction = self.transaction
+        _db.session.add(Transaction(**transaction))

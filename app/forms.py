@@ -63,10 +63,10 @@ class RegisterForm(FlaskForm):
 
 class AddTransactionForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
-    date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
+    accrual_date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
     value = StringField("Value", validators=[DataRequired()])
-    transaction = RadioField("Type of Transaction", validators=[DataRequired()], choices=[])
+    transaction_kind = RadioField("Type of Transaction", validators=[DataRequired()], choices=[])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
-    account_source = SelectField('Source Account', choices=[])
-    account_destination = SelectField('Destination Account', choices=[])
+    account_source = SelectField('Source Account', validators=[DataRequired()], choices=[], coerce=int)
+    account_destination = SelectField('Destination Account', validators=[DataRequired()], choices=[], coerce=int)
     submit = SubmitField("Add it")

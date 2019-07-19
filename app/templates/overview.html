@@ -46,9 +46,9 @@
           </div>
           <!-- Transaction Date -->
           <div class="form-row form-group">
-            {{ form.date.label(class_="col-form-label") }}
-            {{ form.date(class_="form-control", type="date") }}
-            {% for error in form.date.errors %}
+            {{ form.accrual_date.label(class_="col-form-label") }}
+            {{ form.accrual_date(class_="form-control", type="date") }}
+            {% for error in form.accrual_date.errors %}
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
@@ -62,16 +62,16 @@
           </div>
           <!-- Transaction kind -->
           <div id="transactionKind" class="form-row justify-content-center">
-            {{ form.transaction.label(class_="col-form-label col-12 mt-2") }}
+            {{ form.transaction_kind.label(class_="col-form-label col-12 mt-2") }}
             <div class="flex-fill text-center">
-            {% for subfield in form.transaction %}
+            {% for subfield in form.transaction_kind %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
                 {{ subfield.label(class_="custom-control-label") }}
               </div>
             {% endfor %}
             </div>
-            {% for error in form.transaction.errors %}
+            {% for error in form.transaction_kind.errors %}
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
@@ -84,7 +84,7 @@
             {% endfor %}
           </div>
           <!-- Transaction Destination Account -->
-          <div class="form-row form-grouṕ">
+          <div class="form-row form-group">
             {{ form.account_destination.label(class_="col-form-label") }}
             {{ form.account_destination(class_="custom-select") }}
             {% for error in form.account_destination.errors %}

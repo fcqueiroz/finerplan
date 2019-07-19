@@ -1,15 +1,15 @@
 # Standard Library
-from datetime import datetime, timedelta
 import itertools
 # 3rd Party Libraries
 import pytest
 # Local Imports
 from app.models import User, Transaction, Account
 from config import default_account_categories, fundamental_accounts
-from tests.conftest import UserMixin
+from tests.conftest import DatabaseMixin
+from tests.test_auth import BasicAuth
 
 
-class TestUserAccounting(UserMixin):
+class TestUserAccounting(DatabaseMixin):
     def test_create_account_level_0(self, app_db):
         """Tests that User's create_account method is able to create a
         level-0 account (ie an account without a parent)"""
@@ -83,13 +83,25 @@ class TestUserAccounting(UserMixin):
             assert acc.name in acc.fullname
 
 
-class TestTransaction(object):
-    @pytest.mark.parametrize(('kind', 'value', 'date', 'description'), [
-        ('expenses', 15.80, datetime.now(), "I'm a really long but really useful expense description"),
-        ('income', 1200, datetime.now() + timedelta(days=-1), "Regular Salary")
-    ])
-    def test_insert_transaction(self, app_db, kind, value, date, description):
+class BasicTransaction(BasicAuth):
+    def submit_transation(self, client, transaction=None):
+        if transaction is None:
+            transaction = self.transaction
+            transaction['transaction_kind'] = 'expenses'
+        return client.post('/overview', data=dict(**transaction), follow_redirects=True)
+
+
+class TestTransaction(BasicTransaction):
+    def test_insert_transaction_directly_into_db(self, app_db):
         assert Transaction.query.count() == 0
-        transaction = Transaction(value=value, description=description, accrual_date=date, kind=kind)
-        app_db.session.add(transaction)
+        self.create_transaction(app_db)
+        assert Transaction.query.count() == 1
+
+    def test_insert_transaction_through_form(self, client, user_with_default_accounts):
+        assert Transaction.query.count() == 0
+        user = user_with_default_accounts
+        with client:
+            self.login(client)
+            self.submit_transation(client)
+
         assert Transaction.query.count() == 1

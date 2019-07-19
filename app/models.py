@@ -88,8 +88,8 @@ class User(UserMixin, db.Model):
 
 
 @login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(_id):
+    return User.query.get(int(_id))
 
 
 class Account(db.Model):
@@ -174,8 +174,8 @@ class Account(db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    # account_id_origin = db.Column(db.Integer, db.ForeignKey('account.id'))
-    # account_id_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
+    account_source = db.Column(db.Integer, db.ForeignKey('account.id'))
+    account_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     # category_id = db.Column(db.Integer, db.ForeignKey('transaction_category.id'))
     value = db.Column(db.Float)

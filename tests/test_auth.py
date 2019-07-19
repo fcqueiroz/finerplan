@@ -5,10 +5,10 @@ from flask_login import current_user
 import pytest
 # Local Imports
 from app.models import User
-from tests.conftest import RoutingMixin, UserMixin
+from tests.conftest import RoutingMixin, DatabaseMixin
 
 
-class BasicAuth(UserMixin):
+class BasicAuth(DatabaseMixin):
 
     def login(self, client, username=None, password=None, query_string=None):
         """Login helper function"""
