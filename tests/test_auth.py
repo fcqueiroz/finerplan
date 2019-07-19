@@ -4,17 +4,11 @@
 from flask_login import current_user
 import pytest
 # Local Imports
-from app import db
 from app.models import User
-from tests.conftest import RoutingMixin
+from tests.conftest import RoutingMixin, UserMixin
 
 
-class BasicAuth(object):
-    test_user = {
-        'username': 'tester',
-        'email': 'tester@app.com',
-        'password': 'nicepassword'
-    }
+class BasicAuth(UserMixin):
 
     def login(self, client, username=None, password=None, query_string=None):
         """Login helper function"""
@@ -49,22 +43,9 @@ class BasicAuth(object):
             email=email
         ), follow_redirects=True)
 
-    def create_test_user(self, _db, test_user=None):
-        if test_user is None:
-            test_user = self.test_user
-        user = User(username=test_user['username'], email=test_user['email'])
-        user.set_password(test_user['password'])
-        _db.session.add(user)
 
-
+@pytest.mark.usefixtures('app_db_with_test_user')
 class TestUserAuth(RoutingMixin, BasicAuth):
-    @pytest.fixture(autouse=True, scope='class')
-    def app_db_with_test_user(self, app):
-        with app.app_context():
-            db.create_all()
-            self.create_test_user(db)
-            yield db
-            db.session.rollback()
 
     def test_successful_login(self, client):
         with client:
