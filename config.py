@@ -67,3 +67,25 @@ form_words = {'earnings': "Receita",
               'cash': "Dinheiro",
               'credit': "Crédito",
               'outsourced': "Terceiros"}
+
+
+# Temporarily uses a hard-coded list of categories (until the other functionalities are implemented
+default_account_categories = (
+    ('Expenses', [
+        'Housing', 'Electronic devices', 'Personal care', 'Education', 'Business',
+        'Leisure', 'Food', 'Other', 'Health', 'Transportation']),
+    ('Income', ['Scholarship', 'Paycheck', 'Subsidy', 'Other', 'Business']),
+    ('Housing', ['Rent', 'Furniture', 'Maintenance', 'Utilities']),
+    ('Electronic devices', ['Phone', 'Computer']),
+    ('Personal care', ['Cosmetics', 'Hairdresser', 'Hair removal', 'Clothing']),
+    ('Education', ['Courses', 'Supplies', 'Books']),
+    ('Leisure', ['General', 'Hobbies', 'Vacation']),
+    ('Food', ['Groceries', 'Restaurants']),
+    ('Other', ['Uncategorized', 'Gifts and donations']),
+    ('Health', ['Pharmacy', 'Special care', 'Doctors', 'Medicine']),
+    ('Transportation', ['Auto', 'Public', 'Taxi', 'Travel'])
+)
+
+# The 5 fundamental accounts according to basic accounting rules
+# ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
+fundamental_accounts = ['Assets', 'Liabilities', 'Equity', 'Income', 'Expenses']

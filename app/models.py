@@ -2,6 +2,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
+from config import default_account_categories, fundamental_accounts
 
 
 class User(UserMixin, db.Model):
@@ -14,42 +15,54 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
-
-        # Create fundamental accounts
-        for account_name, account_object in fundamental_accounts().items():
-            self.create_account(account_object)
-            setattr(self, account_name, account_object)
-
-    @db.reconstructor
-    def init_on_load(self):
-        for account_name in fundamental_accounts().keys():
-            account_object = Account.query.filter_by(user_id=self.id, name=account_name.capitalize())
-            setattr(self, account_name, account_object)
-
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def create_account(self, account):
-        if not self.has_account(account):
+    def init_accounts(self):
+        self._init_fundamental_accounts()
+        self._init_default_account_categories()
+
+    def _init_fundamental_accounts(self):
+        # Create fundamental accounts
+        for account_name in fundamental_accounts:
+            self.create_account(account_name=account_name)
+
+    def _init_default_account_categories(self):
+        # Create default account categories
+        for parent_account_name, account_list in default_account_categories:
+            for account in account_list:
+                self.create_account(account_name=account, parent_account_name=parent_account_name)
+
+    def _add_account(self, account):
+        if not isinstance(account, Account):
+            raise ValueError(
+                f"Can't create account with type '{type(account)}'. "
+                f"Only Account object is allowed.")
+
+        if not Account.query.filter_by(user_id=self.id, name=account.name) == 1:
             self.accounts.append(account)
+            db.session.commit()
 
-    def owned_accounts(self):
-        return Account.query.filter_by(user_id=self.id)
+    def create_account(self, account_name, parent_account_name=None):
+        """Create a new account within the accounts hierarchy
 
-    def has_account(self, other_account):
-        accounts = self.owned_accounts()
-        return accounts.filter_by(name=other_account.name).count() == 1
+        Parameters
+        ----------
+        account_name: str
+            Name of the new account
+        parent_account_name: str, default None
+            Name of the parent account in hierarchy
+        """
+        if parent_account_name is not None:
+            parent_account = Account.query.filter_by(user_id=self.id, name=parent_account_name).first()
+        else:
+            parent_account = None
 
-    def get_categories(self, kind):
-        """Returns a list of already created categories by the user for a certain kind of transaction"""
-
-        return account_categories(kind)
+        new_account = Account(user_id=self.id, name=account_name, parent_account=parent_account)
+        self._add_account(new_account)
 
 
 @login.user_loader
@@ -57,42 +70,11 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-def account_categories(kind):
-    # Temporarily uses a hard-coded list of categories (until the other functionalities are implemented
-    hard_categories = {
-        'expenses': [
-            'Housing - Rent', 'Housing - Furniture', 'Housing - Maintenance', 'Housing - Utilities',
-            'Electronic devices - Phone', 'Electronic devices - Computer',
-            'Personal care - Cosmetics', 'Personal care - Hairdresser', 'Personal care - Hair removal',
-            'Personal care - Clothing',
-            'Education - Courses', 'Education - Supplies', 'Education - Books',
-            'Business',
-            'Leisure - General', 'Leisure - Hobbies', 'Leisure - Vacation',
-            'Food - Groceries', 'Food - Restaurants',
-            'Other - Uncategorized', 'Other - Gifts and donations',
-            'Health - Pharmacy', 'Health - Special care', 'Health - Doctors', 'Health - Medicine',
-            'Transportation - Auto', 'Transportation - Public', 'Transportation - Taxi', 'Transportation - Travel'
-        ],
-        'income': ['Scholarship', 'Paycheck', 'Subsidy', 'Other', 'Business']
-    }
-    return hard_categories[kind]
-
-
-def fundamental_accounts():
-    """Creates the 5 fundamental accounts according to basic accounting rules
-
-    ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
-    """
-
-    accounts = {name: Account(name=name.capitalize())
-                for name in ['assets', 'liabilities', 'equity', 'income', 'expenses']}
-    return accounts
-
-
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    path = db.Column(db.String(500), nullable=False, index=True)
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
     def __repr__(self):
@@ -100,6 +82,26 @@ class Account(db.Model):
             return f'<Account {self.owner.username}\'s {self.name}>'
         except AttributeError:
             return f'<Account Unclaimed {self.name}>'
+
+    def __init__(self, parent_account=None, **kwargs):
+        super().__init__(**kwargs)
+        self.path = self._generate_node_path(parent_account)
+
+    @staticmethod
+    def _generate_node_path(parent_node):
+        if parent_node is None:
+            path = '/'
+        elif isinstance(parent_node, Account):
+            path = ''.join([parent_node.path, str(parent_node.id), '/'])
+        else:
+            raise ValueError(f"Parent account must be Account type. Got '{type(parent_node)}'")
+
+        return path
+
+    @property
+    def depth(self):
+        nodes = list(filter(None, self.path.split('/')))
+        return len(nodes)
 
 
 class Transaction(db.Model):
