@@ -108,11 +108,3 @@ def accounts(transaction_kind):
 def expenses():
     et1 = sql.expenses_table()
     return render_template('expenses.html', title='Expenses', tables=et1)
-
-
-@simple_page.route('/assets', methods=['GET'])
-@login_required
-def assets():
-    balance = sql.brokerage_balance()
-
-    return render_template('assets.html', title='Assets', tables=balance)
