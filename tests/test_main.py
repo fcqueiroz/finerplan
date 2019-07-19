@@ -57,19 +57,30 @@ class TestUserAccounting(BasicAuth):
         created_accounts = list(itertools.chain(*subaccouts)) + fundamental_accounts
         assert Account.query.filter_by(user_id=user.id).count() == len(created_accounts)
 
-    @pytest.mark.parametrize(('parent_node_name', 'min_depth', 'max_depth', 'result'), (
+    @pytest.mark.parametrize(('root_node_name', 'min_depth', 'max_depth', 'result'), (
             ('Expenses', None, None, 38),
             ('Expenses', None, 2, 38),
             ('Expenses', None, 1, 10),
             ('Expenses', 1, None, 38),
             ('Housing', None, None, 4)))
-    def test_get_descendents(self, user_with_default_accounts, parent_node_name, min_depth, max_depth, result):
+    def test_get_descendents(self, user_with_default_accounts, root_node_name, min_depth, max_depth, result):
         """Checks that we can retrieve descendents from a tree node. Depends on config.py"""
         user = user_with_default_accounts
 
-        root = user.accounts.filter_by(name=parent_node_name).first()
+        root = user.accounts.filter_by(name=root_node_name).first()
         children = root.get_descendents(root, min_depth=min_depth, max_depth=max_depth)
         assert children.count() == result
+
+    @pytest.mark.parametrize(('root_node_names', 'result'), (
+            ('Expenses', 39),
+            ('Income', 6),
+            (['Equity', 'Assets', 'Liabilities'], 3)))
+    def test_get_subaccount(self, user_with_default_accounts, root_node_names, result):
+        """Tests User method to retrieve subaccounts. Depends on config.py"""
+        user = user_with_default_accounts
+
+        subaccounts = user.get_subaccount(root_names=root_node_names)
+        assert len(subaccounts) == result
 
 
 class TestTransaction(object):

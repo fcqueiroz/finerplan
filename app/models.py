@@ -64,6 +64,26 @@ class User(UserMixin, db.Model):
         new_account = Account(user_id=self.id, name=account_name, parent_account=parent_account)
         self._add_account(new_account)
 
+    def get_subaccount(self, root_names):
+        """Returns a list of all the subaccounts under a hierarchy including the root account itself.
+
+        Parameters
+        ----------
+        root_names: str, list-like
+            The names of the accounts that represent the root of the tree hierarchy
+        """
+        if isinstance(root_names, str):
+            root_names = [root_names]
+
+        subaccounts = []
+        for name in root_names:
+            root = self.accounts.filter_by(name=name).first()
+            children = root.get_descendents(root).all()
+            subaccounts.append(root)
+            if children:
+                subaccounts.extend(children)
+
+        return subaccounts
 
 @login.user_loader
 def load_user(id):
