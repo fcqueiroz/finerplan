@@ -14,7 +14,7 @@ function updateAccounts(id, data) {
 
 $(function() {
   $( "#transactionKind" ).change(function() {
-    kind = $(this).find("input[name='transaction']:checked").val();
+    kind = $(this).find("input[name='transaction_kind']:checked").val();
 
     fetch('/accounts/' + kind).then(function(response) {
       response.json().then(function(data) {

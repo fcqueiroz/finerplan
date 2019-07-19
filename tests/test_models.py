@@ -13,7 +13,7 @@ class TestUserAccounting(DatabaseMixin):
     def test_create_account_level_0(self, app_db):
         """Tests that User's create_account method is able to create a
         level-0 account (ie an account without a parent)"""
-        self.create_test_user(app_db)
+        self.create_test_user(app_db, init_accounts=False)
         user = User.query.filter_by(username=self.test_user['username']).first()
         assert user.accounts.count() == 0  # Sanity check
 
@@ -27,7 +27,7 @@ class TestUserAccounting(DatabaseMixin):
     def test_create_account_level_1(self, app_db, child_name='Salary', parent_name='Income'):
         """Tests that User's create_account method is able to create a
         level-1 account (ie a children from a level-0 account)"""
-        self.create_test_user(app_db)
+        self.create_test_user(app_db, init_accounts=False)
         user = User.query.filter_by(username=self.test_user['username']).first()
         user.create_account(account_name=parent_name)
 
@@ -44,9 +44,18 @@ class TestUserAccounting(DatabaseMixin):
         created_accounts = list(itertools.chain(*subaccouts)) + fundamental_accounts
         assert Account.query.filter_by(user_id=user.id).count() == len(created_accounts)
 
+        max_path = 1
+        max_depth = 0
+        for account in user.accounts.all():
+            if len(account.path) > max_path:
+                max_path = len(account.path)
+            if account.depth > max_depth:
+                max_depth = account.depth
+        assert max_depth > 0
+        assert max_path > 1
+
     @pytest.mark.parametrize(('root_node_name', 'min_depth', 'max_depth', 'inner', 'result'), (
             ('Expenses', None, None, True, 38),
-            ('Expenses', None, 2, True, 38),
             ('Expenses', None, 1, True, 10),
             ('Expenses', 1, None, True, 38),
             ('Housing', None, None, True, 4)))
@@ -97,11 +106,12 @@ class TestTransaction(BasicTransaction):
         self.create_transaction(app_db)
         assert Transaction.query.count() == 1
 
-    def test_insert_transaction_through_form(self, client, user_with_default_accounts):
+    def test_insert_transaction_through_form(self, client, app_db_with_test_user):
         assert Transaction.query.count() == 0
-        user = user_with_default_accounts
+
         with client:
             self.login(client)
             self.submit_transation(client)
 
+        app_db_with_test_user.session.remove()
         assert Transaction.query.count() == 1

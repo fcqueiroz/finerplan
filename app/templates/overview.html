@@ -1,7 +1,8 @@
 {% extends "dashboard.html" %}
 
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/form-accounts.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/overview/transaction-form.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/overview/datatable.js') }}" defer></script>
 {% endblock %}
 
 {% block dashboard %}
@@ -109,21 +110,21 @@
   <div class="col-12 col-md-8 py-3">
     <div class="card">
       <div class="card-body">
-        <h2 class="header-title">Recent Expenses</h2>
+        <h2 class="header-title">Recent Transactions</h2>
+        {% if tables.transactions %}
         <div class="data-tables">
-        {% if tables.expenses %}
           <table id="dataTable" class="text-center">
             <thead class="bg-light text-capitalize">
               <tr>
-                <th>Payment Method</th>
                 <th>Accrual Date</th>
                 <th>Description</th>
-                <th>Category</th>
                 <th>Value</th>
+                <th>Source Account</th>
+                <th>Destination Account</th>
               </tr>
             </thead>
             <tbody>
-            {% for row in tables.expenses %}
+            {% for row in tables.transactions %}
               <tr>
               {% for elem in row %}
                 <td>{{ elem }}</td>
@@ -132,75 +133,10 @@
             {% endfor %}
             </tbody>
           </table>
-        {% else %}
-          <p>There are no expenses registered yet.</p>
-        {% endif %}
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 py-3">
-    <div class="card">
-      <div class="card-body">
-        <h2 class="header-title">Recent Earnings</h2>
-        <div class="data-tables">
-        {% if tables.earnings %}
-          <table id="dataTable2" class="text-center">
-            <thead class="bg-light text-capitalize">
-              <tr>
-                <th>Accrual Date</th>
-                <th>Cash Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for row in tables.earnings %}
-              <tr>
-              {% for elem in row %}
-                <td>{{ elem }}</td>
-              {% endfor %}
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
         {% else %}
-          <p>There are no earnings registered yet.</p>
+        <p>There are no transactions registered yet.</p>
         {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 py-3">
-    <div class="card">
-      <div class="card-body">
-        <h2 class="header-title">Recent Investments</h2>
-        <div class="data-tables">
-        {% if tables.investments %}
-          <table id="dataTable3" class="text-center">
-            <thead class="bg-light text-capitalize">
-              <tr>
-                <th>Accrual Date</th>
-                <th>Cash Date</th>
-                <th>Description</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in tables.investments %}
-                <tr>
-                {% for elem in row %}
-                  <td>{{ elem }}</td>
-                {% endfor %}
-                  </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p>There are no investments registered yet.</p>
-        {% endif %}
-        </div>
       </div>
     </div>
   </div>

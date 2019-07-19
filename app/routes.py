@@ -1,5 +1,5 @@
 import logging
-from flask import flash, redirect, render_template, url_for, Blueprint, request, jsonify
+from flask import redirect, render_template, url_for, Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import reports
@@ -69,16 +69,17 @@ def overview():
             logging.error(errors)
             print(form.data)
     if form.validate_on_submit():
-        transaction = form.data
-        del transaction['transaction_kind']
-        del transaction['submit']
+        transaction = {key: form.data[key] for key in form.data.keys()
+                       if key not in ['transaction_kind', 'submit', 'csrf_token']}
         transaction = Transaction(**transaction)
         db.session.add(transaction)
+        db.session.commit()
         return redirect(url_for('simple_page.overview'))
 
-    tables = {'expenses': sql.last_expenses(),
-              'earnings': sql.last_earnings(),
-              'investments': sql.last_investments()}
+    columns = [Transaction.accrual_date, Transaction.description, Transaction.value,
+               Transaction.account_source, Transaction.account_destination]
+    tables = {'transactions': Transaction.query.with_entities(*columns).all()}
+
     basic_report = reports.basic()
     return render_template('overview.html', title='Overview', form=form,
                            tables=tables, report=basic_report)
@@ -99,7 +100,6 @@ def accounts(transaction_kind):
 
     data = {'sources': [{'id': account.id, 'name': account.fullname} for account in source],
             'destinations': [{'id': account.id, 'name': account.fullname} for account in destination]}
-
     return jsonify(data)
 
 
@@ -107,9 +107,7 @@ def accounts(transaction_kind):
 @login_required
 def expenses():
     et1 = sql.expenses_table()
-    et2 = sql.transactions_table(kind='expenses')
-    return render_template('expenses.html', title='Expenses',
-                           tables=et1, expenses=et2)
+    return render_template('expenses.html', title='Expenses', tables=et1)
 
 
 @simple_page.route('/assets', methods=['GET'])
@@ -117,5 +115,4 @@ def expenses():
 def assets():
     balance = sql.brokerage_balance()
 
-    return render_template('assets.html', title='Assets',
-                           tables=balance)
+    return render_template('assets.html', title='Assets', tables=balance)

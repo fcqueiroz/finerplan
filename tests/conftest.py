@@ -46,23 +46,14 @@ class DatabaseMixin(object):
         'account_source': 1,
         'account_destination': 2}
 
-    def create_test_user(self, _db, test_user=None):
+    def create_test_user(self, _db, test_user=None, init_accounts=True):
         if test_user is None:
             test_user = self.test_user
         user = User(username=test_user['username'], email=test_user['email'])
         user.set_password(test_user['password'])
         _db.session.add(user)
-
-    @pytest.fixture(scope='class')
-    def user_with_default_accounts(self, app):
-        """Helper function to create user and init default accounts."""
-        with app.app_context():
-            db.create_all()
-            self.create_test_user(db)
-            user = User.query.filter_by(username=self.test_user['username']).first()
+        if init_accounts:
             user.init_accounts()
-            yield user
-            db.drop_all()
 
     @pytest.fixture(scope='class')
     def app_db_with_test_user(self, app):
@@ -70,7 +61,14 @@ class DatabaseMixin(object):
             db.create_all()
             self.create_test_user(db)
             yield db
-            db.session.rollback()
+            db.drop_all()
+
+    @pytest.fixture(scope='class')
+    def user_with_default_accounts(self, app_db_with_test_user):
+        """Helper function to create user and init default accounts."""
+        _db = app_db_with_test_user
+        user = _db.session.query(User).filter_by(username=self.test_user['username']).first()
+        yield user
 
     def create_transaction(self, _db, transaction=None):
         if transaction is None:

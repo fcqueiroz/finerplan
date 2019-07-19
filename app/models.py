@@ -78,11 +78,12 @@ class User(UserMixin, db.Model):
         subaccounts = []
         for name in root_names:
             root = self.accounts.filter_by(name=name).first()
-            children = root.get_descendents(root, inner=False).all()
-            if root.is_leaf:
-                subaccounts.append(root)
-            if children:
-                subaccounts.extend(children)
+            if root is not None:
+                children = root.get_descendents(root, inner=False).all()
+                if root.is_leaf:
+                    subaccounts.append(root)
+                if children:
+                    subaccounts.extend(children)
 
         return subaccounts
 
@@ -112,6 +113,7 @@ class Account(db.Model):
         self.path = self._generate_node_path(parent_account)
         self._update_parent(parent_account)
         self.depth = len(self._split_path())
+        self.is_leaf = True
 
     @property
     def fullname(self):
