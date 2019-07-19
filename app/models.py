@@ -65,7 +65,7 @@ class User(UserMixin, db.Model):
         self._add_account(new_account)
 
     def get_subaccounts(self, root_names):
-        """Returns a list of all the subaccounts under a hierarchy including the root account itself.
+        """Returns a list of all the subaccounts under a hierarchy that are leaf nodes.
 
         Parameters
         ----------
@@ -78,12 +78,14 @@ class User(UserMixin, db.Model):
         subaccounts = []
         for name in root_names:
             root = self.accounts.filter_by(name=name).first()
-            children = root.get_descendents(root).all()
-            subaccounts.append(root)
+            children = root.get_descendents(root, inner=False).all()
+            if root.is_leaf:
+                subaccounts.append(root)
             if children:
                 subaccounts.extend(children)
 
         return subaccounts
+
 
 @login.user_loader
 def load_user(id):
@@ -96,6 +98,7 @@ class Account(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), nullable=False, index=True)
     depth = db.Column(db.Integer)
+    is_leaf = db.Column(db.Boolean, default=True)
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
     def __repr__(self):
@@ -107,7 +110,14 @@ class Account(db.Model):
     def __init__(self, parent_account=None, **kwargs):
         super().__init__(**kwargs)
         self.path = self._generate_node_path(parent_account)
-        self.depth = self._calculate_depth()
+        self._update_parent(parent_account)
+        self.depth = len(self._split_path())
+
+    @property
+    def fullname(self):
+        path_names = [Account.query.get(int(node)).name for node in self._split_path()]
+        path_names.append(self.name)
+        return ' - '.join(path_names)
 
     @staticmethod
     def _generate_node_path(parent_node):
@@ -120,7 +130,13 @@ class Account(db.Model):
 
         return path
 
-    def get_descendents(self, root, min_depth=None, max_depth=None):
+    @staticmethod
+    def _update_parent(parent_node):
+        """Changes parent attributes to indicate it is not a leaf node anymore"""
+        if isinstance(parent_node, Account):
+            parent_node.is_leaf = False
+
+    def get_descendents(self, root, min_depth=None, max_depth=None, inner=False):
         """Returns the descendents from a certain node.
 
         Parameters
@@ -133,6 +149,8 @@ class Account(db.Model):
         max_depth: int, default=None
             The max difference of depth between the parent node depth and the children nodes.
             If max_depth is None, then the results are unbounded.
+        inner: bool, default=False
+            By default returns only the leaf nodes. If True, returns inner nodes as well.
         """
         root_path = root.path + str(root.id) + '/%'
         base_depth = root.depth
@@ -144,11 +162,14 @@ class Account(db.Model):
         if max_depth is not None:
             children = children.filter(Account.depth <= base_depth + max_depth)
 
+        if not inner:
+            children = children.filter(Account.is_leaf)
+
         return children
 
-    def _calculate_depth(self):
-        nodes = list(filter(None, self.path.split('/')))
-        return len(nodes)
+    def _split_path(self):
+        path = list(filter(None, self.path.split('/')))
+        return path
 
 
 class Transaction(db.Model):

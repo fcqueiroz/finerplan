@@ -41,7 +41,6 @@ def register():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
-        db.session.commit()
 
         # Temporarily init user accounts on register
         user.init_accounts()
@@ -84,10 +83,8 @@ def accounts(transaction_kind):
     else:
         raise ValueError
 
-    data = {'sources': [{'id': account.id, 'name': account.name, 'depth': account.depth}
-                        for account in source],
-            'destinations': [{'id': account.id, 'name': account.name, 'depth': account.depth}
-                             for account in destination]}
+    data = {'sources': [{'id': account.id, 'name': account.fullname} for account in source],
+            'destinations': [{'id': account.id, 'name': account.fullname} for account in destination]}
 
     return jsonify(data)
 

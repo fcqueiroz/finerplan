@@ -2,6 +2,15 @@
  * This script updates the select fields from the "Add Transaction" form
  */
 
+function updateAccounts(id, data) {
+  let account_select = document.getElementById(id);
+  optionHTML = '';
+  regex = /(Expenses - )|(Income - )/g;
+  for (let account of data) {
+    optionHTML += '<option value="' + account.id + '">' + account.name.replace(regex, '') + '</option>';
+  }
+  account_select.innerHTML = optionHTML;
+}
 
 $(function() {
   $( "#transactionKind" ).change(function() {
@@ -10,19 +19,8 @@ $(function() {
     fetch('/accounts/' + kind).then(function(response) {
       response.json().then(function(data) {
         console.table(data)
-        let account_source_select = document.getElementById('account_source');
-        optionHTML = '';
-        for (let source of data.sources) {
-          optionHTML += '<option value="' + source.id + '">' + source.name + '</option>';
-        }
-        account_source_select.innerHTML = optionHTML;
-
-        let account_destination_select = document.getElementById('account_destination');
-        optionHTML = '';
-        for (let destination of data.destinations) {
-          optionHTML += '<option value="' + destination.id + '">' + destination.name + '</option>';
-        }
-        account_destination_select.innerHTML = optionHTML;
+        updateAccounts('account_source', data.sources)
+        updateAccounts('account_destination', data.destinations)
       })
     })
   })
