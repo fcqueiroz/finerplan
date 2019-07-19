@@ -75,6 +75,7 @@ class Account(db.Model):
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), nullable=False, index=True)
+    depth = db.Column(db.Integer)
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
     def __repr__(self):
@@ -86,6 +87,7 @@ class Account(db.Model):
     def __init__(self, parent_account=None, **kwargs):
         super().__init__(**kwargs)
         self.path = self._generate_node_path(parent_account)
+        self.depth = self._calculate_depth()
 
     @staticmethod
     def _generate_node_path(parent_node):
@@ -98,8 +100,33 @@ class Account(db.Model):
 
         return path
 
-    @property
-    def depth(self):
+    def get_descendents(self, root, min_depth=None, max_depth=None):
+        """Returns the descendents from a certain node.
+
+        Parameters
+        ----------
+        root: Account instance
+            The root node of the subtree returned
+        min_depth: int, default=None
+            The min difference of depth between the parent node depth and the children nodes.
+            If min_depth is None, then the results starts on imediate children.
+        max_depth: int, default=None
+            The max difference of depth between the parent node depth and the children nodes.
+            If max_depth is None, then the results are unbounded.
+        """
+        root_path = root.path + str(root.id) + '/%'
+        base_depth = root.depth
+        children = self.query.filter(Account.path.like(root_path))
+
+        if min_depth is not None:
+            children = children.filter(base_depth + min_depth <= Account.depth)
+
+        if max_depth is not None:
+            children = children.filter(Account.depth <= base_depth + max_depth)
+
+        return children
+
+    def _calculate_depth(self):
         nodes = list(filter(None, self.path.split('/')))
         return len(nodes)
 
