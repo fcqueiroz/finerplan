@@ -64,7 +64,7 @@ class User(UserMixin, db.Model):
         new_account = Account(user_id=self.id, name=account_name, parent_account=parent_account)
         self._add_account(new_account)
 
-    def get_subaccount(self, root_names):
+    def get_subaccounts(self, root_names):
         """Returns a list of all the subaccounts under a hierarchy including the root account itself.
 
         Parameters

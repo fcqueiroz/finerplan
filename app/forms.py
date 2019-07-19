@@ -5,11 +5,7 @@ from wtforms import BooleanField, DateField, IntegerField, PasswordField, RadioF
     StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
-from app.sql import SqliteOps
 from app.models import User
-from config import form_words
-
-sql = SqliteOps()
 
 
 class CorrectPassword(object):
@@ -69,18 +65,8 @@ class AddTransactionForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
     date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
     value = StringField("Value", validators=[DataRequired()])
-    transaction = RadioField("Type of Transaction",
-                             choices=[('earnings', form_words['earnings']),
-                                      ('brokerage_transfers', form_words['brokerage_transfers']),
-                                      ('expenses', form_words['expenses'])])
-
-    pay_method = RadioField("Payment Method",
-                            choices=[(form_words['cash'], form_words['cash']),
-                                     (form_words['credit'], form_words['credit']),
-                                     (form_words['outsourced'], form_words['outsourced'])])
+    transaction = RadioField("Type of Transaction", validators=[DataRequired()], choices=[])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
-    new_cat = StringField("New Category")
-    cat_expense = SelectField("Category", default="Mercado", choices=sql.generate_categories('expenses'))
-    cat_earning = SelectField("Category", default="Mercado", choices=sql.generate_categories('earnings'))
-
+    account_source = SelectField('Source Account', choices=[])
+    account_destination = SelectField('Destination Account', choices=[])
     submit = SubmitField("Add it")

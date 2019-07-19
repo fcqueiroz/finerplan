@@ -75,11 +75,11 @@ class TestUserAccounting(BasicAuth):
             ('Expenses', 39),
             ('Income', 6),
             (['Equity', 'Assets', 'Liabilities'], 3)))
-    def test_get_subaccount(self, user_with_default_accounts, root_node_names, result):
+    def test_get_subaccounts(self, user_with_default_accounts, root_node_names, result):
         """Tests User method to retrieve subaccounts. Depends on config.py"""
         user = user_with_default_accounts
 
-        subaccounts = user.get_subaccount(root_names=root_node_names)
+        subaccounts = user.get_subaccounts(root_names=root_node_names)
         assert len(subaccounts) == result
 
 

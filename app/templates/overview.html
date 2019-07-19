@@ -1,7 +1,7 @@
 {% extends "dashboard.html" %}
 
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/form-visibility.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/form-accounts.js') }}" defer></script>
 {% endblock %}
 
 {% block dashboard %}
@@ -36,21 +36,6 @@
           {{ form.hidden_tag() }}
 
           <h2>Add transaction</h2>
-          <!-- Transaction kind -->
-          <div id="transactionKind" class="form-row justify-content-center">
-            {{ form.transaction.label(class_="col-form-label col-12 mt-2") }}
-            <div class="flex-fill text-center">
-            {% for subfield in form.transaction %}
-              <div class="custom-control custom-radio custom-control-inline">
-                {{ subfield(class_="custom-control-input") }}
-                {{ subfield.label(class_="custom-control-label") }}
-              </div>
-            {% endfor %}
-            </div>
-            {% for error in form.transaction.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
           <!-- Transaction Description -->
           <div class="form-row form-group">
             {{ form.description.label(class_="col-form-label") }}
@@ -75,51 +60,40 @@
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
-          <!-- Transaction Category -->
-          <div class="form-row form-group field-wobbly field-expenses field-category">
-            {{ form.cat_expense.label(class_="col-form-label") }}
-            {{ form.cat_expense(class_="custom-select") }}
-            {% for error in form.cat_expense.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-          <div class="form-row form-group field-wobbly field-earnings field-category">
-            {{ form.cat_earning.label(class_="col-form-label") }}
-            {{ form.cat_earning(class_="custom-select") }}
-            {% for error in form.cat_earning.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-          <div class="form-check field-wobbly field-earnings field-expenses">
-              <input type="checkbox" class="form-check-input" id="newCategoryCheck">
-              <label class="form-check-label" for="newCategoryCheck">Add new category</label>
-          </div>
-          <div class="form-row form-group field-wobbly field-new-category">
-            {{ form.new_cat.label(class_="col-form-label") }}
-            {{ form.new_cat(class_="form-control") }}
-            {% for error in form.new_cat.errors %}
-              <span>[{{ error }}]</span>
-            {% endfor %}
-          </div>
-
-          <!-- Transaction payment method -->
-          <div id="paymentMethod" class="form-row form-group field-wobbly field-expenses">
-            {{ form.pay_method.label(class_="col-form-label col-12 mt-2") }}
+          <!-- Transaction kind -->
+          <div id="transactionKind" class="form-row justify-content-center">
+            {{ form.transaction.label(class_="col-form-label col-12 mt-2") }}
             <div class="flex-fill text-center">
-            {% for subfield in form.pay_method %}
+            {% for subfield in form.transaction %}
               <div class="custom-control custom-radio custom-control-inline">
                 {{ subfield(class_="custom-control-input") }}
                 {{ subfield.label(class_="custom-control-label") }}
               </div>
             {% endfor %}
             </div>
-
-            {% for error in form.pay_method.errors %}
-            <span>[{{ error }}]</span>
+            {% for error in form.transaction.errors %}
+              <span>[{{ error }}]</span>
             {% endfor %}
           </div>
+          <!-- Transaction Source Account -->
+          <div class="form-row form-group">
+            {{ form.account_source.label(class_="col-form-label") }}
+            {{ form.account_source(class_="custom-select") }}
+            {% for error in form.account_source.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Destination Account -->
+          <div class="form-row form-grouṕ">
+            {{ form.account_destination.label(class_="col-form-label") }}
+            {{ form.account_destination(class_="custom-select") }}
+            {% for error in form.account_destination.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
           <!-- Credit card installments -->
-          <div id="paymentInstallments" class="form-row form-group field-wobbly field-expenses">
+          <div id="paymentInstallments" class="form-row form-group">
             {{ form.installments.label(class_="col-form-label") }}
             {{ form.installments(class_="form-control", type="number") }}
             {% for error in form.installments.errors %}
