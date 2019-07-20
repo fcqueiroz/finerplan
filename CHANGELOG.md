@@ -1,6 +1,19 @@
 # Changelog
 
 ## [Unreleased]
+- The database was refactored, breaking compatibility with previous version.
+- The pytest was adopted as the main test suite
+- The app now implements Blueprints and the Application Factory pattern
+
+### Added
+- Users (with login+register functionality)
+- Accounts, which is an entity linked to a certain User that contains other sub-accounts or transactions.
+- Transactions, defined as a transfer between two different accounts.
+
+### Removed
+- Together with the expenses, earnings and transfers the categories in them were also removed. 
+A new account attribute roughly maps these categories, but with more funcionalities.
+- The Assets components were removed as they were a draft functionality.
 
 ## [0.3] - 2019-06-23
 ### Added
