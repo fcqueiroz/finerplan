@@ -8,7 +8,7 @@
     if ($('#dataTable').length) {
         $('#dataTable').DataTable({
             responsive: true,
-            "order": [[ 0, 'desc' ],
+            "order": [[ 0, 'desc' ]]
         });
     }
-})(jQuery);
+}) (jQuery);
