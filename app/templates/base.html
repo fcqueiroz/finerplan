@@ -11,13 +11,11 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/themify-icons.css') }}">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/metisMenu.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/slicknav.min.css') }}">
 
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
-
 
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/typography.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/css/srtdash-1.0.default.css') }}">
@@ -26,17 +24,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  <!-- START - jQuery Reference -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
-  <script type='text/javascript'>//<![CDATA[
-    if (typeof jQuery == 'undefined') {
-        document.write(unescape("%3Cscript
-    src='/static/vendor/js/jquery-3.4.1.min.js' type='text/javascript' %3E%3C/script%3E"));
-    }//]]>
-
-  </script>
-  <!-- END - jQuery Reference -->
-
+  <script src="{{ url_for('static', filename='vendor/js/jquery-3.4.1.min.js') }}" defer></script>
   <script src="{{ url_for('static', filename='vendor/js/bootstrap-4.3.1.bundle.min.js') }}" defer></script>
 
   <script src="{{ url_for('static', filename='vendor/js/metisMenu.min.js') }}" defer></script>
