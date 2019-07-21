@@ -21,5 +21,6 @@ setuptools.setup(
     ],
     tests_require=[
         'pytest>=5.0',
+        'mock>=3.0'
     ],
 )

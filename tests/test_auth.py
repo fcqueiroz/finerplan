@@ -2,6 +2,7 @@
 
 # 3rd Party Libraries
 from flask_login import current_user
+from mock import patch, Mock
 import pytest
 # Local Imports
 from app.models import User
@@ -59,10 +60,26 @@ class TestAuthRoutes(RoutingMixin, BasicAuth):
 
     @pytest.mark.parametrize("url", ['/overview', '/expenses'])
     def test_url_is_inaccessible_before_login(self, client, url):
+        expected_query_string = f"{self.login_url}?next={url.replace('/', '%2F')}"
         title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
         with client:
             response = client.get(url)
+            assert expected_query_string in str(response.headers)
+            assert response.status_code == 302
             assert title not in response.data
+
+    @pytest.mark.parametrize("url", ['/overview', '/expenses'])
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_login_redirects_to_private_url(self, mock_user, client, url):
+        fake_user = Mock()
+        fake_user.get_id.return_value = '1'
+        mock_user.return_value.filter_by.return_value.first.return_value = fake_user
+
+        title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
+        with client:
+            query_string = {'next':  url}
+            response = self.login(client, query_string=query_string)
+            assert title in response.data
 
 
 class TestUserRegister(BasicAuth):
@@ -95,10 +112,3 @@ class TestUserLogin(BasicAuth):
         rv = self.login(client, password=self.test_user['password'] + 'x')
         assert b'Invalid password' in rv.data
 
-    @pytest.mark.parametrize("url", ['/overview', '/expenses'])
-    def test_login_redirects_to_private_url(self, client, url):
-        title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
-        with client:
-            query_string = {'next':  url}
-            response = self.login(client, query_string=query_string)
-            assert title in response.data
