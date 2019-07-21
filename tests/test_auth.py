@@ -83,10 +83,10 @@ class TestAuthRoutes(RoutingMixin, BasicAuth):
 
 
 class TestUserRegister(BasicAuth):
-    def test_successful_register(self, client, app_db):
+    def test_successful_register(self, client, session):
         """Tests that a user can register in app"""
         self.register(client)
-        user = app_db.session.query(User).filter_by(username=self.test_user['username']).first()
+        user = session.query(User).filter_by(username=self.test_user['username']).first()
         assert user is not None
 
 

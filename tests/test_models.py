@@ -101,9 +101,9 @@ class BasicTransaction(BasicAuth):
 
 
 class TestTransaction(BasicTransaction):
-    def test_insert_transaction_directly_into_db(self, app_db):
+    def test_insert_transaction_directly_into_db(self, session):
         assert Transaction.query.count() == 0
-        self.create_transaction(app_db)
+        self.create_transaction(session)
         assert Transaction.query.count() == 1
 
     def test_insert_transaction_through_form(self, client, app_db_with_test_user):

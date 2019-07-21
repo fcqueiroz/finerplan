@@ -25,6 +25,27 @@ def app_db(app):
         db.drop_all()
 
 
+@pytest.fixture(scope='function')
+def session(app_db, request):
+    """Creates a new database session for a test."""
+    _db = app_db
+    connection = _db.engine.connect()
+    transaction = connection.begin()
+
+    options = dict(bind=connection, binds={})
+    session = _db.create_scoped_session(options=options)
+
+    _db.session = session
+
+    def teardown():
+        transaction.rollback()
+        connection.close()
+        session.remove()
+
+    #request.addfinalizer(teardown)
+    return session
+
+
 class RoutingMixin(object):
     @staticmethod
     def check_200_status_code(response, url):
@@ -70,7 +91,7 @@ class DatabaseMixin(object):
         user = _db.session.query(User).filter_by(username=self.test_user['username']).first()
         yield user
 
-    def create_transaction(self, _db, transaction=None):
+    def create_transaction(self, _session, transaction=None):
         if transaction is None:
             transaction = self.transaction
-        _db.session.add(Transaction(**transaction))
+        _session.add(Transaction(**transaction))
