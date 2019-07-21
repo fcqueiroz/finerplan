@@ -2,7 +2,7 @@
 
 # 3rd Party Libraries
 from flask_login import current_user
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 import pytest
 # Local Imports
 from app.models import User
@@ -48,15 +48,11 @@ class BasicAuth(DatabaseMixin):
 
 
 class TestAuthRoutes(RoutingMixin, BasicAuth):
-    def test_register_page_exists(self, client):
-        response = client.get(self.register_url)
+    @pytest.mark.parametrize('url', ['login_url', 'register_url'])
+    def test_page_exists(self, client, url):
+        response = client.get(getattr(self, url))
         self.check_200_status_code(response, self.register_url)
         self.check_content_type(response, self.register_url)
-
-    def test_login_page_exists(self, client):
-        response = client.get(self.login_url)
-        self.check_200_status_code(response, self.login_url)
-        self.check_content_type(response, self.login_url)
 
     @pytest.mark.parametrize("url", ['/overview', '/expenses'])
     def test_url_is_inaccessible_before_login(self, client, url):

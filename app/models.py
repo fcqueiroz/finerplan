@@ -102,6 +102,9 @@ class Account(db.Model):
     is_leaf = db.Column(db.Boolean, default=True)
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
+    _path_sep_number = '/'
+    _path_sep_name = ' - '
+
     def __repr__(self):
         try:
             return f'<Account {self.owner.username}\'s {self.name}>'
@@ -119,7 +122,7 @@ class Account(db.Model):
     def fullname(self):
         path_names = [Account.query.get(int(node)).name for node in self._split_path()]
         path_names.append(self.name)
-        return ' - '.join(path_names)
+        return self._path_sep_name.join(path_names)
 
     @staticmethod
     def _generate_node_path(parent_node):
@@ -154,7 +157,7 @@ class Account(db.Model):
         inner: bool, default=False
             By default returns only the leaf nodes. If True, returns inner nodes as well.
         """
-        root_path = root.path + str(root.id) + '/%'
+        root_path = root.path + str(root.id) + self._path_sep_number + '%'
         base_depth = root.depth
         children = self.query.filter(Account.path.like(root_path))
 
@@ -170,7 +173,7 @@ class Account(db.Model):
         return children
 
     def _split_path(self):
-        path = list(filter(None, self.path.split('/')))
+        path = list(filter(None, self.path.split(self._path_sep_number)))
         return path
 
 

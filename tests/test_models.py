@@ -2,7 +2,7 @@
 import itertools
 # 3rd Party Libraries
 import pytest
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 # Local Imports
 from app.models import User, Transaction, Account
 from config import default_account_categories, fundamental_accounts
