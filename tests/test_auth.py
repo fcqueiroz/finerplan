@@ -70,10 +70,10 @@ class TestAuthRoutes(RoutingMixin, BasicAuth):
 
     @pytest.mark.parametrize("url", ['/overview', '/expenses'])
     @patch('flask_sqlalchemy._QueryProperty.__get__')
-    def test_login_redirects_to_private_url(self, mock_user, client, url):
+    def test_login_redirects_to_private_url(self, mock_query_getter, client, url):
         fake_user = Mock()
         fake_user.get_id.return_value = '1'
-        mock_user.return_value.filter_by.return_value.first.return_value = fake_user
+        mock_query_getter.return_value.filter_by.return_value.first.return_value = fake_user
 
         title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
         with client:

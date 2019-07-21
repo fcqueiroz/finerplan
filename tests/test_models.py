@@ -2,6 +2,7 @@
 import itertools
 # 3rd Party Libraries
 import pytest
+from mock import Mock, patch
 # Local Imports
 from app.models import User, Transaction, Account
 from config import default_account_categories, fundamental_accounts
@@ -54,19 +55,6 @@ class TestUserAccounting(DatabaseMixin):
         assert max_depth > 0
         assert max_path > 1
 
-    @pytest.mark.parametrize(('root_node_name', 'min_depth', 'max_depth', 'inner', 'result'), (
-            ('Expenses', None, None, True, 38),
-            ('Expenses', None, 1, True, 10),
-            ('Expenses', 1, None, True, 38),
-            ('Housing', None, None, True, 4)))
-    def test_get_descendents(self, user_with_default_accounts, root_node_name, min_depth, max_depth, inner, result):
-        """Checks that we can retrieve descendents from a tree node. Depends on config.py"""
-        user = user_with_default_accounts
-
-        root = user.accounts.filter_by(name=root_node_name).first()
-        children = root.get_descendents(root, min_depth=min_depth, max_depth=max_depth, inner=inner)
-        assert children.count() == result
-
     @pytest.mark.parametrize(('root_node_names', 'result'), (
             ('Expenses', 29),
             ('Income', 5),
@@ -80,16 +68,35 @@ class TestUserAccounting(DatabaseMixin):
         subaccounts = user.get_subaccounts(root_names=root_node_names)
         assert len(subaccounts) == result
 
-    @pytest.mark.parametrize('root_node_name',
-                             ('Expenses', 'Income', 'Housing'))
-    def test_get_subaccounts_fullname(self, user_with_default_accounts, root_node_name):
-        """Tests User method to retrieve subaccounts' fullname. Depends on config.py"""
+
+class TestAccount(DatabaseMixin):
+    @patch('flask_sqlalchemy._QueryProperty.__get__')
+    def test_fullname_property(self, mock_query_getter):
+        """Tests User method to retrieve subaccounts' fullname"""
+        fake_db = [{'name': f'Account{_id}'} for _id in range(0, 6)]
+        account = Account(name='My Account')
+        account.path = '/1/3/4'
+
+        def get_account(_id):
+            fake_account = Mock()
+            setattr(fake_account, 'name', fake_db[_id]['name'])
+            return fake_account
+        mock_query_getter.return_value.get = lambda _id: get_account(_id)
+
+        assert account.fullname == 'Account1 - Account3 - Account4 - My Account'
+
+    @pytest.mark.parametrize(('root_node_name', 'min_depth', 'max_depth', 'inner', 'result'), (
+            ('Expenses', None, None, True, 38),
+            ('Expenses', None, 1, True, 10),
+            ('Expenses', 1, None, True, 38),
+            ('Housing', None, None, True, 4)))
+    def test_get_descendents(self, user_with_default_accounts, root_node_name, min_depth, max_depth, inner, result):
+        """Checks that we can retrieve descendents from a tree node. Depends on config.py"""
         user = user_with_default_accounts
 
-        subaccounts = user.get_subaccounts(root_names=root_node_name)
-        for acc in subaccounts:
-            assert root_node_name in acc.fullname
-            assert acc.name in acc.fullname
+        root = user.accounts.filter_by(name=root_node_name).first()
+        children = root.get_descendents(root, min_depth=min_depth, max_depth=max_depth, inner=inner)
+        assert children.count() == result
 
 
 class BasicTransaction(BasicAuth):
