@@ -53,3 +53,21 @@ def test_descendents_method(db_session):
     account = db_session.query(Account).filter_by(name='Expenses').first()
 
     assert len(account.descendents()) == 2
+
+
+@pytest.mark.usefixtures('test_accounts')
+def test_is_leaf_property_for_inner_node(db_session):
+    """Tests 'is_leaf' property, which returns a boolean indicating
+    whether the queried account is a leaf (ie, has no descendents)."""
+    account = db_session.query(Account).filter_by(name='Expenses').first()
+
+    assert not account.is_leaf
+
+
+@pytest.mark.usefixtures('test_accounts')
+def test_is_leaf_property_for_leaf_node(db_session):
+    """Tests 'is_leaf' property, which returns a boolean indicating
+    whether the queried account is a leaf (ie, has no descendents)."""
+    account = db_session.query(Account).filter_by(name='Rent').first()
+
+    assert account.is_leaf

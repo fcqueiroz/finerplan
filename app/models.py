@@ -83,6 +83,12 @@ class Account(db.Model):
 
         return children.all()
 
+    @property
+    def is_leaf(self):
+        """Returns a boolean indicating whether the queried account
+        is a leaf (ie, has no descendents)."""
+        return len(self.descendents()) == 0
+
     def prune(self, min_depth=None, max_depth=None, inner=False):
         """
         min_depth: int, default=None
