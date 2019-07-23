@@ -1,0 +1,21 @@
+<div class="card">
+  <div class="card-body">
+    <h2>Basic Report</h2>
+    <p id="basic-report">
+      Your current balance is <b>{{ report.balance }}</b><br>
+      Your balance after paying all debts will be<b>{{ report.free_balance }}</b><br>
+      Your next credit card payment is due {{ report.credit_date }}.<br>
+      The current value is <b>{{ report.credit_value }}</b>({{ report.credit_state }})<br>
+      {% if report.credit_state == 'Closed' %}
+        The current value for the following open invoice is
+        <b>{{ report.credit_nvalue }}</b><br>
+      {% endif %}
+      Current month earnings: <b>{{ report.earnings }}</b><br>
+      Available for luxury expending: <b>{{ report.lux_budget}}</b>({{ report.lux_rate}})<br>
+      Current month expenses: <b>{{ report.expenses }}</b><br>
+      Double Exponential Moving Average Expending: <b>{{ report.dema }}</b><br>
+      This month savings: <b>{{ report.savings }}</b><br>
+      Last 12 months savings rate: <b>{{ report.savings_rate }}</b>
+    </p>
+  </div>
+</div>

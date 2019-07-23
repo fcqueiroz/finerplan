@@ -1,8 +1,8 @@
 """first migration
 
-Revision ID: 2a66b6e56a0f
+Revision ID: b2af183fc727
 Revises: 
-Create Date: 2019-07-23 01:07:23.659381
+Create Date: 2019-07-23 20:20:50.517175
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2a66b6e56a0f'
+revision = 'b2af183fc727'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,15 +38,13 @@ def upgrade():
     op.create_index(op.f('ix_account_path'), 'account', ['path'], unique=False)
     op.create_table('transaction',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('account_source', sa.Integer(), nullable=True),
-    sa.Column('account_destination', sa.Integer(), nullable=True),
+    sa.Column('source_id', sa.Integer(), nullable=True),
+    sa.Column('destination_id', sa.Integer(), nullable=True),
     sa.Column('value', sa.Float(), nullable=True),
-    sa.Column('installments', sa.Integer(), nullable=True),
     sa.Column('accrual_date', sa.DateTime(), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('kind', sa.String(length=64), nullable=True),
-    sa.ForeignKeyConstraint(['account_destination'], ['account.id'], ),
-    sa.ForeignKeyConstraint(['account_source'], ['account.id'], ),
+    sa.ForeignKeyConstraint(['destination_id'], ['account.id'], ),
+    sa.ForeignKeyConstraint(['source_id'], ['account.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

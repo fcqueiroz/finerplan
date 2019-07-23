@@ -162,7 +162,7 @@ class Transaction(db.Model):
     accrual_date = db.Column(db.DateTime)
     # cash_date = db.Column(db.DateTime)
     description = db.Column(db.Text)
-    kind = db.Column(db.String(64))
+    # kind = db.Column(db.String(64))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
