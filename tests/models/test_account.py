@@ -71,3 +71,23 @@ def test_is_leaf_property_for_leaf_node(db_session):
     account = db_session.query(Account).filter_by(name='Rent').first()
 
     assert account.is_leaf
+
+
+@pytest.mark.usefixtures('test_transaction')
+def test_account_deposits(db_session):
+    """Tests relationship betwen Account and Transaction between the deposits attribute."""
+    source = db_session.query(Account).filter_by(name='Earnings').first()
+    destination = db_session.query(Account).filter_by(name='Expenses').first()
+
+    assert source.deposits.count() == 0
+    assert destination.deposits.count() == 1
+
+
+@pytest.mark.usefixtures('test_transaction')
+def test_account_withdraws(db_session):
+    """Tests relationship betwen Account and Transaction between the withdraws attribute."""
+    source = db_session.query(Account).filter_by(name='Earnings').first()
+    destination = db_session.query(Account).filter_by(name='Expenses').first()
+
+    assert source.withdraws.count() == 1
+    assert destination.withdraws.count() == 0

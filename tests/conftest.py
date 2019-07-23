@@ -82,24 +82,25 @@ def test_accounts(db_session, test_user):
 
     expenses = insert(accounts.expenses())
     earnings = insert(accounts.earnings())
+    equity = insert(accounts.equity())
     housing = insert(accounts.housing(), parent=expenses)
     rent = insert(accounts.rent(), parent=housing)
 
-    _all_accounts = [expenses, earnings, housing, rent]
+    _all_accounts = [expenses, earnings, equity, housing, rent]
     return _all_accounts
 
 
 @pytest.fixture(scope='function')
-def test_transaction(db_session):
+def test_transaction(db_session, test_accounts):
     """
     Creates a single transaction
     """
-    source = accounts.earnings()
-    destination = accounts.expenses()
+    source = test_accounts[1]  # Earnings account
+    destination = test_accounts[0]  # Expenses account
 
     transaction = transactions.first_salary()
-    transaction.account_source = source.id
-    transaction.account_destination = destination.id
+    transaction.source_id = source.id
+    transaction.destination_id = destination.id
 
     db_session.add(transaction)
     db_session.commit()

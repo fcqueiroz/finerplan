@@ -68,8 +68,7 @@ class Account(db.Model):
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), index=True)
-
-    # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
+    # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
         return f'<Account {self.id} {self.name}>'
@@ -120,8 +119,16 @@ class Account(db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    account_source = db.Column(db.Integer, db.ForeignKey('account.id'))
-    account_destination = db.Column(db.Integer, db.ForeignKey('account.id'))
+    source_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    source = db.relationship(
+        'Account',
+        foreign_keys=[source_id],
+        backref=db.backref('withdraws', lazy='dynamic'))
+    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    destination = db.relationship(
+        'Account',
+        foreign_keys=[destination_id],
+        backref=db.backref('deposits', lazy='dynamic'))
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     value = db.Column(db.Float)
     installments = db.Column(db.Integer)
