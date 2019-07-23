@@ -61,10 +61,9 @@ class Account(db.Model):
 
     @property
     def fullname(self):
-        path_names = [Account.query.get(int(node)).name for node in self._split_path()]
-        path_names.append(self.name)
-        return self._path_sep_name.join(path_names)
-
+        path_nodes = self.path.split('.')
+        path_names = [Account.query.get(int(node)).name for node in path_nodes]
+        return ' - '.join(path_names)
 
     @staticmethod
     def _update_parent(parent_node):
@@ -102,10 +101,6 @@ class Account(db.Model):
             children = children.filter(Account.is_leaf)
 
         return children
-
-    def _split_path(self):
-        path = list(filter(None, self.path.split(self._path_sep_number)))
-        return path
 
     def init_accounts(self):
         self._init_fundamental_accounts()
