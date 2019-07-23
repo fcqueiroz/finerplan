@@ -12,6 +12,12 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     accounts = db.relationship('Account', backref='owner', lazy='dynamic')
 
+    def __init__(self, password=None, *args, **kwargs):
+        # 'password' is an optional argument for now, but might become obligatory in future
+        super().__init__(*args, **kwargs)
+        if password is not None:
+            self.set_password(password)
+
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -188,6 +194,9 @@ class Transaction(db.Model):
     # cash_date = db.Column(db.DateTime)
     description = db.Column(db.Text)
     kind = db.Column(db.String(64))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'

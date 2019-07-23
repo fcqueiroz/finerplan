@@ -1,110 +1,129 @@
-# Standard Library
 
-# 3rd Party Libraries
+from flask import url_for
 from flask_login import current_user
-from unittest.mock import patch, Mock
 import pytest
-# Local Imports
+
 from app.models import User
-from tests.conftest import RoutingMixin, DatabaseMixin
+
+from tests.data import users
 
 
-class BasicAuth(DatabaseMixin):
-    login_url = '/login'
-    register_url = '/register'
+def fill_login_form(username=None, password=None):
+    """Login helper function"""
+    _user = users.alice()
+    if username is None:
+        username = _user.username
+    if password is None:
+        password = _user.password
+    return dict(username=username,password=password)
 
-    def login(self, client, username=None, password=None, query_string=None):
-        """Login helper function"""
-        if username is None:
-            username = self.test_user['username']
-        if password is None:
-            password = self.test_user['password']
-        
-        return client.post(self.login_url, data=dict(
-            username=username,
-            password=password
-        ), follow_redirects=True, query_string=query_string)
 
-    @staticmethod
-    def logout(client):
-        """Logout helper function"""
-        return client.get('/logout', follow_redirects=True)
+def fill_register_form(username=None, password=None, email=None):
+    """Register new user helper function"""
+    _user = users.alice()
+    if username is None:
+        username = _user.username
+    if email is None:
+        email = _user.email
+    if password is None:
+        password = _user.password
+    return dict(username=username, email=email,
+                password=password, password2=password)
+
+
+def test_register_page_exists(client):
+    url = url_for('simple_page.register')
+    response = client.get(url)
+    assert 200 == response.status_code, f"wrong status code for '{url}'"
+    assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
+
+
+def test_login_page_exists(client):
+    url = url_for('simple_page.login')
+    response = client.get(url)
+    assert 200 == response.status_code, f"wrong status code for '{url}'"
+    assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
+
+
+def test_overview_is_inaccessible_before_login(client):
+    expected_query_string = f"{url_for('simple_page.login')}?next={'%2Foverview'}"
+    title = '<title>Expenses'.encode('utf-8')
+
+    response = client.get(url_for('simple_page.overview'))
+    assert expected_query_string in str(response.headers)
+    assert response.status_code == 302
+    assert title not in response.data
+
+
+def test_expenses_is_inaccessible_before_login(client):
+    expected_query_string = f"{url_for('simple_page.login')}?next={'%2Fexpenses'}"
+    title = '<title>Expenses'.encode('utf-8')
     
-    def register(self, client, username=None, password=None, email=None):
-        """Register new user helper function"""
-        if username is None:
-            username = self.test_user['username']
-        if password is None:
-            password = self.test_user['password']
-        if email is None:
-            email = self.test_user['email']
-        
-        return client.post(self.register_url, data=dict(
-            username=username,
-            password=password,
-            password2=password,
-            email=email
-        ), follow_redirects=True)
+    response = client.get(url_for('simple_page.expenses'))
+    assert expected_query_string in str(response.headers)
+    assert response.status_code == 302
+    assert title not in response.data
 
 
-class TestAuthRoutes(RoutingMixin, BasicAuth):
-    @pytest.mark.parametrize('url', ['login_url', 'register_url'])
-    def test_page_exists(self, client, url):
-        response = client.get(getattr(self, url))
-        self.check_200_status_code(response, self.register_url)
-        self.check_content_type(response, self.register_url)
-
-    @pytest.mark.parametrize("url", ['/overview', '/expenses'])
-    def test_url_is_inaccessible_before_login(self, client, url):
-        expected_query_string = f"{self.login_url}?next={url.replace('/', '%2F')}"
-        title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
-        with client:
-            response = client.get(url)
-            assert expected_query_string in str(response.headers)
-            assert response.status_code == 302
-            assert title not in response.data
-
-    @pytest.mark.parametrize("url", ['/overview', '/expenses'])
-    @patch('flask_sqlalchemy._QueryProperty.__get__')
-    def test_login_redirects_to_private_url(self, mock_query_getter, client, url):
-        fake_user = Mock()
-        fake_user.get_id.return_value = '1'
-        mock_query_getter.return_value.filter_by.return_value.first.return_value = fake_user
-
-        title = ('<title>' + url.replace('/', '').capitalize()).encode('utf-8')
-        with client:
-            query_string = {'next':  url}
-            response = self.login(client, query_string=query_string)
-            assert title in response.data
+@pytest.mark.usefixtures('test_user')
+def test_login_redirects_to_overview_by_default(client):
+    title = '<title>Overview - FinerPlan</title>'.encode('utf-8')
+    response = client.post(url_for('simple_page.login'), data=fill_login_form(), follow_redirects=True)
+    assert title in response.data
 
 
-class TestUserRegister(BasicAuth):
-    def test_successful_register(self, client, session):
-        """Tests that a user can register in app"""
-        self.register(client)
-        user = session.query(User).filter_by(username=self.test_user['username']).first()
-        assert user is not None
+@pytest.mark.usefixtures('test_user')
+def test_login_redirects_with_next(client):
+    title = '<title>Expenses - FinerPlan</title>'.encode('utf-8')
+
+    query_string = {'next':  'expenses'}
+    response = client.post(url_for('simple_page.login'), data=fill_login_form(), 
+                           follow_redirects=True, query_string=query_string)
+    assert title in response.data
 
 
-@pytest.mark.usefixtures('app_db_with_test_user')
-class TestUserLogin(BasicAuth):
-    def test_successful_login(self, client):
-        with client:
-            self.login(client)
-            assert self.test_user['username'] in str(current_user)
+def test_successful_register(client, db_session):
+    """Tests that a user can register in app"""
+    alice = users.alice()
 
-    def test_successful_logout(self, client):
-        with client:
-            self.login(client)
-            assert self.test_user['username'] in str(current_user)
-            self.logout(client)
-            assert self.test_user['username'] not in str(current_user)
+    form = fill_register_form(
+        username=alice.username,
+        password='nicepassword',
+        email=alice.email)
 
-    def test_wrong_username(self, client):
-        rv = self.login(client, username=self.test_user['username'] + 'x')
-        assert b'Invalid username' in rv.data
+    client.post(url_for('simple_page.register'), data=form)
 
-    def test_wrong_password(self, client):
-        rv = self.login(client, password=self.test_user['password'] + 'x')
-        assert b'Invalid password' in rv.data
+    user = db_session.query(User).filter_by(username=alice.username).first()
+    assert user is not None
+
+
+def test_successful_login(client, test_user):
+    form = fill_login_form()
+    with client:
+        client.post(url_for('simple_page.login'), data=form, follow_redirects=True)
+        assert test_user.username in str(current_user)
+
+
+def test_successful_logout(client, test_user):
+    form = fill_login_form()
+    with client:
+        client.post(url_for('simple_page.login'), data=form, follow_redirects=True)
+        assert test_user.username in str(current_user)
+
+        client.get(url_for('simple_page.logout'), follow_redirects=True)
+        assert test_user.username not in str(current_user)
+
+
+@pytest.mark.usefixtures('test_user')
+def test_wrong_username(client):
+    form = fill_login_form(username='other_name')
+    rv = client.post(url_for('simple_page.login'), data=form)
+    assert b'Invalid username' in rv.data
+
+
+@pytest.mark.usefixtures('test_user')
+def test_wrong_password(client):
+    form = fill_login_form(password='other_pass')
+    rv = client.post(url_for('simple_page.login'), data=form)
+    assert b'Invalid password' in rv.data
 

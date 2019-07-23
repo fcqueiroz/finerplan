@@ -1,97 +1,97 @@
 # 3rd Party Libraries
 import pytest
 # Local Imports
-from app import create_app, db
-from app.models import User, Transaction
+from app import create_app, db as _db
+
+from tests import setup_db, teardown_db, clean_db
+from tests.data import users, accounts, transactions
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def app():
-    app = create_app(config_name='testing')
-    yield app
+    """Global application fixture
+
+    Initialized with testing config file.
+    """
+    _app = create_app(config_name='testing')
+    ctx = _app.app_context()
+    ctx.push()
+
+    yield _app
+
+    ctx.pop()
+
+
+@pytest.fixture(scope="session")
+def db(app):
+    """Creates clean database schema and drops it on teardown
+
+    Note, that this is a session scoped fixture, it will be executed only once
+    and shared among all tests. Use `db_session` fixture to get clean database
+    before each test.
+    """
+
+    setup_db(app)
+    yield _db
+    teardown_db()
+
+
+@pytest.fixture(scope="function")
+def db_session(db, app):
+    """Provides clean database before each test. After each test,
+    session.rollback() is issued.
+
+    Return sqlalchemy session.
+    """
+
+    with app.app_context():
+        clean_db()
+        yield db.session
+        db.session.rollback()
 
 
 @pytest.fixture(scope='function')
 def client(app):
-    client = app.test_client()
-    yield client
+    return app.test_client()
+
+
+@pytest.fixture(scope="function")
+def test_user(db_session):
+    """
+    Creates a single test user
+    """
+    user = users.alice()
+    db_session.add(user)
+    db_session.commit()
+    return user
+
+
+@pytest.fixture(scope="function")
+def test_accounts(db_session):
+    """
+    Creates some accounts for test user
+    """
+    _test_user = test_user()
+    _all_accounts = accounts.all_accounts
+    for account in _all_accounts:
+        account.user_id = _test_user.id
+        db_session.add(account)
+    db_session.commit()
+    return _all_accounts
 
 
 @pytest.fixture(scope='function')
-def app_db(app):
-    with app.app_context():
-        db.create_all()
-        yield db
-        db.drop_all()
+def test_transaction(db_session):
+    """
+    Creates a single transaction
+    """
+    source = accounts.earnings()
+    destination = accounts.expenses()
 
+    transaction = transactions.first_salary()
+    transaction.account_source = source.id
+    transaction.account_destination = destination.id
 
-@pytest.fixture(scope='function')
-def session(app_db, request):
-    """Creates a new database session for a test."""
-    _db = app_db
-    connection = _db.engine.connect()
-    transaction = connection.begin()
-
-    options = dict(bind=connection, binds={})
-    session = _db.create_scoped_session(options=options)
-
-    _db.session = session
-
-    def teardown():
-        transaction.rollback()
-        connection.close()
-        session.remove()
-
-    #request.addfinalizer(teardown)
-    return session
-
-
-class RoutingMixin(object):
-    @staticmethod
-    def check_200_status_code(response, url):
-        assert 200 == response.status_code, f"wrong status code for '{url}'"
-
-    @staticmethod
-    def check_content_type(response, url):
-        assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
-
-
-class DatabaseMixin(object):
-    test_user = {
-        'username': 'tester',
-        'email': 'tester@app.com',
-        'password': 'nicepassword'}
-    transaction = {
-        'value': 1200,
-        'description': 'Regular Salary',
-        'account_source': 1,
-        'account_destination': 2}
-
-    def create_test_user(self, _db, test_user=None, init_accounts=True):
-        if test_user is None:
-            test_user = self.test_user
-        user = User(username=test_user['username'], email=test_user['email'])
-        user.set_password(test_user['password'])
-        _db.session.add(user)
-        if init_accounts:
-            user.init_accounts()
-
-    @pytest.fixture(scope='class')
-    def app_db_with_test_user(self, app):
-        with app.app_context():
-            db.create_all()
-            self.create_test_user(db)
-            yield db
-            db.drop_all()
-
-    @pytest.fixture(scope='class')
-    def user_with_default_accounts(self, app_db_with_test_user):
-        """Helper function to create user and init default accounts."""
-        _db = app_db_with_test_user
-        user = _db.session.query(User).filter_by(username=self.test_user['username']).first()
-        yield user
-
-    def create_transaction(self, _session, transaction=None):
-        if transaction is None:
-            transaction = self.transaction
-        _session.add(Transaction(**transaction))
+    db_session.add(transaction)
+    db_session.commit()
+    return transaction
