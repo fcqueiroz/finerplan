@@ -38,7 +38,6 @@ class Account(db.Model):
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), index=True)
-    # depth = db.Column(db.Integer)
     # is_leaf = db.Column(db.Boolean, default=True)
     # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
 
@@ -49,7 +48,6 @@ class Account(db.Model):
         super().__init__(**kwargs)
         # After the account creation, run 'generate_path'. Fix this!
 
-        # self.depth = len(self._split_path())
         # self.is_leaf = True
 
     def generate_path(self, parent=None):
@@ -64,6 +62,10 @@ class Account(db.Model):
         path_nodes = self.path.split('.')
         path_names = [Account.query.get(int(node)).name for node in path_nodes]
         return ' - '.join(path_names)
+
+    @property
+    def depth(self):
+        return len(self.path.split('.'))
 
     @staticmethod
     def _update_parent(parent_node):

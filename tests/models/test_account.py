@@ -20,3 +20,20 @@ def test_fullname_property(db_session):
     account = db_session.query(Account).filter_by(name='Rent').first()
 
     assert account.fullname == 'Expenses - Housing - Rent'
+
+
+@pytest.mark.usefixtures('test_accounts')
+def test_depth_property_in_1st_level(db_session):
+    """Tests account's depth property"""
+    account = db_session.query(Account).filter_by(name='Expenses').first()
+
+    assert account.depth == 1
+
+
+@pytest.mark.usefixtures('test_accounts')
+def test_depth_property_in_3rd_level(db_session):
+    """Tests account's depth property"""
+    account = db_session.query(Account).filter_by(name='Rent').first()
+
+    assert account.depth == 3
+
