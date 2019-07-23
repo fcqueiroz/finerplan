@@ -59,27 +59,32 @@ class Account(db.Model):
 
     @property
     def fullname(self):
+        """
+        Returns the name of all the accounts parents accounts in a single string.
+        """
         path_nodes = self.path.split('.')
         path_names = [Account.query.get(int(node)).name for node in path_nodes]
+
         return ' - '.join(path_names)
 
     @property
     def depth(self):
+        """
+        Returns how deep a certain account is in the hierarchy
+        """
         return len(self.path.split('.'))
 
-    @staticmethod
-    def _update_parent(parent_node):
-        """Changes parent attributes to indicate it is not a leaf node anymore"""
-        if isinstance(parent_node, Account):
-            parent_node.is_leaf = False
+    def descendents(self):
+        """
+        Returns the descendents from self.
+        """
+        children_path = self.path + '.%'
+        children = self.query.filter(Account.path.like(children_path))
 
-    def get_descendents(self, root, min_depth=None, max_depth=None, inner=False):
-        """Returns the descendents from a certain node.
+        return children.all()
 
-        Parameters
-        ----------
-        root: Account instance
-            The root node of the subtree returned
+    def prune(self, min_depth=None, max_depth=None, inner=False):
+        """
         min_depth: int, default=None
             The min difference of depth between the parent node depth and the children nodes.
             If min_depth is None, then the results starts on imediate children.
@@ -89,10 +94,6 @@ class Account(db.Model):
         inner: bool, default=False
             By default returns only the leaf nodes. If True, returns inner nodes as well.
         """
-        root_path = root.path + str(root.id) + self._path_sep_number + '%'
-        base_depth = root.depth
-        children = self.query.filter(Account.path.like(root_path))
-
         if min_depth is not None:
             children = children.filter(base_depth + min_depth <= Account.depth)
 

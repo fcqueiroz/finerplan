@@ -37,3 +37,19 @@ def test_depth_property_in_3rd_level(db_session):
 
     assert account.depth == 3
 
+
+@pytest.mark.usefixtures('test_accounts')
+def test_descendents_method_without_subaccounts(db_session):
+    """Assures that the Account.descendents() returns 0 values when there are no descendents."""
+    account = db_session.query(Account).filter_by(name='Rent').first()
+
+    assert len(account.descendents()) == 0
+
+
+@pytest.mark.usefixtures('test_accounts')
+def test_descendents_method(db_session):
+    """Assures that the Account.descendents() returns the full
+    list of descendents from the queried account."""
+    account = db_session.query(Account).filter_by(name='Expenses').first()
+
+    assert len(account.descendents()) == 2
