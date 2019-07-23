@@ -27,30 +27,23 @@ def liabilities():
 
 def housing():
     return Account(
-        name='Housing',
-        parent_account=expenses()
+        name='Housing'
     )
 
 
 def food():
     return Account(
-        name='Food',
-        parent_account=expenses()
+        name='Food'
     )
 
 
 def rent():
     return Account(
-        name='Rent',
-        parent_account=housing()
+        name='Rent'
     )
 
 
 def utilities():
     return Account(
-        name='Utilities',
-        parent_account=housing()
+        name='Utilities'
     )
-
-
-all_accounts = [expenses(), earnings(), assets(), liabilities(), housing(), food(), rent(), utilities()]

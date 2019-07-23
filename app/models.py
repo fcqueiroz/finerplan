@@ -27,6 +27,86 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+@login.user_loader
+def load_user(_id):
+    return User.query.get(int(_id))
+
+
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    path = db.Column(db.String(500), index=True)
+    # depth = db.Column(db.Integer)
+    # is_leaf = db.Column(db.Boolean, default=True)
+    # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<Account {self.id} {self.name}>'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # After the account creation, run 'generate_path'. Fix this!
+
+        # self.depth = len(self._split_path())
+        # self.is_leaf = True
+
+    def generate_path(self, parent=None):
+        if parent is not None:
+            path = parent.path + '.'
+        else:
+            path = ''
+        self.path = path + str(self.id)
+
+    @property
+    def fullname(self):
+        path_names = [Account.query.get(int(node)).name for node in self._split_path()]
+        path_names.append(self.name)
+        return self._path_sep_name.join(path_names)
+
+
+    @staticmethod
+    def _update_parent(parent_node):
+        """Changes parent attributes to indicate it is not a leaf node anymore"""
+        if isinstance(parent_node, Account):
+            parent_node.is_leaf = False
+
+    def get_descendents(self, root, min_depth=None, max_depth=None, inner=False):
+        """Returns the descendents from a certain node.
+
+        Parameters
+        ----------
+        root: Account instance
+            The root node of the subtree returned
+        min_depth: int, default=None
+            The min difference of depth between the parent node depth and the children nodes.
+            If min_depth is None, then the results starts on imediate children.
+        max_depth: int, default=None
+            The max difference of depth between the parent node depth and the children nodes.
+            If max_depth is None, then the results are unbounded.
+        inner: bool, default=False
+            By default returns only the leaf nodes. If True, returns inner nodes as well.
+        """
+        root_path = root.path + str(root.id) + self._path_sep_number + '%'
+        base_depth = root.depth
+        children = self.query.filter(Account.path.like(root_path))
+
+        if min_depth is not None:
+            children = children.filter(base_depth + min_depth <= Account.depth)
+
+        if max_depth is not None:
+            children = children.filter(Account.depth <= base_depth + max_depth)
+
+        if not inner:
+            children = children.filter(Account.is_leaf)
+
+        return children
+
+    def _split_path(self):
+        path = list(filter(None, self.path.split(self._path_sep_number)))
+        return path
+
     def init_accounts(self):
         self._init_fundamental_accounts()
         self._init_default_account_categories()
@@ -92,95 +172,6 @@ class User(UserMixin, db.Model):
                     subaccounts.extend(children)
 
         return subaccounts
-
-
-@login.user_loader
-def load_user(_id):
-    return User.query.get(int(_id))
-
-
-class Account(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    path = db.Column(db.String(500), nullable=False, index=True)
-    depth = db.Column(db.Integer)
-    is_leaf = db.Column(db.Boolean, default=True)
-    # transaction = db.relationship('Transaction', backref='owner', lazy='dynamic')
-
-    _path_sep_number = '/'
-    _path_sep_name = ' - '
-
-    def __repr__(self):
-        try:
-            return f'<Account {self.owner.username}\'s {self.name}>'
-        except AttributeError:
-            return f'<Account Unclaimed {self.name}>'
-
-    def __init__(self, parent_account=None, **kwargs):
-        super().__init__(**kwargs)
-        self.path = self._generate_node_path(parent_account)
-        self._update_parent(parent_account)
-        self.depth = len(self._split_path())
-        self.is_leaf = True
-
-    @property
-    def fullname(self):
-        path_names = [Account.query.get(int(node)).name for node in self._split_path()]
-        path_names.append(self.name)
-        return self._path_sep_name.join(path_names)
-
-    @staticmethod
-    def _generate_node_path(parent_node):
-        if parent_node is None:
-            path = '/'
-        elif isinstance(parent_node, Account):
-            path = ''.join([parent_node.path, str(parent_node.id), '/'])
-        else:
-            raise ValueError(f"Parent account must be Account type. Got '{type(parent_node)}'")
-
-        return path
-
-    @staticmethod
-    def _update_parent(parent_node):
-        """Changes parent attributes to indicate it is not a leaf node anymore"""
-        if isinstance(parent_node, Account):
-            parent_node.is_leaf = False
-
-    def get_descendents(self, root, min_depth=None, max_depth=None, inner=False):
-        """Returns the descendents from a certain node.
-
-        Parameters
-        ----------
-        root: Account instance
-            The root node of the subtree returned
-        min_depth: int, default=None
-            The min difference of depth between the parent node depth and the children nodes.
-            If min_depth is None, then the results starts on imediate children.
-        max_depth: int, default=None
-            The max difference of depth between the parent node depth and the children nodes.
-            If max_depth is None, then the results are unbounded.
-        inner: bool, default=False
-            By default returns only the leaf nodes. If True, returns inner nodes as well.
-        """
-        root_path = root.path + str(root.id) + self._path_sep_number + '%'
-        base_depth = root.depth
-        children = self.query.filter(Account.path.like(root_path))
-
-        if min_depth is not None:
-            children = children.filter(base_depth + min_depth <= Account.depth)
-
-        if max_depth is not None:
-            children = children.filter(Account.depth <= base_depth + max_depth)
-
-        if not inner:
-            children = children.filter(Account.is_leaf)
-
-        return children
-
-    def _split_path(self):
-        path = list(filter(None, self.path.split(self._path_sep_number)))
-        return path
 
 
 class Transaction(db.Model):

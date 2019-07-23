@@ -67,16 +67,25 @@ def test_user(db_session):
 
 
 @pytest.fixture(scope="function")
-def test_accounts(db_session):
+def test_accounts(db_session, test_user):
     """
     Creates some accounts for test user
     """
-    _test_user = test_user()
-    _all_accounts = accounts.all_accounts
-    for account in _all_accounts:
-        account.user_id = _test_user.id
-        db_session.add(account)
-    db_session.commit()
+    _test_user = test_user
+
+    def insert(_account, parent=None):
+        _account.user_id = _test_user.id
+        db_session.add(_account)
+        db_session.commit()
+        _account.generate_path(parent=parent)
+        return _account
+
+    expenses = insert(accounts.expenses())
+    earnings = insert(accounts.earnings())
+    housing = insert(accounts.housing(), parent=expenses)
+    rent = insert(accounts.rent(), parent=housing)
+
+    _all_accounts = [expenses, earnings, housing, rent]
     return _all_accounts
 
 
