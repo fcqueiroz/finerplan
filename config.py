@@ -87,4 +87,4 @@ default_account_categories = (
 )
 
 # ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
-fundamental_accounts = ['Assets', 'Liabilities', 'Earnings', 'Expenses']
+fundamental_accounts = ['Equity', 'Earnings', 'Expenses']

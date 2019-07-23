@@ -53,7 +53,10 @@ def register():
 def overview():
     form = AddTransactionForm()
     form.transaction_kind.choices = [(kind.lower(), kind) for kind in ['Income', 'Expenses']]
-    user_accounts = current_user.get_subaccounts(['Equity', 'Assets', 'Liabilities', 'Expenses', 'Income'])
+
+    # Todo Fill the choices using the same accounts view that produces the json
+    # Retrieves only the leaf nodes from user's accounts
+    user_accounts = [account for account in current_user.accounts if account.is_leaf]
     user_accounts_choices = [(account.id, '') for account in user_accounts]
     form.account_source.choices = user_accounts_choices
     form.account_destination.choices = user_accounts_choices
@@ -84,13 +87,18 @@ def overview():
 @simple_page.route('/accounts/<transaction_kind>')
 @login_required
 def accounts(transaction_kind):
-    equity_subaccounts = current_user.get_subaccounts(['Equity', 'Assets', 'Liabilities'])
+    # TODO Test this view!
+
+    leaves = dict()
+    for name in ['equity', 'expenses', 'earnings']:
+        leaves[name] = [account for account in getattr(current_user, name).descendents() if account.is_leaf]
+
     if transaction_kind == 'income':
-        source = current_user.get_subaccounts('Income')
-        destination = equity_subaccounts
+        source = leaves['earnings']
+        destination = leaves['equity']
     elif transaction_kind == 'expenses':
-        source = equity_subaccounts
-        destination = current_user.get_subaccounts('Expenses')
+        source = leaves['equity']
+        destination = leaves['expenses']
     else:
         raise ValueError
 

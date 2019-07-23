@@ -24,7 +24,29 @@ class User(UserMixin, db.Model):
         for account_name in fundamental_accounts:
             new_account = Account(user_id=self.id, name=account_name)
             db.session.add(new_account)
+            new_account.generate_path()
             db.session.commit()
+
+    @property
+    def equity(self):
+        accounts = self.accounts.filter_by(name='Equity')
+        for account in accounts:
+            if account.depth == 1:
+                return account
+
+    @property
+    def expenses(self):
+        accounts = self.accounts.filter_by(name='Expenses')
+        for account in accounts:
+            if account.depth == 1:
+                return account
+
+    @property
+    def earnings(self):
+        accounts = self.accounts.filter_by(name='Earnings')
+        for account in accounts:
+            if account.depth == 1:
+                return account
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

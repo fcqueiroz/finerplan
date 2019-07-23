@@ -13,15 +13,9 @@ def earnings():
     )
 
 
-def assets():
+def equity():
     return Account(
-        name='Assets'
-    )
-
-
-def liabilities():
-    return Account(
-        name='Liabilities'
+        name='Equity'
     )
 
 
