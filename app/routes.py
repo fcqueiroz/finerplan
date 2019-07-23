@@ -39,12 +39,8 @@ def register():
         return redirect(url_for('simple_page.overview'))
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
+        user = User(username=form.username.data, password=form.password.data, email=form.email.data)
         db.session.add(user)
-
-        # Temporarily init user accounts on register
-        user.init_accounts()
         db.session.commit()
 
         return redirect(url_for('simple_page.login'))

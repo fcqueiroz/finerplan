@@ -86,6 +86,5 @@ default_account_categories = (
     ('Transportation', ['Auto', 'Public', 'Taxi', 'Travel'])
 )
 
-# The 5 fundamental accounts according to basic accounting rules
 # ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
-fundamental_accounts = ['Assets', 'Liabilities', 'Equity', 'Income', 'Expenses']
+fundamental_accounts = ['Assets', 'Liabilities', 'Earnings', 'Expenses']
