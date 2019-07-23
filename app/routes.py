@@ -76,7 +76,7 @@ def overview():
         return redirect(url_for('simple_page.overview'))
 
     columns = [Transaction.accrual_date, Transaction.description, Transaction.value,
-               Transaction.account_source, Transaction.account_destination]
+               Transaction.source, Transaction.destination]
     tables = {'transactions': Transaction.query.with_entities(*columns).all()}
 
     basic_report = reports.basic()

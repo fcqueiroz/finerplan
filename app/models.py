@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
@@ -115,6 +116,32 @@ class Account(db.Model):
         """Returns a boolean indicating whether the queried account
         is a leaf (ie, has no descendents)."""
         return len(self.descendents()) == 0
+
+    def balance(self, start=None, end=None) -> float:
+        filters = self._accrual_date_filter(start, end)
+
+        deposits_sum = self._balance(self.deposits, filters)
+        withdraws_sum = self._balance(self.withdraws, filters)
+
+        return deposits_sum - withdraws_sum
+
+    @staticmethod
+    def _balance(query, filters):
+        result = query.filter(*filters).with_entities(func.sum(Transaction.value)).first()[0]
+        if result is None:
+            return 0
+        else:
+            return result
+
+    @staticmethod
+    def _accrual_date_filter(start, end):
+        filters = []
+        if start is not None:
+            filters.append((start <= Transaction.accrual_date))
+        if end is not None:
+            filters.append((Transaction.accrual_date <= end))
+
+        return filters
 
 
 class Transaction(db.Model):

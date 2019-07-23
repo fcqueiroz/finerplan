@@ -105,3 +105,26 @@ def test_transaction(db_session, test_accounts):
     db_session.add(transaction)
     db_session.commit()
     return transaction
+
+
+@pytest.fixture(scope='function')
+def test_transactions(db_session, test_accounts):
+    """
+    Creates some transactions
+    """
+    def insert(_transaction, source, destination):
+        _transaction.source_id = source.id
+        _transaction.destination_id = destination.id
+        db_session.add(_transaction)
+        db_session.commit()
+        return _transaction
+
+    # From Earnings to Equity
+    first_salary = insert(transactions.first_salary(), test_accounts[1], test_accounts[2])
+    # From Equity to Expenses
+    dining_out = insert(transactions.dining_out(), test_accounts[2], test_accounts[0])
+    # From Equity to Expenses
+    phone_bill = insert(transactions.phone_bill(), test_accounts[2], test_accounts[0])
+
+    _all_transactions = [first_salary, dining_out, phone_bill]
+    return _all_transactions

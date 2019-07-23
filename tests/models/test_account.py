@@ -1,4 +1,4 @@
-
+from datetime import datetime
 import pytest
 
 from app.models import Account
@@ -91,3 +91,23 @@ def test_account_withdraws(db_session):
 
     assert source.withdraws.count() == 1
     assert destination.withdraws.count() == 0
+
+
+@pytest.mark.usefixtures('test_transactions')
+def test_account_balance_method_unbounded(db_session):
+    """Tests generic method to calculate account's balance over a period of time."""
+    account = db_session.query(Account).filter_by(name='Equity').first()
+
+    assert account.balance() == 1135
+
+
+@pytest.mark.usefixtures('test_transactions')
+def test_account_balance_method_bounded(db_session):
+    """Tests generic method to calculate account's balance over a period of time."""
+    account = db_session.query(Account).filter_by(name='Equity').first()
+
+    dt = datetime(2019, 7, 15)
+
+    assert account.balance(end=dt) == 1185
+    assert account.balance(start=dt) == -50
+    assert account.balance(start=datetime(2019, 7, 3), end=dt) == -15
