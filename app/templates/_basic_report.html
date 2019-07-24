@@ -2,20 +2,20 @@
   <div class="card-body">
     <h2>Basic Report</h2>
     <p id="basic-report">
-      Your current balance is <b>{{ report.balance }}</b><br>
-      Your balance after paying all debts will be<b>{{ report.free_balance }}</b><br>
-      Your next credit card payment is due {{ report.credit_date }}.<br>
-      The current value is <b>{{ report.credit_value }}</b>({{ report.credit_state }})<br>
-      {% if report.credit_state == 'Closed' %}
+      Your current balance is <b>{{ "%.2f"|format(report.basic.balance())  }}</b><br>
+      Your balance after paying all debts will be<b>{{ "%.2f"|format(report.basic.free_balance())  }}</b><br>
+      Your next credit card payment is due {{ report.credit_card.future_payments() }}.<br>
+      The current value is <b>{{ "%.2f"|format(report.credit_card.invoice_value())  }}</b> ({{ report.credit_card.state() }})<br>
+      {% if report.credit_card.state == 'Closed' %}
         The current value for the following open invoice is
-        <b>{{ report.credit_nvalue }}</b><br>
+        <b>{{ "%.2f"|format(report.credit_card.invoice_value(1))  }}</b><br>
       {% endif %}
-      Current month earnings: <b>{{ report.earnings }}</b><br>
-      Available for luxury expending: <b>{{ report.lux_budget}}</b>({{ report.lux_rate}})<br>
-      Current month expenses: <b>{{ report.expenses }}</b><br>
-      Double Exponential Moving Average Expending: <b>{{ report.dema }}</b><br>
-      This month savings: <b>{{ report.savings }}</b><br>
-      Last 12 months savings rate: <b>{{ report.savings_rate }}</b>
+      Current month earnings: <b>{{ "%.2f"|format(report.basic.earnings())  }}</b><br>
+      Available for luxury expending: <b>{{ "%.2f"|format(report.budget.available())  }}</b> ({{ report.budget.rate() }})<br>
+      Current month expenses: <b>{{ "%.2f"|format(report.basic.expenses())  }}</b><br>
+      Double Exponential Moving Average Expending: <b>{{ "%.2f"|format(report.basic.double_ema())  }}</b><br>
+      This month savings: <b>{{ "%.2f"|format(report.basic.month_savings())  }}</b><br>
+      Last 12 months savings rate: <b>{{ report.basic.savings_rate() }}</b>
     </p>
   </div>
 </div>

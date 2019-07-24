@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 import os
 
 import pandas as pd
@@ -9,14 +9,12 @@ from app.dates import special_dates as sdate
 
 from config import basedir, date_model
 
-
 # Temporarily connects only to the old database (until we can move all functions to new database)
 database = os.path.join(basedir, 'old.db')
 con = sqlite3.connect(database, check_same_thread=False)
 cur = con.cursor()
 
 
-# Modules still using this class: [reports.py, routes.py]
 class SqliteOps(object):
     @staticmethod
     def sum_query(query_str, query_values):
@@ -26,7 +24,8 @@ class SqliteOps(object):
             result = 0
         return result
 
-    def ema(self, alpha=0.15, beta=0.5, kind='simple'):
+    @staticmethod
+    def ema(alpha=0.15, beta=0.5, kind='simple'):
         """Calculates Exponential Moving Average
         for monthly expenses. The EMA can be simple or double
         """
@@ -90,15 +89,15 @@ class SqliteOps(object):
     def expenses_table(months=13):
         df = pd.DataFrame(columns=['Category'])
         for num in range(months-1, -1, -1):
-            sdate = date.today() + relativedelta(day=1, months=-num)
-            fdate = sdate + relativedelta(months=1)
+            start_date = date.today() + relativedelta(day=1, months=-num)
+            final_date = start_date + relativedelta(months=1)
             query = ("SELECT category,sum(value) "
                      "FROM expenses "
                      "WHERE accrual_date >= ? and accrual_date < ? "
                      "GROUP BY category;")
-            cur.execute(query, (sdate, fdate))
+            cur.execute(query, (start_date, final_date))
             result = cur.fetchall()
-            label = sdate.strftime('%m/%y')
+            label = start_date.strftime('%m/%y')
             tmp = pd.DataFrame(result, columns=['Category', label])
             df = pd.merge(df, tmp, how='outer',
                           left_on='Category', right_on='Category')

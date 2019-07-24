@@ -1,7 +1,7 @@
 """Creates a dictionary of special dates for easy access."""
 
 from datetime import date
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 
 
 def start_of_current_month():

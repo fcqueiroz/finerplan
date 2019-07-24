@@ -2,7 +2,7 @@ import logging
 from flask import redirect, render_template, url_for, Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from app import reports
+from app.reports import Report
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
 from app.sql import SqliteOps
@@ -79,9 +79,8 @@ def overview():
                Transaction.source, Transaction.destination]
     tables = {'transactions': Transaction.query.with_entities(*columns).all()}
 
-    basic_report = reports.basic()
     return render_template('overview.html', title='Overview', form=form,
-                           tables=tables, report=basic_report)
+                           tables=tables, report=Report())
 
 
 @simple_page.route('/accounts/<transaction_kind>')
