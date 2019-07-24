@@ -1,11 +1,14 @@
-from dateutil.relativedelta import *
+from datetime import date, datetime
+from dateutil import relativedelta
 import os
 
-import sqlite3
 import pandas as pd
+import sqlite3
 
-from app import dates
-from config import basedir
+from app.dates import special_dates as sdate
+
+from config import basedir, date_model
+
 
 # Temporarily connects only to the old database (until we can move all functions to new database)
 database = os.path.join(basedir, 'old.db')
@@ -15,9 +18,6 @@ cur = con.cursor()
 
 # Modules still using this class: [reports.py, routes.py]
 class SqliteOps(object):
-    sdate = dates.sdate()
-    SOCM, SOM = sdate['SOCM'], sdate['SOM']
-
     @staticmethod
     def sum_query(query_str, query_values):
         cur.execute('SELECT sum(value) FROM ' + query_str, query_values)
@@ -39,7 +39,8 @@ class SqliteOps(object):
         except TypeError:
             # The database is probably empty
             return 0
-        month_start = dates.date_converter(oldest_date)
+
+        month_start = datetime.strptime(oldest_date, date_model).date()
         month_ending = month_start + relativedelta(day=31)
 
         cur.execute('SELECT sum(value) FROM expenses '
@@ -50,7 +51,7 @@ class SqliteOps(object):
             return 0
         if kind == 'double':
             month_start = month_ending + relativedelta(days=1)
-            if month_start == self.SOCM:
+            if month_start == sdate.start_of_current_month():
                 # Not enough data for making a double EMA
                 return mov_avg
             month_ending = month_start + relativedelta(day=31)
@@ -73,7 +74,7 @@ class SqliteOps(object):
                         'WHERE accrual_date>=? AND accrual_date <=?;',
                         (month_start, month_ending))
             result = cur.fetchone()[0]
-            if (not isinstance(result, (int, float))) or (month_start == self.SOCM):
+            if (not isinstance(result, (int, float))) or (month_start == sdate.start_of_current_month()):
                 if kind == 'simple':
                     return mov_avg
                 elif kind == 'double':
@@ -89,7 +90,7 @@ class SqliteOps(object):
     def expenses_table(months=13):
         df = pd.DataFrame(columns=['Category'])
         for num in range(months-1, -1, -1):
-            sdate = dates.date.today() + relativedelta(day=1, months=-num)
+            sdate = date.today() + relativedelta(day=1, months=-num)
             fdate = sdate + relativedelta(months=1)
             query = ("SELECT category,sum(value) "
                      "FROM expenses "

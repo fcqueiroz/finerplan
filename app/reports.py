@@ -1,6 +1,8 @@
+from datetime import date
 import locale
-from app import dates
+
 from app.sql import SqliteOps
+from app.dates import helpers, special_dates as sdates
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -15,11 +17,15 @@ def basic():
     Savings Rate of the past 12 months based on accrual accounting.
     """
 
-    sdate = dates.sdate()
     sql = SqliteOps()
-    SOCM, SOM, NEXT_PAY = sdate['SOCM'], sdate['SOM'], sdate['NEXT_PAY']
-    TODAY, FOLLOWING_NEXT_PAY = sdate['TODAY'], sdate['FOLLOWING_NEXT_PAY']
-    M_PROGRESS = sdate['M_PROGRESS']
+
+    SOCM = sdates.start_of_current_month()
+    SOM = sdates.start_of_next_month()
+    NEXT_PAY = helpers.credit_card_future_payments()
+    FOLLOWING_NEXT_PAY = helpers.credit_card_future_payments(1)
+    TODAY = date.today()
+    M_PROGRESS = helpers.month_progress()
+
     # This variable holds the user preference for the minimum desired balance
     MIN_TG_BALANCE = 500
     # This variable holds the user preference for maximum expending in luxyry
@@ -43,17 +49,17 @@ def basic():
 
     values = (SOM, '-12 month', SOCM)
     query = ('expenses WHERE ((SELECT date(?, ?) <= accrual_date) '
-            'and (accrual_date < ?));')
+             'and (accrual_date < ?));')
     out_12m = sql.sum_query(query, values)
     query = ('earnings WHERE ((SELECT date(?, ?) <= accrual_date) '
-            'and (accrual_date < ?));')
+             'and (accrual_date < ?));')
     in_12m = sql.sum_query(query, values)
     if in_12m == 0:
         savings_rate = "Not available"
     else:
         savings_rate = locale.format_string('%.2f %%', 100*(1 - out_12m/in_12m))
 
-    if dates.credit_state():
+    if helpers.credit_state():
         invoice_state = "Closed"
     else:
         invoice_state = "Open"
