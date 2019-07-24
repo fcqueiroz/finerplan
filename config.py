@@ -1,5 +1,4 @@
 import os
-import tempfile
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -29,7 +28,6 @@ class TestingConfig(BaseConfig):
     """Configurations for Testing, with a separate test database."""
     DEBUG = True
     TESTING = True
-    SERVER_NAME = 'localhost.localdomain'
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     WTF_CSRF_ENABLED = False
 

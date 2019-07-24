@@ -76,7 +76,8 @@ class Account(db.Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # After the account creation, run 'generate_path'. Fix this!
+        # TODO: Run 'generate_path' in account creation.
+        # TODO: Do not create account if its fullname isn't unique amoung User accounts
 
     def generate_path(self, parent=None):
         if parent is not None:
