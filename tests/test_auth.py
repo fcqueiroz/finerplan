@@ -12,9 +12,9 @@ def fill_login_form(username=None, password=None):
     """Login helper function"""
     _user = users.alice()
     if username is None:
-        username = _user.username
+        username = _user['username']
     if password is None:
-        password = _user.password
+        password = _user['password']
     return dict(username=username, password=password)
 
 
@@ -22,11 +22,11 @@ def fill_register_form(username=None, password=None, email=None):
     """Register new user helper function"""
     _user = users.alice()
     if username is None:
-        username = _user.username
+        username = _user['username']
     if email is None:
-        email = _user.email
+        email = _user['email']
     if password is None:
-        password = _user.password
+        password = _user['username']
     return dict(username=username, email=email,
                 password=password, password2=password)
 
@@ -86,14 +86,10 @@ def test_successful_register(client, db_session):
     """Tests that a user can register in app"""
     alice = users.alice()
 
-    form = fill_register_form(
-        username=alice.username,
-        password='nicepassword',
-        email=alice.email)
-
+    form = fill_register_form(**alice)
     client.post(url_for('simple_page.register'), data=form)
 
-    user = db_session.query(User).filter_by(username=alice.username).first()
+    user = db_session.query(User).filter_by(username=alice['username'], email=alice['email']).first()
     assert user is not None
 
 

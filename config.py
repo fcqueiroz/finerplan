@@ -30,7 +30,7 @@ class TestingConfig(BaseConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     WTF_CSRF_ENABLED = False
-    SERVER_NAME = 'localhost'
+    SERVER_NAME = 'localhost.localdomain'
 
 
 class ProductionConfig(BaseConfig):

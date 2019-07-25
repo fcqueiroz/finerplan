@@ -1,43 +1,49 @@
-from app.models import Account
 
 
 def expenses():
-    return Account(
-        name='Expenses'
+    return dict(
+        name='Expenses',
+        group='expenses'
     )
 
 
 def earnings():
-    return Account(
-        name='Earnings'
+    return dict(
+        name='Earnings',
+        group='earnings'
     )
 
 
 def equity():
-    return Account(
-        name='Equity'
+    return dict(
+        name='Equity',
+        group='equity'
     )
 
 
 def housing():
-    return Account(
-        name='Housing'
+    return dict(
+        name='Housing',
+        group='expenses'
     )
 
 
 def food():
-    return Account(
-        name='Food'
+    return dict(
+        name='Food',
+        group='expenses'
     )
 
 
 def rent():
-    return Account(
-        name='Rent'
+    return dict(
+        name='Rent',
+        group='expenses'
     )
 
 
 def utilities():
-    return Account(
-        name='Utilities'
+    return dict(
+        name='Utilities',
+        group='expenses'
     )

@@ -1,20 +1,18 @@
-from app.models import Account
+import pytest
+
+from app.models import User
+
+from tests.data import users
 
 
-def test_user_init_accounts(test_user):
-    user = test_user
-    assert user.accounts.count() == 0  # Sanity check
+@pytest.mark.usefixtures('db_session')
+def test_create_user():
+    user_data = users.alice()
+    return_value = User.create(**user_data)
 
-    user.init_accounts()
-    assert user.accounts.count() == 3
+    new_user = User.query.filter_by(username=user_data['username'], email=user_data['email']).first()
 
-
-def test_user_fundamental_account_attribute(test_user):
-    """Tests that the fundamental accounts are available as attributes of the User instance."""
-    user = test_user
-    user.init_accounts()
-
-    fundamental_account = ['Equity', 'Earnings', 'Expenses']
-    for account in fundamental_account:
-        assert isinstance(getattr(user, account.lower()), Account)
-        assert getattr(user, account.lower()).name == account
+    assert return_value == new_user
+    assert new_user is not None
+    assert new_user.check_password(password=user_data['password'])
+    assert new_user.accounts.count() == 0

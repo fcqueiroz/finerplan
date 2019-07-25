@@ -1,11 +1,8 @@
-from app.models import User
 
 
 def alice():
-    user = User(
+    return dict(
         username='Alice',
         email='alice@finerplan.com',
         password='nicepassword'
     )
-    user.password = 'nicepassword'
-    return user

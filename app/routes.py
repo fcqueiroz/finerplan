@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
-from app.models import User, Transaction
+from app.models import User, Transaction, init_fundamental_accounts
 from app.reports import Report, history
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
@@ -19,6 +19,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
+        init_fundamental_accounts(user)
+
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -39,9 +41,7 @@ def register():
         return redirect(url_for('simple_page.overview'))
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, password=form.password.data, email=form.email.data)
-        db.session.add(user)
-        db.session.commit()
+        _ = User.create(username=form.username.data, password=form.password.data, email=form.email.data)
 
         return redirect(url_for('simple_page.login'))
     return render_template('register.html', title='Sign Up', form=form)

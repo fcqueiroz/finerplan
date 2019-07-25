@@ -2,6 +2,7 @@
 import pytest
 # Local Imports
 from app import create_app, db as _db
+from app.models import User, Account, Transaction
 
 from tests import setup_db, teardown_db, clean_db
 from tests.data import users, accounts, transactions
@@ -60,9 +61,9 @@ def test_user(db_session):
     """
     Creates a single test user
     """
-    user = users.alice()
-    db_session.add(user)
-    db_session.commit()
+    user_data = users.alice()
+    user = User.create(**user_data)
+
     return user
 
 
@@ -71,20 +72,11 @@ def test_accounts(db_session, test_user):
     """
     Creates some accounts for test user
     """
-    _test_user = test_user
-
-    def insert(_account, parent=None):
-        _account.user_id = _test_user.id
-        db_session.add(_account)
-        db_session.commit()
-        _account.generate_path(parent=parent)
-        return _account
-
-    expenses = insert(accounts.expenses())
-    earnings = insert(accounts.earnings())
-    equity = insert(accounts.equity())
-    housing = insert(accounts.housing(), parent=expenses)
-    rent = insert(accounts.rent(), parent=housing)
+    expenses = Account.create(name=accounts.expenses()['name'], user=test_user)
+    earnings = Account.create(name=accounts.earnings()['name'], user=test_user)
+    equity = Account.create(name=accounts.equity()['name'], user=test_user)
+    housing = Account.create(name=accounts.housing()['name'], user=test_user, parent=expenses)
+    rent = Account.create(name=accounts.rent()['name'], user=test_user, parent=housing)
 
     _all_accounts = [expenses, earnings, equity, housing, rent]
     return _all_accounts
