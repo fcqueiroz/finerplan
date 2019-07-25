@@ -10,9 +10,9 @@
         The current value for the following open invoice is
         <b>{{ "%.2f"|format(report.credit_card.invoice_value(1))  }}</b><br>
       {% endif %}
-      Current month earnings: <b>{{ "%.2f"|format(report.basic.earnings())  }}</b><br>
+      Current month earnings: <b>{{ "%.2f"|format(report.basic.income_and_expenses('Earnings'))  }}</b><br>
       Available for luxury expending: <b>{{ "%.2f"|format(report.budget.available())  }}</b> ({{ report.budget.rate() }})<br>
-      Current month expenses: <b>{{ "%.2f"|format(report.basic.expenses())  }}</b><br>
+      Current month expenses: <b>{{ "%.2f"|format(report.basic.income_and_expenses('Expenses'))  }}</b><br>
       Double Exponential Moving Average Expending: <b>{{ "%.2f"|format(report.basic.double_ema())  }}</b><br>
       This month savings: <b>{{ "%.2f"|format(report.basic.month_savings())  }}</b><br>
       Last 12 months savings rate: <b>{{ report.basic.savings_rate() }}</b>
