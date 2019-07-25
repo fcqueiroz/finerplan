@@ -86,38 +86,68 @@ class SqliteOps(object):
                 trend = beta * (mov_avg - tmp) + (1 - beta) * trend
 
     @staticmethod
-    def expenses_table(months=13):
-        df = pd.DataFrame(columns=['Category'])
-        for num in range(months-1, -1, -1):
-            start_date = date.today() + relativedelta(day=1, months=-num)
-            final_date = start_date + relativedelta(months=1)
-            query = ("SELECT category,sum(value) "
-                     "FROM expenses "
-                     "WHERE accrual_date >= ? and accrual_date < ? "
-                     "GROUP BY category;")
-            cur.execute(query, (start_date, final_date))
-            result = cur.fetchall()
-            label = start_date.strftime('%m/%y')
-            tmp = pd.DataFrame(result, columns=['Category', label])
-            df = pd.merge(df, tmp, how='outer',
-                          left_on='Category', right_on='Category')
+    def _generate_month_expenses_table_data(start_date, final_date):
+        query = ("SELECT category,sum(value) "
+                 "FROM expenses "
+                 "WHERE accrual_date >= ? and accrual_date < ? "
+                 "GROUP BY category;")
+        cur.execute(query, (start_date, final_date))
+        return cur.fetchall()
 
-        cols = list(df.columns)
-        cols.pop(cols.index('Category'))
-        cols = ['Category'] + cols
-        df = df[cols]
-        df.fillna(value=0, inplace=True)
-        df["Média"] = df.iloc[:, :-1].mean(axis=1)
-        df["Média"] = df["Média"].apply(lambda x: round(x,2))
-        df = df.sort_values(by="Média", ascending=False)
+    def _generate_month_expenses_dataframe(self, num):
+        start_date = date.today() + relativedelta(day=1, months=-num)
+        final_date = start_date + relativedelta(months=1)
 
-        df["Peso Ac."] = df["Média"].cumsum() / df["Média"].sum()
-        df["Peso Ac."] = df["Peso Ac."].apply(lambda x: "{0:.1f} %".format(100*x))
+        table_data = self._generate_month_expenses_table_data(start_date, final_date)
 
-        soma = df.sum()
-        soma.name = 'Soma'
-        soma['Category'] = soma.name
+        label = start_date.strftime('%m/%y')
+        new_df = pd.DataFrame(table_data, columns=['Category', label])
+        new_df = new_df.set_index('Category')
+
+        return new_df
+
+    def _generate_expenses_dataframe(self, months, index_name):
+        dataframes = [self._generate_month_expenses_dataframe(num) for num in range(months-1, -1, -1)]
+        df = pd.concat(dataframes, axis=1, sort=False)
+        df.index.name = index_name
+        df = df.reset_index()
+        return df.fillna(value=0)
+
+    @staticmethod
+    def _add_mean_column(_df, new_col_name):
+        _df[new_col_name] = _df.iloc[:, :-1].mean(axis=1).apply(lambda x: round(x, 2))
+        return _df
+
+    @staticmethod
+    def _add_cumulative_weight_column(_df, mean_col, new_col_name):
+        _df = _df.sort_values(by=mean_col, ascending=False)
+        _df[new_col_name] = _df[mean_col].cumsum() / _df[mean_col].sum()
+        _df[new_col_name] = _df[new_col_name].apply(lambda x: "{0:.1f} %".format(100 * x))
+        return _df
+
+    @staticmethod
+    def _append_total_sum_row(_df, index_name, sum_name):
+        soma = _df.sum()
+        soma.name = sum_name
+        soma[index_name] = soma.name
         soma[-1] = ""
-        df = df.append(soma)
+        return _df.append(soma)
+
+    def expenses_table(self, months=13):
+        """This method is being created as an updated version of
+        'expenses_table'. The old method is being used to generate
+        the correct value so this method can be tested."""
+
+        index_name = 'Category'
+        df = self._generate_expenses_dataframe(months, index_name=index_name)
+
+        mean_name = 'Média'
+        df = self._add_mean_column(df, new_col_name=mean_name)
+
+        weight_name = "Peso Ac."
+        df = self._add_cumulative_weight_column(df, mean_col=mean_name, new_col_name=weight_name)
+
+        sum_name = 'Soma'
+        df = self._append_total_sum_row(df, index_name=index_name, sum_name=sum_name)
 
         return df.to_html(classes='expenses', index=False)
