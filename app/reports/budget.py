@@ -1,7 +1,5 @@
 from app.dates import helpers, special_dates as sdates
-from app.sql import SqliteOps
-
-sql = SqliteOps()
+from app.sql import sum_query
 
 # This variable holds the user preference for maximum expending in luxyry
 luxury_budget = 320
@@ -16,7 +14,7 @@ def expenses():
                                and (accrual_date < ?)
                                and (category = 'Restaurantes'
                                     or category = 'Lazer'));"""
-    return sql.sum_query(query, values)
+    return sum_query(query, values)
 
 
 def available():

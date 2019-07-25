@@ -1,15 +1,15 @@
 import logging
+
 from flask import redirect, render_template, url_for, Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from app.reports import Report
+
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm
-from app.sql import SqliteOps
 from app.models import User, Transaction
+from app.reports import Report, history
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
-sql = SqliteOps()
 
 
 @simple_page.route('/login', methods=['GET', 'POST'])
@@ -109,5 +109,5 @@ def accounts(transaction_kind):
 @simple_page.route('/expenses', methods=['GET'])
 @login_required
 def expenses():
-    et1 = sql.expenses_table()
+    et1 = history.Expenses()
     return render_template('expenses.html', title='Expenses', tables=et1)

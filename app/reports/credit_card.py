@@ -1,11 +1,9 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from app.sql import SqliteOps
+from app.sql import sum_query
 
 from config import UserInfo
-
-sql = SqliteOps()
 
 
 def state():
@@ -38,12 +36,12 @@ def invoice_value(position=0):
     """
     query = 'expenses WHERE pay_method="Crédito" and cash_date=?'
     values = (future_payments(position),)
-    _value = sql.sum_query(query, values)
+    _value = sum_query(query, values)
     return _value
 
 
 def total_invoice_debt():
     values = (future_payments(),)
     query = 'expenses WHERE pay_method="Crédito" and cash_date>=?'
-    _total_invoice_debt = sql.sum_query(query, values)
+    _total_invoice_debt = sum_query(query, values)
     return _total_invoice_debt
