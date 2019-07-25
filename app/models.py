@@ -114,11 +114,24 @@ class Account(db.Model):
 
     @property
     def is_leaf(self):
-        """Returns a boolean indicating whether the queried account
-        is a leaf (ie, has no descendents)."""
+        """
+        Returns a boolean indicating whether the queried account
+        is a leaf (ie, has no descendents).
+        """
         return len(self.descendents()) == 0
 
     def balance(self, start=None, end=None) -> float:
+        """
+        Evaluates the difference between account's deposits and
+        withdraws during a provided period time.
+
+        Paramenters
+        -----------
+        start: date like object
+            The beginning of the evaluation period.
+        end: date like object
+            The ending of the evaluation period.
+        """
         filters = self._accrual_date_filter(start, end)
 
         deposits_sum = self._balance(self.deposits, filters)

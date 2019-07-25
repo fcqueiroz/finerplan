@@ -23,9 +23,9 @@ def sum_query(query_str, query_values):
 
 
 def exponential_moving_average(alpha=0.15, beta=0.5, kind='simple'):
-    """Calculates Exponential Moving Average for monthly expenses.
-
-    The EMA can be simple or double
+    """
+    Calculates Exponential Moving Average for monthly expenses.
+    The EMA can be simple or double.
     """
 
     # Include code to check if kind == simple/Double
