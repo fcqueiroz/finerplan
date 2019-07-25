@@ -1,12 +1,10 @@
 """Generates basic reports for Overview page."""
-
-from . import basic, budget, credit_card, trends
+from . import budget, credit_card, trends
+from .basic import BasicReport
 
 
 class Report(object):
-    @property
-    def basic(self):
-        return basic
+    basic = BasicReport()
 
     @property
     def budget(self):

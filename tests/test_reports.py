@@ -8,28 +8,35 @@ from app.reports import Report
 
 @pytest.mark.usefixtures('test_transactions')
 @patch('app.reports.basic.current_user')
-def test_report_basic_balance(mock_user, test_user):
-    mock_user.id = test_user.id
-    period_end = date(2019, 7, 15)
-    assert Report().basic.balance(period_end=period_end) == 1185
-
-
-@pytest.mark.parametrize(
-    ('account', 'result'),
-    [('Earnings', 1200), ('Expenses', 65)])
-@pytest.mark.usefixtures('test_transactions')
-@patch('app.dates.special_dates.date')
-@patch('app.reports.basic.current_user')
-def test_report_basic_income_and_expenses(mock_user, mock_date, test_user, account, result):
+@patch('app.reports.basic.date')
+def test_report_basic_balance(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 7, 15)
-    assert Report().basic.income_and_expenses(account=account) == result
+    assert Report().basic.balance() == 1185
 
 
 @pytest.mark.usefixtures('test_transactions')
-@patch('app.dates.special_dates.date')
 @patch('app.reports.basic.current_user')
-def test_report_basic_savings_rate(mock_user, mock_date, test_user):
+@patch('app.reports.basic.date')
+def test_report_basic_earnings(mock_date, mock_user, test_user):
+    mock_user.id = test_user.id
+    mock_date.today.return_value = date(2019, 7, 15)
+    assert Report().basic.earnings() == 1200
+
+
+@pytest.mark.usefixtures('test_transactions')
+@patch('app.reports.basic.current_user')
+@patch('app.reports.basic.date')
+def test_report_basic_expenses(mock_date, mock_user, test_user):
+    mock_user.id = test_user.id
+    mock_date.today.return_value = date(2019, 7, 15)
+    assert Report().basic.expenses() == 65
+
+
+@pytest.mark.usefixtures('test_transactions')
+@patch('app.reports.basic.current_user')
+@patch('app.reports.basic.date')
+def test_report_basic_savings_rate(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 8, 1)
 

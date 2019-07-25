@@ -15,7 +15,7 @@ def fill_login_form(username=None, password=None):
         username = _user.username
     if password is None:
         password = _user.password
-    return dict(username=username,password=password)
+    return dict(username=username, password=password)
 
 
 def fill_register_form(username=None, password=None, email=None):
@@ -65,7 +65,7 @@ def test_expenses_is_inaccessible_before_login(client):
     assert title not in response.data
 
 
-@pytest.mark.usefixtures('test_user')
+@pytest.mark.usefixtures('test_accounts')
 def test_login_redirects_to_overview_by_default(client):
     title = '<title>Overview - FinerPlan</title>'.encode('utf-8')
     response = client.post(url_for('simple_page.login'), data=fill_login_form(), follow_redirects=True)
@@ -77,7 +77,7 @@ def test_login_redirects_with_next(client):
     title = '<title>Expenses - FinerPlan</title>'.encode('utf-8')
 
     query_string = {'next':  'expenses'}
-    response = client.post(url_for('simple_page.login'), data=fill_login_form(), 
+    response = client.post(url_for('simple_page.login'), data=fill_login_form(),
                            follow_redirects=True, query_string=query_string)
     assert title in response.data
 
@@ -97,14 +97,8 @@ def test_successful_register(client, db_session):
     assert user is not None
 
 
-def test_successful_login(client, test_user):
-    form = fill_login_form()
-    with client:
-        client.post(url_for('simple_page.login'), data=form, follow_redirects=True)
-        assert test_user.username in str(current_user)
-
-
-def test_successful_logout(client, test_user):
+@pytest.mark.usefixtures('test_accounts')
+def test_successful_login_logout(client, test_user):
     form = fill_login_form()
     with client:
         client.post(url_for('simple_page.login'), data=form, follow_redirects=True)
@@ -126,4 +120,3 @@ def test_wrong_password(client):
     form = fill_login_form(password='other_pass')
     rv = client.post(url_for('simple_page.login'), data=form)
     assert b'Invalid password' in rv.data
-

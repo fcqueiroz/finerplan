@@ -1,10 +1,8 @@
-from datetime import datetime
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import os
 
 import sqlite3
-
-from app.dates import special_dates as sdate
 
 from config import basedir, date_model
 
@@ -48,7 +46,7 @@ def exponential_moving_average(alpha=0.15, beta=0.5, kind='simple'):
         return 0
     if kind == 'double':
         month_start = month_ending + relativedelta(days=1)
-        if month_start == sdate.start_of_current_month():
+        if month_start == date.today() + relativedelta(day=1):
             # Not enough data for making a double EMA
             return mov_avg
         month_ending = month_start + relativedelta(day=31)
@@ -71,7 +69,7 @@ def exponential_moving_average(alpha=0.15, beta=0.5, kind='simple'):
                     'WHERE accrual_date>=? AND accrual_date <=?;',
                     (month_start, month_ending))
         result = cur.fetchone()[0]
-        if (not isinstance(result, (int, float))) or (month_start == sdate.start_of_current_month()):
+        if (not isinstance(result, (int, float))) or (month_start == date.today() + relativedelta(day=1)):
             if kind == 'simple':
                 return mov_avg
             elif kind == 'double':
