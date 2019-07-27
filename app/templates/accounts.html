@@ -1,0 +1,24 @@
+{% extends "dashboard.html" %}
+
+{% block dashboard %}
+<table class="table text-center">
+  <thead class="text-uppercase bg-primary">
+      <tr class="text-white">
+          <th scope="col">Fullname</th>
+          <th scope="col">Group</th>
+          <th scope="col">Subaccount</th>
+          <th scope="col">Edit</th>
+      </tr>
+  </thead>
+  <tbody>
+  {% for row in accounts %}
+    <tr>
+      <td>{{ row.fullname }}</td>
+      <td>{{ row.group }}</td>
+      <td><i class="ti-trash"></i></td>
+      <td><i class="ti-trash"></i></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

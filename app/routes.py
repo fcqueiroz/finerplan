@@ -83,13 +83,20 @@ def overview():
                            tables=tables, report=Report())
 
 
+@simple_page.route('/accounts')
+@login_required
+def accounts():
+    return render_template('accounts.html', title='Accounts', accounts=current_user.accounts.all())
+
+
 @simple_page.route('/accounts/<transaction_kind>')
 @login_required
-def accounts(transaction_kind):
+def accounts_json(transaction_kind):
     # TODO Test this view!
 
     leaves = dict()
     for name in ['equity', 'expenses', 'earnings']:
+        # TODO This doesn't work anymore
         leaves[name] = [account for account in getattr(current_user, name).descendents() if account.is_leaf]
 
     if transaction_kind == 'income':
