@@ -5,8 +5,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from app import db
-from app.forms import AddTransactionForm, LoginForm, RegisterForm
-from app.models import User, Transaction, init_fundamental_accounts
+from app.forms import AddTransactionForm, LoginForm, RegisterForm, AddAccountForm
+from app.models import User, Account, Transaction, init_fundamental_accounts
 from app.reports import Report, history
 
 simple_page = Blueprint('simple_page', __name__, template_folder='templates')
@@ -83,10 +83,32 @@ def overview():
                            tables=tables, report=Report())
 
 
-@simple_page.route('/accounts')
+@simple_page.route('/accounts', methods=['GET', 'POST'])
 @login_required
 def accounts():
-    return render_template('accounts.html', title='Accounts', accounts=current_user.accounts.all())
+    form = AddAccountForm()
+
+    if request.method == 'POST':
+        form.validate()
+        errors = form.errors
+        if errors:
+            logging.error(errors)
+            print(form.data)
+
+    if form.validate_on_submit():
+        parent_id = form.data['parent_id']
+        parent = Account.query.get(parent_id)
+        name = form.data['name']
+        try:
+            Account.create(name, current_user, parent)
+        except NameError:
+            # Tell user that account's fullname must be unique
+            pass
+
+        return redirect(url_for('simple_page.accounts'))
+
+    return render_template(
+        'accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
 
 
 @simple_page.route('/accounts/<transaction_kind>')

@@ -1,5 +1,9 @@
 {% extends "dashboard.html" %}
 
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/configuration/add_accounts.js') }}"></script>
+{% endblock %}
+
 {% block dashboard %}
 <table class="table text-center">
   <thead class="text-uppercase bg-primary">
@@ -15,10 +19,17 @@
     <tr>
       <td>{{ row.fullname }}</td>
       <td>{{ row.group }}</td>
-      <td><i class="ti-trash"></i></td>
-      <td><i class="ti-trash"></i></td>
+      <td>
+        <a href="javascript:fill_modal('{{ row.id }}', '{{ row.name }}')">
+          <i class="fa fa-plus-square" data-toggle="modal" data-target="#subaccountModal"></i>
+        </a>
+      </td>
+      <td><i class="fa fa-edit"></i></td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+
+{% include '_add_account_form.html' %}
+
 {% endblock %}

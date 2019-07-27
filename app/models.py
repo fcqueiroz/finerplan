@@ -112,7 +112,6 @@ class Account(db.Model):
             return True
 
         for _account in account:
-            print(account, _account)
             if _account.fullname == base_fullname + name:
                 return False
 

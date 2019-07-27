@@ -70,3 +70,9 @@ class AddTransactionForm(FlaskForm):
     account_source = SelectField('Source Account', validators=[DataRequired()], choices=[], coerce=int)
     account_destination = SelectField('Destination Account', validators=[DataRequired()], choices=[], coerce=int)
     submit = SubmitField("Add it")
+
+
+class AddAccountForm(FlaskForm):
+    parent_id = IntegerField('Parent Account Id', validators=[DataRequired()])
+    name = StringField('Account Name', validators=[DataRequired()])
+    submit = SubmitField('Create')
