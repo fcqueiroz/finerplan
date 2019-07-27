@@ -82,7 +82,7 @@ class Account(db.Model):
             If passed, the new account will become a subaccount of
             parent Account and will have the same type.
         """
-        if cls._check_unique_fullname(name=name, user=user, parent=parent):
+        if cls.check_unique_fullname(name=name, user=user, parent=parent):
             new_account = cls(name=name, user_id=user.id)
             db.session.add(new_account)
             db.session.commit()
@@ -99,7 +99,7 @@ class Account(db.Model):
         return new_account
 
     @classmethod
-    def _check_unique_fullname(cls, name, user, parent):
+    def check_unique_fullname(cls, name, user, parent):
         if parent is not None:
             base_fullname = parent.fullname + ' - '
         else:

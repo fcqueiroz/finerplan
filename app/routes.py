@@ -100,11 +100,7 @@ def accounts():
         parent_id = form.data['parent_id']
         parent = Account.query.get(parent_id)
         name = form.data['name']
-        try:
-            Account.create(name, current_user, parent)
-        except NameError:
-            # Tell user that account's fullname must be unique
-            pass
+        Account.create(name, current_user, parent)
 
         return redirect(url_for('simple_page.accounts'))
 

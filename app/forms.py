@@ -1,11 +1,12 @@
 from datetime import date
 
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, IntegerField, PasswordField, RadioField, SelectField, \
     StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
-from app.models import User
+from app.models import User, Account
 
 
 class CorrectPassword(object):
@@ -29,6 +30,28 @@ class CorrectPassword(object):
         if user is not None:
             if not user.check_password(field.data):
                 raise ValidationError(self.message)
+
+
+class UniqueFullname(object):
+    """
+    Checks if the provided new account name has an unique fullname.
+
+    :param parent_id:
+        The name of the field containing the id of the parent account.
+    :param message:
+        Error message to raise in case of a validation error.
+    """
+    def __init__(self, parent_id, message=None):
+        self.parent_id = parent_id
+        if not message:
+            message = u"There is an account using this name under the same parent account"
+        self.message = message
+
+    def __call__(self, form, field):
+        parent_id = form[self.parent_id]
+        parent = Account.query.get(parent_id.data)
+        if not Account.check_unique_fullname(field.data, current_user, parent):
+            raise ValidationError(self.message)
 
 
 class LoginForm(FlaskForm):
@@ -74,5 +97,5 @@ class AddTransactionForm(FlaskForm):
 
 class AddAccountForm(FlaskForm):
     parent_id = IntegerField('Parent Account Id', validators=[DataRequired()])
-    name = StringField('Account Name', validators=[DataRequired()])
+    name = StringField('Account Name', validators=[DataRequired(), UniqueFullname('parent_id')])
     submit = SubmitField('Create')

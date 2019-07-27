@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
+        <h5 class="modal-title">Add Subaccount</h5>
         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
       </div>
       <form action="#" method="post" name="account">
@@ -15,7 +15,7 @@
               <input type="text" id="parentAccountName" class="form-control" placeholder="">
             </div>
           </fieldset>
-          <div class="form-row form-group">
+          <div class="d-none">
             {{ form.parent_id.label(class_="col-form-label") }}
             {{ form.parent_id(class_="form-control") }}
           </div>
@@ -26,10 +26,6 @@
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           {{ form.submit(class_="btn btn-primary") }}
         </div>
       </form>
