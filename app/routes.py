@@ -41,7 +41,8 @@ def register():
         return redirect(url_for('simple_page.overview'))
     form = RegisterForm()
     if form.validate_on_submit():
-        _ = User.create(username=form.username.data, password=form.password.data, email=form.email.data)
+        user = User.create(username=form.username.data, password=form.password.data, email=form.email.data)
+        init_fundamental_accounts(user)
 
         return redirect(url_for('simple_page.login'))
     return render_template('register.html', title='Sign Up', form=form)
@@ -114,12 +115,10 @@ def accounts():
 @simple_page.route('/accounts/<transaction_kind>')
 @login_required
 def accounts_json(transaction_kind):
-    # TODO Test this view!
-
     leaves = dict()
-    for name in ['equity', 'expenses', 'earnings']:
-        # TODO This doesn't work anymore
-        leaves[name] = [account for account in getattr(current_user, name).descendents() if account.is_leaf]
+    for group in ['equity', 'expenses', 'earnings']:
+        major_group = current_user.accounts.filter_by(group=group)
+        leaves[group] = [account for account in major_group if account.is_leaf]
 
     if transaction_kind == 'income':
         source = leaves['earnings']
