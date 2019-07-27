@@ -88,7 +88,9 @@ class AddTransactionForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
     accrual_date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
     value = StringField("Value", validators=[DataRequired()])
-    transaction_kind = RadioField("Type of Transaction", validators=[DataRequired()], choices=[])
+    transaction_kind = RadioField(
+        "Type of Transaction", validators=[DataRequired()],
+        choices=[(kind.lower(), kind) for kind in ['Income', 'Expenses']])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
     account_source = SelectField('Source Account', validators=[DataRequired()], choices=[], coerce=int)
     account_destination = SelectField('Destination Account', validators=[DataRequired()], choices=[], coerce=int)

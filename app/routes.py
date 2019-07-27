@@ -53,10 +53,7 @@ def register():
 @login_required
 def overview():
     form = AddTransactionForm()
-    form.transaction_kind.choices = [(kind.lower(), kind) for kind in ['Income', 'Expenses']]
-
-    # Todo Fill the choices using the same accounts view that produces the json
-    # Retrieves only the leaf nodes from user's accounts
+    # Retrieves all the leaf nodes from user's accounts to use as valid choices.
     user_accounts = [account for account in current_user.accounts if account.is_leaf]
     user_accounts_choices = [(account.id, '') for account in user_accounts]
     form.account_source.choices = user_accounts_choices
@@ -108,20 +105,20 @@ def accounts():
         'accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
 
 
+def get_group_leaves(user, group):
+    major_group = user.accounts.filter_by(group=group)
+    return [account for account in major_group if account.is_leaf]
+
+
 @simple_page.route('/accounts/<transaction_kind>')
 @login_required
 def accounts_json(transaction_kind):
-    leaves = dict()
-    for group in ['equity', 'expenses', 'earnings']:
-        major_group = current_user.accounts.filter_by(group=group)
-        leaves[group] = [account for account in major_group if account.is_leaf]
-
     if transaction_kind == 'income':
-        source = leaves['earnings']
-        destination = leaves['equity']
+        source = get_group_leaves(current_user, group='earnings')
+        destination = get_group_leaves(current_user, group='equity')
     elif transaction_kind == 'expenses':
-        source = leaves['equity']
-        destination = leaves['expenses']
+        source = get_group_leaves(current_user, group='equity')
+        destination = get_group_leaves(current_user, group='expenses')
     else:
         raise ValueError
 
