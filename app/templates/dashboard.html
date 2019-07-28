@@ -15,14 +15,14 @@
             <li class="active">
               <a href="javascript:void(0)" aria-expanded="true"><i class="ti-dashboard"></i><span>dashboard</span></a>
               <ul class="collapse">
-                <li><a href="{{ url_for('simple_page.overview') }}">Overview</a></li>
-                <li><a href="{{ url_for('simple_page.expenses') }}">Expenses</a></li>
+                <li><a href="{{ url_for('dashboard.overview') }}">Overview</a></li>
+                <li><a href="{{ url_for('dashboard.expenses') }}">Expenses</a></li>
               </ul>
             </li>
             <li>
               <a href="javascript:void(0)" aria-expanded="true"><i class="ti-dashboard"></i><span>configuration</span></a>
               <ul class="collapse">
-                <li><a href="{{ url_for('simple_page.accounts') }}">Accounts</a></li>
+                <li><a href="{{ url_for('dashboard.config_accounts') }}">Accounts</a></li>
               </ul>
             </li>
           </ul>
@@ -70,7 +70,7 @@
               <h4 class="dropdown-toggle" data-toggle="dropdown">{{ current_user.username }} <i class="fa fa-angle-down"></i></h4>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">Settings</a>
-                <a class="dropdown-item" href="{{ url_for('simple_page.logout') }}">Log Out</a>
+                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Log Out</a>
               </div>
             </div>
           </div>

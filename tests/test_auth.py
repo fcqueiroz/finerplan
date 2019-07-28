@@ -32,34 +32,34 @@ def fill_register_form(username=None, password=None, email=None):
 
 
 def test_register_page_exists(client):
-    url = url_for('simple_page.register')
+    url = url_for('auth.register')
     response = client.get(url)
     assert 200 == response.status_code, f"wrong status code for '{url}'"
     assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
 
 
 def test_login_page_exists(client):
-    url = url_for('simple_page.login')
+    url = url_for('auth.login')
     response = client.get(url)
     assert 200 == response.status_code, f"wrong status code for '{url}'"
     assert 'text/html' in response.content_type, f"wrong content type for '{url}'"
 
 
 def test_overview_is_inaccessible_before_login(client):
-    expected_query_string = f"{url_for('simple_page.login')}?next={'%2Foverview'}"
+    expected_query_string = f"{url_for('auth.login')}?next={'%2Foverview'}"
     title = '<title>Expenses'.encode('utf-8')
 
-    response = client.get(url_for('simple_page.overview'))
+    response = client.get(url_for('dashboard.overview'))
     assert expected_query_string in str(response.headers)
     assert response.status_code == 302
     assert title not in response.data
 
 
 def test_expenses_is_inaccessible_before_login(client):
-    expected_query_string = f"{url_for('simple_page.login')}?next={'%2Fexpenses'}"
+    expected_query_string = f"{url_for('auth.login')}?next={'%2Fexpenses'}"
     title = '<title>Expenses'.encode('utf-8')
     
-    response = client.get(url_for('simple_page.expenses'))
+    response = client.get(url_for('dashboard.expenses'))
     assert expected_query_string in str(response.headers)
     assert response.status_code == 302
     assert title not in response.data
@@ -68,7 +68,7 @@ def test_expenses_is_inaccessible_before_login(client):
 @pytest.mark.usefixtures('test_accounts')
 def test_login_redirects_to_overview_by_default(client):
     title = '<title>Overview - FinerPlan</title>'.encode('utf-8')
-    response = client.post(url_for('simple_page.login'), data=fill_login_form(), follow_redirects=True)
+    response = client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
     assert title in response.data
 
 
@@ -77,7 +77,7 @@ def test_login_redirects_with_next(client):
     title = '<title>Expenses - FinerPlan</title>'.encode('utf-8')
 
     query_string = {'next':  'expenses'}
-    response = client.post(url_for('simple_page.login'), data=fill_login_form(),
+    response = client.post(url_for('auth.login'), data=fill_login_form(),
                            follow_redirects=True, query_string=query_string)
     assert title in response.data
 
@@ -87,7 +87,7 @@ def test_successful_register(client, db_session):
     alice = users.alice()
 
     form = fill_register_form(**alice)
-    client.post(url_for('simple_page.register'), data=form)
+    client.post(url_for('auth.register'), data=form)
 
     user = db_session.query(User).filter_by(username=alice['username'], email=alice['email']).first()
     assert user is not None
@@ -97,22 +97,22 @@ def test_successful_register(client, db_session):
 def test_successful_login_logout(client, test_user):
     form = fill_login_form()
     with client:
-        client.post(url_for('simple_page.login'), data=form, follow_redirects=True)
+        client.post(url_for('auth.login'), data=form, follow_redirects=True)
         assert test_user.username in str(current_user)
 
-        client.get(url_for('simple_page.logout'), follow_redirects=True)
+        client.get(url_for('auth.logout'), follow_redirects=True)
         assert test_user.username not in str(current_user)
 
 
 @pytest.mark.usefixtures('test_user')
 def test_wrong_username(client):
     form = fill_login_form(username='other_name')
-    rv = client.post(url_for('simple_page.login'), data=form)
+    rv = client.post(url_for('auth.login'), data=form)
     assert b'Invalid username' in rv.data
 
 
 @pytest.mark.usefixtures('test_user')
 def test_wrong_password(client):
     form = fill_login_form(password='other_pass')
-    rv = client.post(url_for('simple_page.login'), data=form)
+    rv = client.post(url_for('auth.login'), data=form)
     assert b'Invalid password' in rv.data

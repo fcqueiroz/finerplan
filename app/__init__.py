@@ -13,32 +13,29 @@ from config import app_config
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
-login.login_view = 'simple_page.login'
+login.login_view = 'auth.login'
 
 
 def create_app(config_name):
     """Initialize the core application"""
-    _app = Flask(__name__)
-    _app.config.from_object(app_config(config_name))
+    app = Flask(__name__)
+    app.config.from_object(app_config(config_name))
 
-    # Initialize plugins
-    db.init_app(_app)
-    migrate.init_app(_app, db)
-    login.init_app(_app)
+    init_plugins(app)
 
-    setup_logging(_app)
+    setup_logging(app)
 
-    with _app.app_context():
-        # Include routes
-        from . import routes, error_handlers
+    register_blueprints(app)
 
-        # Register blueprints
-        _app.register_blueprint(routes.simple_page)
-        _app.register_blueprint(error_handlers.blueprint)
-
-    return _app
+    return app
 
 
+def init_plugins(app):
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login.init_app(app)
+
+    
 def setup_logging(app):
     if not app.debug:
         if not os.path.exists('logs'):
@@ -52,3 +49,15 @@ def setup_logging(app):
 
         app.logger.setLevel(logging.INFO)
         app.logger.info('Finerplan startup')
+
+
+def register_blueprints(app):
+    with app.app_context():
+        from app.errors import bp as errors_bp
+        app.register_blueprint(errors_bp)
+
+        from app.auth import bp as auth_bp
+        app.register_blueprint(auth_bp)
+
+        from app.dashboard import bp as dashboard_bp
+        app.register_blueprint(dashboard_bp)

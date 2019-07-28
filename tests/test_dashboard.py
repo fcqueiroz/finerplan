@@ -11,9 +11,9 @@ def test_accounts_add(client, test_accounts):
     form = dict(name='Scholarship', parent_id=earnings.id)
 
     with client:
-        client.post(url_for('simple_page.login'), data=fill_login_form(), follow_redirects=True)
+        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
 
-        rv = client.post(url_for('simple_page.accounts'), data=form, follow_redirects=True)
+        rv = client.post(url_for('dashboard.config_accounts'), data=form, follow_redirects=True)
         assert b'Earnings - Scholarship' in rv.data
 
 
@@ -23,8 +23,8 @@ def test_accounts_add(client, test_accounts):
 def test_get_lead_accounts_json(client, test_accounts, transaction_kind, source_idx, destination_idx):
 
     with client:
-        client.post(url_for('simple_page.login'), data=fill_login_form(), follow_redirects=True)
-        rv = client.get(url_for('simple_page.accounts_json', transaction_kind=transaction_kind))
+        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
+        rv = client.get(url_for('dashboard.accounts_json', transaction_kind=transaction_kind))
 
         source = test_accounts[source_idx]
         destination = test_accounts[destination_idx]
