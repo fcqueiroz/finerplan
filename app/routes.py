@@ -3,6 +3,7 @@ import logging
 from flask import redirect, render_template, url_for, Blueprint, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from sqlalchemy.exc import StatementError
 
 from app import db
 from app.forms import AddTransactionForm, LoginForm, RegisterForm, AddAccountForm
@@ -56,8 +57,8 @@ def overview():
     # Retrieves all the leaf nodes from user's accounts to use as valid choices.
     user_accounts = [account for account in current_user.accounts if account.is_leaf]
     user_accounts_choices = [(account.id, '') for account in user_accounts]
-    form.account_source.choices = user_accounts_choices
-    form.account_destination.choices = user_accounts_choices
+    form.source_id.choices = user_accounts_choices
+    form.destination_id.choices = user_accounts_choices
 
     if request.method == 'POST':
         form.validate()
@@ -68,9 +69,11 @@ def overview():
     if form.validate_on_submit():
         transaction = {key: form.data[key] for key in form.data.keys()
                        if key not in ['transaction_kind', 'submit', 'csrf_token']}
+        # TODO: Rollback transactions if anything goes wrong
         transaction = Transaction(**transaction)
         db.session.add(transaction)
         db.session.commit()
+
         return redirect(url_for('simple_page.overview'))
 
     columns = [Transaction.accrual_date, Transaction.description, Transaction.value,

@@ -2,7 +2,7 @@ from datetime import date
 
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, DateField, IntegerField, PasswordField, RadioField, SelectField, \
+from wtforms import BooleanField, DateField, DecimalField, IntegerField, PasswordField, RadioField, SelectField, \
     StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
@@ -87,13 +87,13 @@ class RegisterForm(FlaskForm):
 class AddTransactionForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
     accrual_date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
-    value = StringField("Value", validators=[DataRequired()])
+    value = DecimalField("Value", validators=[DataRequired()])
     transaction_kind = RadioField(
         "Type of Transaction", validators=[DataRequired()],
         choices=[(kind.lower(), kind) for kind in ['Income', 'Expenses']])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
-    account_source = SelectField('Source Account', validators=[DataRequired()], choices=[], coerce=int)
-    account_destination = SelectField('Destination Account', validators=[DataRequired()], choices=[], coerce=int)
+    source_id = SelectField('Source Account', validators=[DataRequired()], choices=[], coerce=int)
+    destination_id = SelectField('Destination Account', validators=[DataRequired()], choices=[], coerce=int)
     submit = SubmitField("Add it")
 
 

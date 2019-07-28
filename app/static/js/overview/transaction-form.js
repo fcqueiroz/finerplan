@@ -19,8 +19,8 @@ $(function() {
     fetch('/accounts/' + kind).then(function(response) {
       response.json().then(function(data) {
         console.table(data)
-        updateAccounts('account_source', data.sources)
-        updateAccounts('account_destination', data.destinations)
+        updateAccounts('source_id', data.sources)
+        updateAccounts('destination_id', data.destinations)
       })
     })
   })
