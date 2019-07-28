@@ -1,5 +1,5 @@
-from app import create_app, db
-from app.models import User, Account, Transaction
+from finerplan import create_app, db
+from finerplan.models import User, Account, Transaction
 
 app = create_app(config_name='development')
 

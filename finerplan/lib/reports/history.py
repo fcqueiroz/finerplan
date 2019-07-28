@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 import pandas as pd
 
-from app.sql import generate_month_expenses_table_data
+from finerplan.sql import generate_month_expenses_table_data
 
 
 class Expenses(object):

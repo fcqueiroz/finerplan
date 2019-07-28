@@ -3,7 +3,7 @@ from flask import url_for
 from flask_login import current_user
 import pytest
 
-from app.models import User
+from finerplan.models import User
 
 from tests.data import users
 

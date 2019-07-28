@@ -1,8 +1,8 @@
 # 3rd Party Libraries
 import pytest
 # Local Imports
-from app import create_app, db as _db
-from app.models import User, Account, Transaction
+from finerplan import create_app, db as _db
+from finerplan.models import User, Account, Transaction
 
 from tests import setup_db, teardown_db, clean_db
 from tests.data import users, accounts, transactions

@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.models import Transaction
+from finerplan.models import Transaction
 
 
 def first_salary():

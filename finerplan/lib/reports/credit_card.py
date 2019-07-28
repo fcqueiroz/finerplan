@@ -1,7 +1,7 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from app.sql import sum_query
+from finerplan.sql import sum_query
 
 from config import UserInfo
 

@@ -1,6 +1,6 @@
 import pytest
 
-from app.models import User
+from finerplan.models import User
 
 from tests.data import users
 

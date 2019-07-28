@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from flask_login import current_user
 
-from app.models import Account
+from finerplan.models import Account
 
 
 class BasicReport(object):

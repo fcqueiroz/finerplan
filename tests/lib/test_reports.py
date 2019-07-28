@@ -3,12 +3,12 @@ from unittest.mock import patch
 
 import pytest
 
-from app.lib.reports import Report
+from finerplan.lib.reports import Report
 
 
 @pytest.mark.usefixtures('test_transactions')
-@patch('app.lib.reports.basic.current_user')
-@patch('app.lib.reports.basic.date')
+@patch('finerplan.lib.reports.basic.current_user')
+@patch('finerplan.lib.reports.basic.date')
 def test_report_basic_balance(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 7, 15)
@@ -16,8 +16,8 @@ def test_report_basic_balance(mock_date, mock_user, test_user):
 
 
 @pytest.mark.usefixtures('test_transactions')
-@patch('app.lib.reports.basic.current_user')
-@patch('app.lib.reports.basic.date')
+@patch('finerplan.lib.reports.basic.current_user')
+@patch('finerplan.lib.reports.basic.date')
 def test_report_basic_earnings(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 7, 15)
@@ -25,8 +25,8 @@ def test_report_basic_earnings(mock_date, mock_user, test_user):
 
 
 @pytest.mark.usefixtures('test_transactions')
-@patch('app.lib.reports.basic.current_user')
-@patch('app.lib.reports.basic.date')
+@patch('finerplan.lib.reports.basic.current_user')
+@patch('finerplan.lib.reports.basic.date')
 def test_report_basic_expenses(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 7, 15)
@@ -34,8 +34,8 @@ def test_report_basic_expenses(mock_date, mock_user, test_user):
 
 
 @pytest.mark.usefixtures('test_transactions')
-@patch('app.lib.reports.basic.current_user')
-@patch('app.lib.reports.basic.date')
+@patch('finerplan.lib.reports.basic.current_user')
+@patch('finerplan.lib.reports.basic.date')
 def test_report_basic_savings_rate(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 8, 1)

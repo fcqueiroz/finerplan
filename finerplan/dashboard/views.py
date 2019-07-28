@@ -3,10 +3,10 @@ import logging
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
-from app import db
-from app.lib.reports import Report
-from app.lib.reports import history
-from app.models import Transaction, Account
+from finerplan import db
+from finerplan.lib.reports import Report
+from finerplan.lib.reports import history
+from finerplan.models import Transaction, Account
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm

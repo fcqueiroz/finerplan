@@ -1,4 +1,4 @@
-from app import db
+from finerplan import db
 
 __all__ = ["setup_db", "clean_db", "teardown_db"]
 

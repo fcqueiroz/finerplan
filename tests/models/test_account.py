@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytest
 
-from app.models import Account
+from finerplan.models import Account
 
 from tests.data import accounts
 

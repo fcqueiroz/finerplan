@@ -1,6 +1,6 @@
 from flask import render_template
 
-from app import db
+from finerplan import db
 
 from . import bp
 

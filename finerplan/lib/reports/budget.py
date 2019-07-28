@@ -1,7 +1,7 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from app.sql import sum_query
+from finerplan.sql import sum_query
 
 # This variable holds the user preference for maximum expending in luxyry
 luxury_budget = 320

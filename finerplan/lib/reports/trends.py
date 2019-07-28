@@ -1,4 +1,5 @@
-from app.sql import exponential_moving_average
+from finerplan.sql import exponential_moving_average
+
 from .basic import BasicReport
 from .credit_card import total_invoice_debt
 
