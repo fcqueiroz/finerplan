@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from finerplan import db
 from finerplan.lib.reports import Report
 from finerplan.lib.reports import history
-from finerplan.models import Transaction, Account
+from finerplan.model import Transaction, Account
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm

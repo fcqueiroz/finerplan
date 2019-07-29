@@ -1,56 +1,10 @@
-from flask_login import UserMixin
 from sqlalchemy.sql import func
-from werkzeug.security import check_password_hash, generate_password_hash
 
-from finerplan import db, login
+from finerplan import db
 
 from config import fundamental_accounts
 
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-    accounts = db.relationship('Account', backref='owner', lazy='dynamic')
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @classmethod
-    def create(cls, username, email, password) -> 'User':
-        """
-        Public method to create a new user.
-        """
-        new_user = cls(username=username, email=email)
-        new_user.set_password(password=password)
-        db.session.add(new_user)
-        db.session.commit()
-
-        return new_user
-
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-
-@login.user_loader
-def load_user(_id):
-    return User.query.get(int(_id))
-
-
-def init_fundamental_accounts(user):
-    # Initialize user accounts here
-    for account_name in fundamental_accounts:
-        try:
-            Account.create(name=account_name, user=user)
-        except NameError:
-            pass  # Account is already created
+from .transaction import Transaction
 
 
 class Account(db.Model):
@@ -204,28 +158,10 @@ class Account(db.Model):
         return filters
 
 
-class Transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    source_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-    source = db.relationship(
-        'Account',
-        foreign_keys=[source_id],
-        backref=db.backref('withdraws', lazy='dynamic'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-    destination = db.relationship(
-        'Account',
-        foreign_keys=[destination_id],
-        backref=db.backref('deposits', lazy='dynamic'))
-    # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
-    value = db.Column(db.Float)
-    installments = db.Column(db.Integer)
-    accrual_date = db.Column(db.DateTime)
-    # cash_date = db.Column(db.DateTime)
-    description = db.Column(db.Text)
-    # kind = db.Column(db.String(64))
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __repr__(self):
-        return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
+def init_fundamental_accounts(user):
+    # Initialize user accounts here
+    for account_name in fundamental_accounts:
+        try:
+            Account.create(name=account_name, user=user)
+        except NameError:
+            pass  # Account is already created

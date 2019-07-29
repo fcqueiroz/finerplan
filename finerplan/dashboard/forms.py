@@ -6,7 +6,7 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
     StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError
 
-from finerplan.models import Account
+from finerplan.model import Account
 
 
 class UniqueFullname(object):
