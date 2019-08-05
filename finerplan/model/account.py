@@ -1,10 +1,6 @@
-from sqlalchemy.sql import func
-
 from finerplan import db
 
 from config import fundamental_accounts
-
-from .transaction import Transaction
 
 
 class Account(db.Model):
@@ -119,43 +115,6 @@ class Account(db.Model):
         is a leaf (ie, has no descendents).
         """
         return len(self.descendents()) == 0
-
-    def balance(self, start=None, end=None) -> float:
-        """
-        Evaluates the difference between account's deposits and
-        withdraws during a provided period time.
-
-        Paramenters
-        -----------
-        start: date like object
-            The beginning of the evaluation period.
-        end: date like object
-            The ending of the evaluation period.
-        """
-        filters = self._accrual_date_filter(start, end)
-
-        deposits_sum = self._balance(self.deposits, filters)
-        withdraws_sum = self._balance(self.withdraws, filters)
-
-        return deposits_sum - withdraws_sum
-
-    @staticmethod
-    def _balance(query, filters):
-        result = query.filter(*filters).with_entities(func.sum(Transaction.value)).first()[0]
-        if result is None:
-            return 0
-        else:
-            return result
-
-    @staticmethod
-    def _accrual_date_filter(start, end):
-        filters = []
-        if start is not None:
-            filters.append((start <= Transaction.accrual_date))
-        if end is not None:
-            filters.append((Transaction.accrual_date <= end))
-
-        return filters
 
 
 def init_fundamental_accounts(user):

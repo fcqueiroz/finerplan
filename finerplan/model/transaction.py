@@ -1,3 +1,5 @@
+from sqlalchemy.sql import func
+
 from finerplan import db
 
 
@@ -26,3 +28,38 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
+
+    @classmethod
+    def balance(cls, account, start=None, end=None) -> float:
+        """
+        Evaluates the difference between deposits and withdraws
+        for a specific account during a provided period time.
+
+        Paramenters
+        -----------
+        start: date like object
+            The beginning of the evaluation period.
+        end: date like object
+            The ending of the evaluation period.
+        """
+
+        filters = cls._accrual_date_filter(start, end)
+        transactions = cls.query.filter(*filters)
+
+        deposits = transactions.filter(cls.destination_id == account.id)
+        deposits_sum = deposits.with_entities(func.coalesce(func.sum(cls.value), 0)).first()[0]
+
+        withdraws = transactions.filter(cls.source_id == account.id)
+        withdraws_sum = withdraws.with_entities(func.coalesce(func.sum(cls.value), 0)).first()[0]
+
+        return deposits_sum - withdraws_sum
+
+    @classmethod
+    def _accrual_date_filter(cls, start, end):
+        filters = []
+        if start is not None:
+            filters.append((start <= cls.accrual_date))
+        if end is not None:
+            filters.append((cls.accrual_date <= end))
+
+        return filters

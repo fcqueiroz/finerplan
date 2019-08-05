@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from flask_login import current_user
 
-from finerplan.model import Account
+from finerplan.model import Account, Transaction
 
 
 class BasicReport(object):
@@ -34,7 +34,7 @@ class BasicReport(object):
 
         # This only works when we deal with a leaf node. It
         # doesn't calculate balance of account's descendents.
-        _result = account.balance(**kwargs)
+        _result = Transaction.balance(account, **kwargs)
         if _account_name == 'Earnings':
             # Because transactions only flow out of Earnings, we must
             # invert the signal to get a positive value.
