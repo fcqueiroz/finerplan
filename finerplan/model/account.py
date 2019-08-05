@@ -8,7 +8,7 @@ class Account(db.Model):
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), index=True)
-    group = db.Column(db.String(64))
+    group_id = db.Column(db.Integer, db.ForeignKey('account_groups.id'))
     # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
@@ -115,6 +115,11 @@ class Account(db.Model):
         is a leaf (ie, has no descendents).
         """
         return len(self.descendents()) == 0
+
+
+class AccountGroups(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String(50), nullable=False)
 
 
 def init_fundamental_accounts(user):

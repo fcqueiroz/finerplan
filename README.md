@@ -21,6 +21,7 @@ Create a local copy of the repository in the current folder
 Install the application (using virtual environment is recommended)
 > pip install --editable .  
 > flask db upgrade  
+> flask seed
 
 Run this command inside finerplan/ folder whenever you want to start the application.
 > flask run  

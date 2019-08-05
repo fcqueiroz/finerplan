@@ -16,12 +16,16 @@ login = LoginManager()
 login.login_view = 'auth.login'
 
 
-def create_app(config_name):
+def create_app(config_name=None, script_info=None):
     """Initialize the core application"""
     app = Flask(__name__)
     app.config.from_object(app_config(config_name))
 
     init_plugins(app)
+
+    # Register aditional commmands for flask.
+    from finerplan.cli import register
+    register(app)
 
     setup_logging(app)
 
@@ -35,7 +39,7 @@ def init_plugins(app):
     migrate.init_app(app, db)
     login.init_app(app)
 
-    
+
 def setup_logging(app):
     if not app.debug:
         if not os.path.exists('logs'):
