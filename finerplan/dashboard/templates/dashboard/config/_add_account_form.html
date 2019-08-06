@@ -38,6 +38,25 @@
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
+
+          <!-- Credit Card Closing Day -->
+          <div class="form-row form-group">
+            {{ form.closing.label(class_="col-form-label") }}
+            {{ form.closing(class_="form-control") }}
+            {% for error in form.closing.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          <!-- Credit Card Payment Day -->
+          <div class="form-row form-group">
+            {{ form.payment.label(class_="col-form-label") }}
+            {{ form.payment(class_="form-control") }}
+            {% for error in form.payment.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
           {{ form.submit(class_="btn btn-primary") }}
         </div>
       </form>

@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from finerplan import db
 from finerplan.lib.reports import Report
 from finerplan.lib.reports import history
-from finerplan.model import Transaction, Account, AccountGroups
+from finerplan.model import Transaction, Account, CreditCard, AccountGroups
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm
@@ -77,29 +77,57 @@ def expenses():
     return render_template('explore/expenses.html', title='Expenses', tables=et1)
 
 
-@bp.route('/config/accounts', methods=['GET', 'POST'])
+@bp.route('/config/accounts', methods=['GET'])
 @login_required
-def config_accounts():
+def config_accounts_list():
     form = AddAccountForm()
-    account_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
     # TODO Dynamically populate this based on parent account group
-    form.group_id.choices = account_choices
+    form.group_id.choices = group_choices
 
-    if request.method == 'POST':
-        form.validate()
-        errors = form.errors
-        if errors:
-            logging.error(errors)
-            print(form.data)
+    return render_template(
+        'config/accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
+
+
+@bp.route('/config/accounts', methods=['POST'])
+@login_required
+def config_accounts_create():
+    form = AddAccountForm()
+    group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    # TODO Dynamically populate this based on parent account group
+    form.group_id.choices = group_choices
+
+    print(form.data)
+    form.validate()
+    errors = form.errors
+    if errors:
+        logging.error(errors)
+
+    # Post process form data
+    parent_id = request.form.get('parent_id')
+    if parent_id is not None:
+        parent = Account.query.get(int(parent_id))
+        assert parent.user_id == current_user.id
+    else:
+        parent = None
+    group_id = form.data['group_id']
 
     if form.validate_on_submit():
-        Account.create(
+        account_data = dict(
             name=form.data['name'],
             user=current_user,
-            group_id=form.data['group_id'],
-            parent=Account.query.get(form.data['parent_id']))
+            group_id=group_id,
+            parent=parent)
 
-        return redirect(url_for('dashboard.config_accounts'))
+        if AccountGroups.query.get(group_id).name == 'Credit Card':
+            CreditCard.create(
+                closing=form.data['closing'],
+                payment=form.data['payment'],
+                **account_data)
+        else:
+            Account.create(**account_data)
+
+        return redirect(url_for('dashboard.config_accounts_list'))
 
     return render_template(
         'config/accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)

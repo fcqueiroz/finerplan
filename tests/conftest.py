@@ -2,7 +2,7 @@
 import pytest
 # Local Imports
 from finerplan import create_app, db as _db
-from finerplan.model import User, Account, AccountGroups
+from finerplan.model import User, Account, CreditCard
 
 from tests import setup_db, teardown_db, clean_db, seed_db
 from tests.data import users, accounts, transactions
@@ -89,7 +89,10 @@ def test_accounts(db_session, test_user):
     new_account = accounts.turn_group_into_id(accounts.rent())
     rent = Account.create(user=test_user, parent=housing, **new_account)
 
-    _all_accounts = [expenses, income, equity, housing, rent]
+    new_account = accounts.turn_group_into_id(accounts.card_3412())
+    credit_card = CreditCard.create(user=test_user, **new_account)
+
+    _all_accounts = [expenses, income, equity, housing, rent, credit_card]
     return _all_accounts
 
 

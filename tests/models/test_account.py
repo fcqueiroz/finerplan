@@ -131,9 +131,5 @@ def test_account_withdraws(db_session):
 @pytest.mark.usefixtures('test_accounts')
 def test_credit_card_account(test_user):
     """Tests polymorphism of credit card class."""
-
-    existing_accounts = test_user.accounts.count()
-    account_data = accounts.turn_group_into_id(accounts.card_3412())
-    _ = CreditCard.create(user=test_user, **account_data)
-
-    assert test_user.accounts.count() == existing_accounts + 1
+    account_types = set([account.type for account in test_user.accounts])
+    assert 'credit_card' in account_types

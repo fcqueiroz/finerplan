@@ -2,11 +2,11 @@ from finerplan.model import AccountGroups
 
 
 def turn_group_into_id(account_data):
-    _name = account_data['name']
     _group = account_data['group']
-
     _group_id = AccountGroups.query.filter_by(name=_group).first().id
-    return dict(name=_name, group_id=_group_id)
+    del account_data['group']
+    account_data['group_id'] = _group_id
+    return account_data
 
 
 def expenses():

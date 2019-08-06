@@ -4,22 +4,21 @@ from finerplan import db
 
 
 class Account(db.Model):
+    __tablename__ = 'account'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), index=True)
     group_id = db.Column(db.Integer, db.ForeignKey('account_groups.id'))
     _group = db.relationship("AccountGroups")
+    type = db.Column(db.String(50))
     # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
         return f'<Account {self.id} {self.name}>'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @classmethod
-    def create(cls, name, user, group_id, parent=None) -> 'Account':
+    def create(cls, name, user, group_id, parent=None, **kwargs) -> 'Account':
         """
         Public method to create an account linked to an user.
 
@@ -36,7 +35,7 @@ class Account(db.Model):
             parent Account and will have the same type.
         """
         if cls.check_unique_fullname(name=name, user=user, parent=parent):
-            new_account = cls(name=name, user_id=user.id, group_id=group_id)
+            new_account = cls(name=name, user_id=user.id, group_id=group_id, **kwargs)
             db.session.add(new_account)
             db.session.commit()
 
@@ -82,7 +81,7 @@ class Account(db.Model):
         Returns the name of all the account's parents accounts in a single string.
         """
         path_nodes = self.path.split('.')
-        path_names = [self.query.get(int(node)).name for node in path_nodes]
+        path_names = [Account.query.get(int(node)).name for node in path_nodes]
 
         return ' - '.join(path_names)
 
@@ -98,7 +97,7 @@ class Account(db.Model):
         Returns the descendents from self.
         """
         children_path = self.path + '.%'
-        children = self.query.filter(Account.path.like(children_path))
+        children = Account.query.filter(Account.path.like(children_path))
 
         return children.all()
 
@@ -114,7 +113,23 @@ class Account(db.Model):
     def group(self):
         return self._group.name
 
+    __mapper_args__ = {
+        "polymorphic_identity": "account",
+        "polymorphic_on": type,
+    }
+
 
 class CreditCard(Account):
+    __tablename__ = 'credit_card'
+    id = db.Column(db.Integer, db.ForeignKey('account.id'), primary_key=True)
     closing = db.Column(db.Integer)
     payment = db.Column(db.Integer)
+
+    @classmethod
+    def create(cls, closing, payment, **kwargs) -> 'Account':
+        new_account = super().create(closing=closing, payment=payment, **kwargs)
+        return new_account
+
+    __mapper_args__ = {
+        "polymorphic_identity": "credit_card",
+    }
