@@ -2,8 +2,7 @@ from flask import redirect, render_template, url_for, request
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
-from finerplan.model import User
-from finerplan.model.account import init_fundamental_accounts
+from finerplan.model import User, init_fundamental_accounts
 
 from . import bp
 from .forms import LoginForm, RegisterForm

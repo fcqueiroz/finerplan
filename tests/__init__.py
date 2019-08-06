@@ -1,5 +1,5 @@
 from finerplan import db
-from finerplan.model.account import init_account_groups
+from finerplan.model.account_groups import init_account_groups
 
 __all__ = ["setup_db", "clean_db", "teardown_db"]
 

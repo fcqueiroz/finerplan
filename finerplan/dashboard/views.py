@@ -6,8 +6,7 @@ from flask_login import current_user, login_required
 from finerplan import db
 from finerplan.lib.reports import Report
 from finerplan.lib.reports import history
-from finerplan.model import Transaction, Account
-from finerplan.model.account import AccountGroups
+from finerplan.model import Transaction, Account, AccountGroups
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm
@@ -44,7 +43,7 @@ def overview():
                Transaction.source, Transaction.destination]
     tables = {'transactions': Transaction.query.with_entities(*columns).all()}
 
-    return render_template('overview.html', title='Overview', form=form,
+    return render_template('explore/overview.html', title='Overview', form=form,
                            tables=tables, report=Report())
 
 
@@ -75,7 +74,7 @@ def accounts_json(transaction_kind):
 @login_required
 def expenses():
     et1 = history.Expenses()
-    return render_template('expenses.html', title='Expenses', tables=et1)
+    return render_template('explore/expenses.html', title='Expenses', tables=et1)
 
 
 @bp.route('/config/accounts', methods=['GET', 'POST'])
@@ -83,6 +82,7 @@ def expenses():
 def config_accounts():
     form = AddAccountForm()
     account_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    # TODO Dynamically populate this based on parent account group
     form.group_id.choices = account_choices
 
     if request.method == 'POST':
@@ -102,4 +102,10 @@ def config_accounts():
         return redirect(url_for('dashboard.config_accounts'))
 
     return render_template(
-        'accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
+        'config/accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
+
+
+@bp.route('/config/accounts/<int:account_id>', methods=['GET', 'POST'])
+@login_required
+def edit_accounts(account_id):
+    pass

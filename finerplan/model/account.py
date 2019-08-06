@@ -2,13 +2,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from finerplan import db
 
-from config import fundamental_accounts, account_groups_list
-
-
-class AccountGroups(db.Model):
-    id = db.Column('id', db.Integer, primary_key=True)
-    name = db.Column('name', db.String(50), nullable=False)
-
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,6 +9,7 @@ class Account(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     path = db.Column(db.String(500), index=True)
     group_id = db.Column(db.Integer, db.ForeignKey('account_groups.id'))
+    _group = db.relationship("AccountGroups")
     # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
@@ -42,14 +36,13 @@ class Account(db.Model):
             parent Account and will have the same type.
         """
         if cls.check_unique_fullname(name=name, user=user, parent=parent):
-            new_account = cls(name=name, user_id=user.id)
+            new_account = cls(name=name, user_id=user.id, group_id=group_id)
             db.session.add(new_account)
             db.session.commit()
 
         else:
             raise NameError("Each account's fullname must be unique.")
 
-        new_account.group_id = group_id
         new_account._generate_path(parent=parent)
 
         db.session.commit()
@@ -89,7 +82,7 @@ class Account(db.Model):
         Returns the name of all the account's parents accounts in a single string.
         """
         path_nodes = self.path.split('.')
-        path_names = [Account.query.get(int(node)).name for node in path_nodes]
+        path_names = [self.query.get(int(node)).name for node in path_nodes]
 
         return ' - '.join(path_names)
 
@@ -119,26 +112,9 @@ class Account(db.Model):
 
     @hybrid_property
     def group(self):
-        return AccountGroups.query.filter_by(id=self.group_id).first().name
+        return self._group.name
 
 
-def init_account_groups():
-    """
-    Inserts into AccountGroups the data needed for aplication.
-    """
-    for group_name in account_groups_list:
-        result = AccountGroups.query.filter_by(name=group_name).first()
-        if result is None:
-            db.session.add(AccountGroups(name=group_name))
-    db.session.commit()
-
-
-def init_fundamental_accounts(user):
-    # Initialize user accounts here
-    for account_name in fundamental_accounts:
-        try:
-            Account.create(
-                name=account_name, user=user,
-                group_id=db.session.query(AccountGroups).filter_by(name=account_name).first().id)
-        except NameError:
-            pass  # Account is already created
+class CreditCard(Account):
+    closing = db.Column(db.Integer)
+    payment = db.Column(db.Integer)

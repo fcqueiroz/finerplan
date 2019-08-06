@@ -2,8 +2,7 @@
 import pytest
 # Local Imports
 from finerplan import create_app, db as _db
-from finerplan.model import User, Account
-from finerplan.model.account import AccountGroups
+from finerplan.model import User, Account, AccountGroups
 
 from tests import setup_db, teardown_db, clean_db, seed_db
 from tests.data import users, accounts, transactions

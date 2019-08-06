@@ -1,4 +1,4 @@
-from finerplan.model.account import AccountGroups
+from finerplan.model import AccountGroups
 
 
 def turn_group_into_id(account_data):
@@ -55,4 +55,13 @@ def utilities():
     return dict(
         name='Utilities',
         group='Expenses'
+    )
+
+
+def card_3412():
+    return dict(
+        name='Credit Card 3412',
+        group='Credit Card',
+        closing=11,  # Day of month when the credit card invoice closes
+        payment=25  # Day of month when the credit card invoice is paid
     )

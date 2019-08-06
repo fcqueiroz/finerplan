@@ -7,8 +7,9 @@
       </div>
       <form action="#" method="post" name="account">
         <div class="modal-body">
-
           {{ form.hidden_tag() }}
+
+          <!-- Account Parent -->
           <fieldset disabled>
             <div class="form-group">
               <label for="parentAccountName">Parent Account</label>
@@ -19,7 +20,8 @@
             {{ form.parent_id.label(class_="col-form-label") }}
             {{ form.parent_id(class_="form-control") }}
           </div>
-          <!-- Transaction Source Account -->
+
+          <!-- Account Group -->
           <div class="form-row form-group">
             {{ form.group_id.label(class_="col-form-label") }}
             {{ form.group_id(class_="custom-select") }}
@@ -27,6 +29,8 @@
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
+
+          <!-- Account Name -->
           <div class="form-row form-group">
             {{ form.name.label(class_="col-form-label") }}
             {{ form.name(class_="form-control") }}
