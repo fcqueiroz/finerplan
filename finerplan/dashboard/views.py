@@ -7,6 +7,7 @@ from finerplan import db
 from finerplan.lib.reports import Report
 from finerplan.lib.reports import history
 from finerplan.model import Transaction, Account
+from finerplan.model.account import AccountGroups
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm
@@ -48,7 +49,8 @@ def overview():
 
 
 def get_group_leaves(user, group):
-    major_group = user.accounts.filter_by(group=group)
+    _group = AccountGroups.query.filter_by(name=group).first()
+    major_group = user.accounts.filter_by(group_id=_group.id)
     return [account for account in major_group if account.is_leaf]
 
 
@@ -56,11 +58,11 @@ def get_group_leaves(user, group):
 @login_required
 def accounts_json(transaction_kind):
     if transaction_kind == 'income':
-        source = get_group_leaves(current_user, group='earnings')
-        destination = get_group_leaves(current_user, group='equity')
+        source = get_group_leaves(current_user, group='Income')
+        destination = get_group_leaves(current_user, group='Equity')
     elif transaction_kind == 'expenses':
-        source = get_group_leaves(current_user, group='equity')
-        destination = get_group_leaves(current_user, group='expenses')
+        source = get_group_leaves(current_user, group='Equity')
+        destination = get_group_leaves(current_user, group='Expenses')
     else:
         raise ValueError
 
@@ -80,6 +82,8 @@ def expenses():
 @login_required
 def config_accounts():
     form = AddAccountForm()
+    account_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    form.group_id.choices = account_choices
 
     if request.method == 'POST':
         form.validate()
@@ -89,10 +93,11 @@ def config_accounts():
             print(form.data)
 
     if form.validate_on_submit():
-        parent_id = form.data['parent_id']
-        parent = Account.query.get(parent_id)
-        name = form.data['name']
-        Account.create(name, current_user, parent)
+        Account.create(
+            name=form.data['name'],
+            user=current_user,
+            group_id=form.data['group_id'],
+            parent=Account.query.get(form.data['parent_id']))
 
         return redirect(url_for('dashboard.config_accounts'))
 

@@ -22,11 +22,11 @@ class BasicReport(object):
 
         Parameters
         ----------
-        account: str {'Earnings', 'Expenses', 'Equity'}
+        account: str {'Income', 'Expenses', 'Equity'}
             Account name to perform the calculation
         """
         _account_name = account
-        if _account_name in ('Earnings', 'Expenses', 'Equity'):
+        if _account_name in ('Income', 'Expenses', 'Equity'):
             user_id = current_user.id
             account = Account.query.filter_by(name=account, user_id=user_id).first()
         else:
@@ -35,8 +35,8 @@ class BasicReport(object):
         # This only works when we deal with a leaf node. It
         # doesn't calculate balance of account's descendents.
         _result = Transaction.balance(account, **kwargs)
-        if _account_name == 'Earnings':
-            # Because transactions only flow out of Earnings, we must
+        if _account_name == 'Income':
+            # Because transactions only flow out of Income, we must
             # invert the signal to get a positive value.
             _result = - _result
 
@@ -48,11 +48,11 @@ class BasicReport(object):
         """
         return self._account_balance(account='Equity', end=date.today())
 
-    def earnings(self) -> float:
+    def income(self) -> float:
         """
-        Evaluates total earnings in the current month.
+        Evaluates total income in the current month.
         """
-        return self._account_balance("Earnings", start=self._month_start, end=self._month_end)
+        return self._account_balance("Income", start=self._month_start, end=self._month_end)
 
     def expenses(self) -> float:
         """
@@ -64,7 +64,7 @@ class BasicReport(object):
         """
         Evaluates total savings in the current month.
         """
-        return self.earnings() - self.expenses()
+        return self.income() - self.expenses()
 
     def savings_rate(self, length=12) -> str:
         """
@@ -79,12 +79,12 @@ class BasicReport(object):
         period_start = period_end - relativedelta(months=length)
 
         _expenses = self._account_balance(account='Expenses', start=period_start, end=period_end)
-        _earnings = self._account_balance(account='Earnings', start=period_start, end=period_end)
+        _income = self._account_balance(account='Income', start=period_start, end=period_end)
 
-        if _earnings == 0:
-            return "No earnings during period."
-        elif _expenses > _earnings:
-            return "No savings in period. (expenses greater than earnings)"
+        if _income == 0:
+            return "No income during period."
+        elif _expenses > _income:
+            return "No savings in period. (expenses greater than income)"
         else:
-            rate = 1 - _expenses / _earnings
+            rate = 1 - _expenses / _income
             return '{0:.1f} %'.format(100 * rate)

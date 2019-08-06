@@ -3,7 +3,7 @@
     <h2>Basic Report</h2>
     <p id="basic-report">
       Your current balance is <b>{{ "%.2f"|format(report.basic.balance())  }}</b><br>
-      Current month earnings: <b>{{ "%.2f"|format(report.basic.earnings())  }}</b><br>
+      Current month earnings: <b>{{ "%.2f"|format(report.basic.income())  }}</b><br>
       Current month expenses: <b>{{ "%.2f"|format(report.basic.expenses())  }}</b><br>
       This month savings: <b>{{ "%.2f"|format(report.basic.savings())  }}</b><br>
       Last 12 months savings rate: <b>{{ report.basic.savings_rate() }}</b>

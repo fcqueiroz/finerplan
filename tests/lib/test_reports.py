@@ -21,7 +21,7 @@ def test_report_basic_balance(mock_date, mock_user, test_user):
 def test_report_basic_earnings(mock_date, mock_user, test_user):
     mock_user.id = test_user.id
     mock_date.today.return_value = date(2019, 7, 15)
-    assert Report().basic.earnings() == 1200
+    assert Report().basic.income() == 1200
 
 
 @pytest.mark.usefixtures('test_transactions')

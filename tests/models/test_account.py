@@ -2,6 +2,7 @@ from datetime import datetime
 import pytest
 
 from finerplan.model import Account
+from finerplan.model.account import AccountGroups
 
 from tests.data import accounts
 
@@ -9,7 +10,9 @@ from tests.data import accounts
 def test_create_account(test_user):
     """Tests method to create an account linked to a user."""
     account_data = accounts.equity()
-    return_value = Account.create(name=account_data['name'], user=test_user, parent=None)
+    return_value = Account.create(
+        name=account_data['name'], user=test_user, parent=None,
+        group_id=AccountGroups.query.filter_by(name='Equity').first().id)
 
     assert test_user.accounts.count() == 1
     assert test_user.accounts.first() == return_value
@@ -23,21 +26,28 @@ def test_create_account_refuses_duplicated_fullname(test_user):
     Tests that method to create an account linked to a user does
     not allow the creation of two accounts with the same fullname.
     """
-    _ = Account.create(name='Equity', user=test_user, parent=None)
+    _ = Account.create(
+        name='Equity', user=test_user, parent=None,
+        group_id=AccountGroups.query.filter_by(name='Equity').first().id)
 
     with pytest.raises(NameError):
-        _ = Account.create(name='Equity', user=test_user, parent=None)
+        _ = Account.create(
+            name='Equity', user=test_user, parent=None,
+            group_id=AccountGroups.query.filter_by(name='Equity').first().id)
 
 
 def test_create_account_subaccount(test_user):
     """Tests method to create a subaccount."""
-    parent_account = Account.create(name=accounts.expenses()['name'], user=test_user)
+    parent_account = Account.create(
+        name=accounts.expenses()['name'], user=test_user,
+        group_id=AccountGroups.query.filter_by(name='Expenses').first().id)
 
-    account = Account.create(name=accounts.housing()['name'], user=test_user, parent=parent_account)
+    account = Account.create(
+        name=accounts.housing()['name'], user=test_user, parent=parent_account,
+        group_id=AccountGroups.query.filter_by(name='Expenses').first().id)
 
     assert test_user.accounts.count() == 2
     assert account.path == '1.2'
-    assert account.group == parent_account.group
 
 
 @pytest.mark.usefixtures('test_accounts')
@@ -102,7 +112,7 @@ def test_is_leaf_property_for_leaf_node(db_session):
 @pytest.mark.usefixtures('test_transaction')
 def test_account_deposits(db_session):
     """Tests relationship betwen Account and Transaction between the deposits attribute."""
-    source = db_session.query(Account).filter_by(name='Earnings').first()
+    source = db_session.query(Account).filter_by(name='Income').first()
     destination = db_session.query(Account).filter_by(name='Expenses').first()
 
     assert source.deposits.count() == 0
@@ -112,7 +122,7 @@ def test_account_deposits(db_session):
 @pytest.mark.usefixtures('test_transaction')
 def test_account_withdraws(db_session):
     """Tests relationship betwen Account and Transaction between the withdraws attribute."""
-    source = db_session.query(Account).filter_by(name='Earnings').first()
+    source = db_session.query(Account).filter_by(name='Income').first()
     destination = db_session.query(Account).filter_by(name='Expenses').first()
 
     assert source.withdraws.count() == 1

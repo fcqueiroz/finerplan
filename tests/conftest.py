@@ -3,8 +3,9 @@ import pytest
 # Local Imports
 from finerplan import create_app, db as _db
 from finerplan.model import User, Account
+from finerplan.model.account import AccountGroups
 
-from tests import setup_db, teardown_db, clean_db
+from tests import setup_db, teardown_db, clean_db, seed_db
 from tests.data import users, accounts, transactions
 
 
@@ -47,6 +48,7 @@ def db_session(db, app):
 
     with app.app_context():
         clean_db()
+        seed_db()
         yield db.session
         db.session.rollback()
 
@@ -72,13 +74,23 @@ def test_accounts(db_session, test_user):
     """
     Creates some accounts for test user
     """
-    expenses = Account.create(name=accounts.expenses()['name'], user=test_user)
-    earnings = Account.create(name=accounts.earnings()['name'], user=test_user)
-    equity = Account.create(name=accounts.equity()['name'], user=test_user)
-    housing = Account.create(name=accounts.housing()['name'], user=test_user, parent=expenses)
-    rent = Account.create(name=accounts.rent()['name'], user=test_user, parent=housing)
 
-    _all_accounts = [expenses, earnings, equity, housing, rent]
+    new_account = accounts.turn_group_into_id(accounts.expenses())
+    expenses = Account.create(user=test_user, **new_account)
+
+    new_account = accounts.turn_group_into_id(accounts.income())
+    income = Account.create(user=test_user, **new_account)
+
+    new_account = accounts.turn_group_into_id(accounts.equity())
+    equity = Account.create(user=test_user, **new_account)
+
+    new_account = accounts.turn_group_into_id(accounts.housing())
+    housing = Account.create(user=test_user, parent=expenses, **new_account)
+
+    new_account = accounts.turn_group_into_id(accounts.rent())
+    rent = Account.create(user=test_user, parent=housing, **new_account)
+
+    _all_accounts = [expenses, income, equity, housing, rent]
     return _all_accounts
 
 

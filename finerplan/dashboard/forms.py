@@ -7,6 +7,7 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
 from wtforms.validators import DataRequired, ValidationError
 
 from finerplan.model import Account
+from finerplan.model.account import AccountGroups
 
 
 class UniqueFullname(object):
@@ -47,4 +48,5 @@ class AddTransactionForm(FlaskForm):
 class AddAccountForm(FlaskForm):
     parent_id = IntegerField('Parent Account Id', validators=[DataRequired()])
     name = StringField('Account Name', validators=[DataRequired(), UniqueFullname('parent_id')])
+    group_id = SelectField('Account Group', validators=[DataRequired()], choices=[], coerce=int)
     submit = SubmitField('Create')

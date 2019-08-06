@@ -1,6 +1,13 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from finerplan import db
 
-from config import fundamental_accounts
+from config import fundamental_accounts, account_groups_list
+
+
+class AccountGroups(db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String(50), nullable=False)
 
 
 class Account(db.Model):
@@ -18,7 +25,7 @@ class Account(db.Model):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def create(cls, name, user, parent=None) -> 'Account':
+    def create(cls, name, user, group_id, parent=None) -> 'Account':
         """
         Public method to create an account linked to an user.
 
@@ -28,6 +35,8 @@ class Account(db.Model):
             Name of the new account.
         user: models.User
             User object to which the new account will be linked to.
+        group_id: int
+            Group'id this account belongs
         parent: models.Account
             If passed, the new account will become a subaccount of
             parent Account and will have the same type.
@@ -40,10 +49,9 @@ class Account(db.Model):
         else:
             raise NameError("Each account's fullname must be unique.")
 
+        new_account.group_id = group_id
         new_account._generate_path(parent=parent)
-        db.session.commit()
 
-        new_account._define_group(parent=parent)
         db.session.commit()
 
         return new_account
@@ -74,13 +82,6 @@ class Account(db.Model):
         else:
             path = ''
         self.path = path + str(self.id)
-
-    def _define_group(self, parent=None) -> None:
-        if parent is not None:
-            group = parent.group
-        else:
-            group = self.name.lower()
-        self.group = group
 
     @property
     def fullname(self):
@@ -116,16 +117,28 @@ class Account(db.Model):
         """
         return len(self.descendents()) == 0
 
+    @hybrid_property
+    def group(self):
+        return AccountGroups.query.filter_by(id=self.group_id).first().name
 
-class AccountGroups(db.Model):
-    id = db.Column('id', db.Integer, primary_key=True)
-    name = db.Column('name', db.String(50), nullable=False)
+
+def init_account_groups():
+    """
+    Inserts into AccountGroups the data needed for aplication.
+    """
+    for group_name in account_groups_list:
+        result = AccountGroups.query.filter_by(name=group_name).first()
+        if result is None:
+            db.session.add(AccountGroups(name=group_name))
+    db.session.commit()
 
 
 def init_fundamental_accounts(user):
     # Initialize user accounts here
     for account_name in fundamental_accounts:
         try:
-            Account.create(name=account_name, user=user)
+            Account.create(
+                name=account_name, user=user,
+                group_id=db.session.query(AccountGroups).filter_by(name=account_name).first().id)
         except NameError:
             pass  # Account is already created

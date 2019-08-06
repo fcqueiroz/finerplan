@@ -19,6 +19,14 @@
             {{ form.parent_id.label(class_="col-form-label") }}
             {{ form.parent_id(class_="form-control") }}
           </div>
+          <!-- Transaction Source Account -->
+          <div class="form-row form-group">
+            {{ form.group_id.label(class_="col-form-label") }}
+            {{ form.group_id(class_="custom-select") }}
+            {% for error in form.group_id.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
           <div class="form-row form-group">
             {{ form.name.label(class_="col-form-label") }}
             {{ form.name(class_="form-control") }}
