@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from finerplan.lib.loans.installments import monthly_invoice, instant_transfer
+from finerplan.lib.loans import monthly_invoice, instant_transfer
 
 
 def test_instant_transfer():

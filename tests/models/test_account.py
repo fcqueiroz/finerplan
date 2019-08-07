@@ -1,7 +1,8 @@
-from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 import pytest
 
-from finerplan.model import Account, AccountGroups, CreditCard
+from finerplan.model import Account, AccountGroups
 
 from tests.data import accounts
 
@@ -133,3 +134,32 @@ def test_credit_card_account(test_user):
     """Tests polymorphism of credit card class."""
     account_types = set([account.type for account in test_user.accounts])
     assert 'credit_card' in account_types
+
+
+def test_account_calculate_installments(test_transactions):
+    """Tests method 'calculate installments'."""
+    transaction = test_transactions[1]
+    source = transaction.source
+    value = 84.01
+
+    result = source.calculate_installments(transaction=transaction, value=value)
+
+    assert result == [dict(cash_date=transaction.accrual_date, value=value)]
+
+
+def test_credit_card_calculate_installments(test_transactions, test_accounts):
+    """Tests method 'calculate installments'."""
+    transaction = test_transactions[1]
+    source = test_accounts[5]
+    value = 84.01
+    closing_day = 10
+    payment_day = 25
+    expected = [
+        dict(cash_date=transaction.accrual_date + relativedelta(day=payment_day), value=42.01),
+        dict(cash_date=transaction.accrual_date + relativedelta(months=1, day=payment_day), value=42.00)
+    ]
+
+    result = source.calculate_installments(
+        transaction=transaction, installments=2, value=value, closing_day=closing_day, payment_day=payment_day)
+
+    assert result == expected

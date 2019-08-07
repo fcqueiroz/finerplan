@@ -26,7 +26,7 @@ class Account(db.Model):
         ----------
         name: str
             Name of the new account.
-        user: models.User
+        user: finerplan.model.user.User
             User object to which the new account will be linked to.
         group_id: int
             Group'id this account belongs
@@ -112,6 +112,9 @@ class Account(db.Model):
     @hybrid_property
     def group(self):
         return self._group.name
+
+    def calculate_installments(self, transaction, **kwargs):
+        return self._group.calculate_installments(account=self, transaction=transaction, **kwargs)
 
     __mapper_args__ = {
         "polymorphic_identity": "account",

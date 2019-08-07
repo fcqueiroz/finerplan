@@ -97,11 +97,11 @@ def config_accounts_create():
     # TODO Dynamically populate this based on parent account group
     form.group_id.choices = group_choices
 
-    print(form.data)
     form.validate()
     errors = form.errors
     if errors:
         logging.error(errors)
+        print(form.data)
 
     # Post process form data
     parent_id = request.form.get('parent_id')
