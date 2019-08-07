@@ -17,3 +17,6 @@ class Report(object):
     @property
     def trends(self):
         return trends
+
+
+genres = ['Information', 'Table', 'Graph']

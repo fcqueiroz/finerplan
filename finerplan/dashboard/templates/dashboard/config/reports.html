@@ -1,0 +1,31 @@
+{% extends "dashboard.html" %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block dashboard %}
+{% if reports %}
+<table class="table text-center">
+  <thead class="text-uppercase bg-primary">
+      <tr class="text-white">
+          <th scope="col">Title</th>
+          <th scope="col">Type</th>
+      </tr>
+  </thead>
+  <tbody>
+  {% for row in reports %}
+    <tr>
+      <td>{{ row.title }}</td>
+      <td>{{ row.genre }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No reports created yet.</p>
+{% endif %}
+
+
+{% include 'config/_add_report_form.html' %}
+
+{% endblock %}

@@ -14,20 +14,21 @@ class Installment(db.Model):
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     source_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    accrual_date = db.Column(db.Date)
+    description = db.Column(db.Text)
+    # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
+    # kind = db.Column(db.String(64))
+
     source = db.relationship(
         'Account',
         foreign_keys=[source_id],
         backref=db.backref('withdraws', lazy='dynamic'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     destination = db.relationship(
         'Account',
         foreign_keys=[destination_id],
         backref=db.backref('deposits', lazy='dynamic'))
-    # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     installments = db.relationship('Installment', lazy='dynamic')
-    accrual_date = db.Column(db.Date)
-    description = db.Column(db.Text)
-    # kind = db.Column(db.String(64))
 
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'

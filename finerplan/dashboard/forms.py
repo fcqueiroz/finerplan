@@ -7,6 +7,7 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
 from wtforms.validators import DataRequired, ValidationError
 
 from finerplan.model import Account, AccountGroups
+from .reports import genres
 
 
 class UniqueFullname(object):
@@ -98,4 +99,12 @@ class AddAccountForm(FlaskForm):
     payment = IntegerField(
         'Payment Day of Credit Card Invoice',
         validators=[RequiredIfFieldEqualTo(field='group_id', func=GetGroupId(name='Credit Card'))])
+    submit = SubmitField('Create')
+
+
+class AddReportForm(FlaskForm):
+    name = StringField("Report Title", validators=[DataRequired()])
+    genre = SelectField('Report Type', validators=[DataRequired()], choices=[(g.lower(), g) for g in genres])
+    # Create nested fields for each genre choice
+
     submit = SubmitField('Create')

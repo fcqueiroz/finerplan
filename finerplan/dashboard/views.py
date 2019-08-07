@@ -7,7 +7,7 @@ from finerplan.dashboard.reports import Report, history
 from finerplan.model import Transaction, Account, CreditCard, AccountGroups
 
 from . import bp
-from .forms import AddTransactionForm, AddAccountForm
+from .forms import AddTransactionForm, AddAccountForm, AddReportForm
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -132,3 +132,13 @@ def config_accounts_create():
 @login_required
 def edit_accounts(account_id):
     pass
+
+
+@bp.route('/config/reports', methods=['GET'])
+@login_required
+def config_report_list():
+    form = AddReportForm()
+    report_cards = current_user.cards.all()
+
+    return render_template(
+        'config/reports.html', title='Reports', reports=report_cards, form=form)

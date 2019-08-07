@@ -1,4 +1,4 @@
-from finerplan.model.account_groups import init_account_groups
+from finerplan.model import init_account_groups
 
 
 def register(app):

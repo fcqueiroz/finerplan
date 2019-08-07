@@ -1,9 +1,12 @@
-from config import fundamental_accounts
+from finerplan import db
 
 from .account import Account, CreditCard
 from .account_groups import AccountGroups
+from .card import Card
 from .user import User
 from .transaction import Transaction
+
+from config import fundamental_accounts, account_groups_list
 
 
 def init_fundamental_accounts(user):
@@ -15,3 +18,14 @@ def init_fundamental_accounts(user):
                 group_id=AccountGroups.query.filter_by(name=account_name).first().id)
         except NameError:
             pass  # Account is already created
+
+
+def init_account_groups():
+    """
+    Inserts into AccountGroups the data needed for aplication.
+    """
+    for group_name in account_groups_list:
+        result = AccountGroups.query.filter_by(name=group_name).first()
+        if result is None:
+            db.session.add(AccountGroups(name=group_name))
+    db.session.commit()
