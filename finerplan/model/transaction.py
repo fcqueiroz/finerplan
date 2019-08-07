@@ -1,3 +1,4 @@
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func
 
 from finerplan import db
@@ -6,7 +7,7 @@ from finerplan import db
 class Installment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-    cash_date = db.Column(db.DateTime)
+    cash_date = db.Column(db.Date)
     value = db.Column(db.Float)
 
 
@@ -23,9 +24,8 @@ class Transaction(db.Model):
         foreign_keys=[destination_id],
         backref=db.backref('deposits', lazy='dynamic'))
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
-    value = db.Column(db.Float)
     installments = db.relationship('Installment', lazy='dynamic')
-    accrual_date = db.Column(db.DateTime)
+    accrual_date = db.Column(db.Date)
     description = db.Column(db.Text)
     # kind = db.Column(db.String(64))
 
@@ -87,13 +87,21 @@ class Transaction(db.Model):
         filters = cls._accrual_date_filter(start, end)
         transactions = cls.query.filter(*filters)
 
-        deposits = transactions.filter(cls.destination_id == account.id)
-        deposits_sum = deposits.with_entities(func.coalesce(func.sum(cls.value), 0)).first()[0]
+        deposits = transactions.filter(cls.destination_id == account.id).join(cls.installments)
+        deposits_sum = deposits.with_entities(func.coalesce(func.sum(Installment.value), 0)).first()[0]
 
-        withdraws = transactions.filter(cls.source_id == account.id)
-        withdraws_sum = withdraws.with_entities(func.coalesce(func.sum(cls.value), 0)).first()[0]
+        withdraws = transactions.filter(cls.source_id == account.id).join(cls.installments)
+        withdraws_sum = withdraws.with_entities(func.coalesce(func.sum(Installment.value), 0)).first()[0]
 
         return deposits_sum - withdraws_sum
+
+    @hybrid_property
+    def value(self):
+        return self.installments.with_entities(func.coalesce(func.sum(Installment.value), 0)).first()[0]
+
+    @value.expression
+    def value(cls):
+        return cls.query.join(cls.installments).with_entities(func.coalesce(func.sum(Installment.value), 0)).first()[0]
 
     @classmethod
     def _accrual_date_filter(cls, start, end):

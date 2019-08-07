@@ -111,5 +111,4 @@ def test_transactions(db_session, test_accounts):
     phone_bill = Transaction.create(source_id=equity.id, destination_id=expenses.id, **transactions.phone_bill())
 
     _all_transactions = [first_salary, dining_out, phone_bill]
-    print(_all_transactions)
     return _all_transactions

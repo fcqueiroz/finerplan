@@ -32,16 +32,13 @@ def overview():
     if form.validate_on_submit():
         transaction = {key: form.data[key] for key in form.data.keys()
                        if key not in ['transaction_kind', 'submit', 'csrf_token']}
-        # TODO: Rollback transactions if anything goes wrong
-        transaction = Transaction(**transaction)
-        db.session.add(transaction)
-        db.session.commit()
+        _ = Transaction.create(**transaction)
 
         return redirect(url_for('dashboard.overview'))
 
-    columns = [Transaction.accrual_date, Transaction.description, Transaction.value,
-               Transaction.source, Transaction.destination]
-    tables = {'transactions': Transaction.query.with_entities(*columns).all()}
+    tables = {'transactions': [
+        (t.accrual_date, t.description, t.value, t.source.name, t.destination.name)
+        for t in Transaction.query.all()]}
 
     return render_template('explore/overview.html', title='Overview', form=form,
                            tables=tables, report=Report())
