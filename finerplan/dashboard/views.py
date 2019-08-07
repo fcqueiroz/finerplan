@@ -3,9 +3,7 @@ import logging
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
-from finerplan import db
-from finerplan.lib.reports import Report
-from finerplan.lib.reports import history
+from finerplan.dashboard.reports import Report, history
 from finerplan.model import Transaction, Account, CreditCard, AccountGroups
 
 from . import bp
