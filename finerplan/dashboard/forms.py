@@ -3,11 +3,12 @@ from datetime import date
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectField, \
-    StringField, SubmitField, Field, HiddenField
+    StringField, SubmitField, HiddenField, SelectMultipleField
 from wtforms.validators import DataRequired, ValidationError
 
 from finerplan.model import Account, AccountGroups
-from .reports import genres
+
+from .reports import genres, information_report_kinds
 
 
 class UniqueFullname(object):
@@ -102,9 +103,19 @@ class AddAccountForm(FlaskForm):
     submit = SubmitField('Create')
 
 
+def choices_list(choices):
+    """
+    Produces a list of choices suitable for SelectField 'choices' param.
+    Modifies each string in list to use lower case and replace all spaces for underscores.
+    """
+    return [(old_str.lower().replace(' ', '_'), old_str) for old_str in choices]
+
+
 class AddReportForm(FlaskForm):
     name = StringField("Report Title", validators=[DataRequired()])
-    genre = SelectField('Report Type', validators=[DataRequired()], choices=[(g.lower(), g) for g in genres])
+    genre = SelectField('Report Type', validators=[DataRequired()], choices=choices_list(genres))
+
     # Create nested fields for each genre choice
+    information_kinds = SelectMultipleField('Information Reports', choices=choices_list(information_report_kinds))
 
     submit = SubmitField('Create')

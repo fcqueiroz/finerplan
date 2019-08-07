@@ -20,3 +20,7 @@ class Report(object):
 
 
 genres = ['Information', 'Table', 'Graph']
+
+information_report_kinds = {
+    'Current Balance': BasicReport(kind='balance')
+}

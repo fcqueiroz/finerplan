@@ -7,6 +7,18 @@ from finerplan.model import Account, Transaction
 
 
 class BasicReport(object):
+
+    def __init__(self, kind=None):
+        """
+        kind: str
+            Name of the method to use when this instance is called
+        """
+        self._kind = kind
+
+    def __call__(self, **kwargs):
+        if self._kind is not None and hasattr(self, self._kind):
+            self._kind(**kwargs)
+
     @property
     def _month_start(self):
         return date.today() + relativedelta(day=1)

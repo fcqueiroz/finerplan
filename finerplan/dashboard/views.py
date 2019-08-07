@@ -4,7 +4,7 @@ from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
 from finerplan.dashboard.reports import Report, history
-from finerplan.model import Transaction, Account, CreditCard, AccountGroups
+from finerplan.model import Transaction, Account, CreditCard, AccountGroups, Card
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm, AddReportForm
@@ -74,7 +74,7 @@ def expenses():
 
 @bp.route('/config/accounts', methods=['GET'])
 @login_required
-def config_accounts_list():
+def accounts_list():
     form = AddAccountForm()
     group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
     # TODO Dynamically populate this based on parent account group
@@ -86,7 +86,7 @@ def config_accounts_list():
 
 @bp.route('/config/accounts', methods=['POST'])
 @login_required
-def config_accounts_create():
+def accounts_create():
     form = AddAccountForm()
     group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
     # TODO Dynamically populate this based on parent account group
@@ -122,7 +122,7 @@ def config_accounts_create():
         else:
             Account.create(**account_data)
 
-        return redirect(url_for('dashboard.config_accounts_list'))
+        return redirect(url_for('dashboard.accounts_list'))
 
     return render_template(
         'config/accounts.html', title='Accounts', accounts=current_user.accounts.all(), form=form)
@@ -136,9 +136,30 @@ def edit_accounts(account_id):
 
 @bp.route('/config/reports', methods=['GET'])
 @login_required
-def config_report_list():
+def reports_list():
     form = AddReportForm()
     report_cards = current_user.cards.all()
+
+    return render_template(
+        'config/reports.html', title='Reports', reports=report_cards, form=form)
+
+
+@bp.route('/config/reports', methods=['POST'])
+@login_required
+def reports_create():
+    form = AddReportForm()
+    report_cards = current_user.cards.all()
+
+    form.validate()
+    errors = form.errors
+    if errors:
+        logging.error(errors)
+        print(form.data)
+
+    if form.validate_on_submit():
+        Card.create(user=current_user, **form.data)
+
+        return redirect(url_for('dashboard.reports_list'))
 
     return render_template(
         'config/reports.html', title='Reports', reports=report_cards, form=form)

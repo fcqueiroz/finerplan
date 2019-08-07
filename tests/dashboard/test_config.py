@@ -3,6 +3,7 @@ import pytest
 
 from tests.test_auth import fill_login_form
 from tests.data.accounts import card_3412, turn_group_into_id
+from tests.data.cards import new_report
 
 
 def test_accounts_add_income(client, test_accounts):
@@ -12,7 +13,7 @@ def test_accounts_add_income(client, test_accounts):
     with client:
         client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
 
-        rv = client.post(url_for('dashboard.config_accounts_create'), data=form, follow_redirects=True)
+        rv = client.post(url_for('dashboard.accounts_create'), data=form, follow_redirects=True)
         assert b'Income - Scholarship' in rv.data
 
 
@@ -23,18 +24,30 @@ def test_accounts_add_credit_card(client):
 
     with client:
         client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
-        rv = client.post(url_for('dashboard.config_accounts_create'), data=credit_card, follow_redirects=True)
+        rv = client.post(url_for('dashboard.accounts_create'), data=credit_card, follow_redirects=True)
 
         assert b'Credit Card 3412' in rv.data
 
 
 @pytest.mark.usefixtures('test_transactions')
-def test_report_list(client):
+def test_reports_list(client):
     """
     Tests that user can visit page to see all the already created reports.
     """
     with client:
         client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
-        rv = client.get(url_for('dashboard.config_report_list'), follow_redirects=True)
+        rv = client.get(url_for('dashboard.reports_list'), follow_redirects=True)
 
         assert b'No reports created yet' in rv.data
+
+
+@pytest.mark.usefixtures('test_transactions')
+def test_reports_add_card(client):
+    """
+    Tests that user can create a new report card.
+    """
+    with client:
+        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
+        rv = client.post(url_for('dashboard.reports_create'), data=new_report(), follow_redirects=True)
+
+    assert b'New Report' in rv.data
