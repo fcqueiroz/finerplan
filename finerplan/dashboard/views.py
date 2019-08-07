@@ -3,8 +3,8 @@ import logging
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
-from finerplan.dashboard.reports import Report, history
-from finerplan.model import Transaction, Account, CreditCard, AccountGroups, Card
+from finerplan.model import Transaction, Account, CreditCard, AccountGroups
+from finerplan.reports import Report, history
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm, AddReportForm
@@ -38,8 +38,10 @@ def overview():
         (t.accrual_date, t.description, t.value, t.source.name, t.destination.name)
         for t in Transaction.query.all()]}
 
+    cards = [Report(card=c) for c in current_user.cards]
+
     return render_template('explore/overview.html', title='Overview', form=form,
-                           tables=tables, report=Report())
+                           tables=tables, cards=cards)
 
 
 def get_group_leaves(user, group):

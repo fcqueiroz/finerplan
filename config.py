@@ -85,7 +85,12 @@ default_account_categories = (
     ('Transportation', ['Auto', 'Public', 'Taxi', 'Travel'])
 )
 
+# Model
 # ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
 fundamental_accounts = ['Equity', 'Income', 'Expenses']
 
 account_groups_list = ['Equity', 'Income', 'Expenses', 'Cash', 'Credit Card']
+
+# Reports
+genres = ['Information', 'Table', 'Graph']
+information_report_kinds = ['Current Balance']

@@ -1,5 +1,5 @@
-def new_report():
+def test_report():
     return dict(
-        name='New Report',
+        name='Test Report',
         genre='information',
-        information_kinds=['current_balance'])
+        information_kinds=['Current Balance'])

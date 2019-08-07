@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, ValidationError
 
 from finerplan.model import Account, AccountGroups
 
-from .reports import genres, information_report_kinds
+from config import genres, information_report_kinds
 
 
 class UniqueFullname(object):
@@ -103,19 +103,12 @@ class AddAccountForm(FlaskForm):
     submit = SubmitField('Create')
 
 
-def choices_list(choices):
-    """
-    Produces a list of choices suitable for SelectField 'choices' param.
-    Modifies each string in list to use lower case and replace all spaces for underscores.
-    """
-    return [(old_str.lower().replace(' ', '_'), old_str) for old_str in choices]
-
-
 class AddReportForm(FlaskForm):
     name = StringField("Report Title", validators=[DataRequired()])
-    genre = SelectField('Report Type', validators=[DataRequired()], choices=choices_list(genres))
+    genre = SelectField('Report Type', validators=[DataRequired()], choices=[(s, s) for s in genres])
 
     # Create nested fields for each genre choice
-    information_kinds = SelectMultipleField('Information Reports', choices=choices_list(information_report_kinds))
+    information_kinds = SelectMultipleField(
+        'Information Reports', choices=[(s, s) for s in information_report_kinds])
 
     submit = SubmitField('Create')

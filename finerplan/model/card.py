@@ -11,7 +11,7 @@ class Card(db.Model):
     __tablename__ = 'card'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    title = db.Column(db.String(50))
+    name = db.Column(db.String(50))
 
     reports = db.relationship('CardReports', lazy='dynamic')
 
@@ -23,13 +23,13 @@ class Card(db.Model):
         Parameters
         ----------
         user: finerplan.model.user.User
-            User object to which the new card will be linked to.
+            User object to which the new Card will be linked to.
         name: str
-            Title of the new report Card
+            Name of the new Card
         genre: str
-            Name of the report's group
+            Name of the Card's report group
         """
-        new_card = cls(user_id=user.id, title=name)
+        new_card = cls(user_id=user.id, name=name)
         db.session.add(new_card)
         db.session.flush()
 

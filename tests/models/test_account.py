@@ -4,7 +4,7 @@ import pytest
 
 from finerplan.model import Account, AccountGroups
 
-from tests.data import accounts, transactions
+from tests.data import accounts
 
 
 def test_create_account(test_user):

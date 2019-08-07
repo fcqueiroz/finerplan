@@ -5,19 +5,53 @@ from flask_login import current_user
 
 from finerplan.model import Account, Transaction
 
+from config import information_report_kinds
 
-class BasicReport(object):
 
-    def __init__(self, kind=None):
+class BaseReport(object):
+    _report = None
+    _value = None
+    _text = None
+
+    def __init__(self, report, available_reports):
+        self._find_report_method(report, available_reports)
+
+    def to_html(self):
+        getattr(self, self._report)()
+        return self._text + self._formated_value
+
+    @property
+    def _formated_value(self):
+        return ' <b>{0:.2f}</b>'.format(self._value)
+
+    def _find_report_method(self, report, available_reports):
+        if report in available_reports:
+            report = self._kind_mapper(report)
+            self._report = report
+        else:
+            raise ValueError(f"{type(self).__name__} doesn't provide report '{report}'")
+
+    @staticmethod
+    def _kind_mapper(kind):
+        raise NotImplementedError
+
+
+class InformationReport(BaseReport):
+
+    def __init__(self, report):
         """
-        kind: str
-            Name of the method to use when this instance is called
-        """
-        self._kind = kind
+        Produces basic information reports (Descriptive text + Scalar value)
 
-    def __call__(self, **kwargs):
-        if self._kind is not None and hasattr(self, self._kind):
-            self._kind(**kwargs)
+        Parameters
+        ----------
+        report: str
+            Name of the report to be generated.
+        """
+        super().__init__(report=report, available_reports=information_report_kinds)
+
+    @staticmethod
+    def _kind_mapper(kind):
+        return kind.lower().replace(' ', '_')
 
     @property
     def _month_start(self):
@@ -54,11 +88,12 @@ class BasicReport(object):
 
         return _result
 
-    def balance(self) -> float:
+    def current_balance(self) -> None:
         """
         Evaluates equity balance at present date.
         """
-        return self._account_balance(account='Equity', end=date.today())
+        self._text = 'Your current balance is:'
+        self._value = self._account_balance(account='Equity', end=date.today())
 
     def income(self) -> float:
         """
