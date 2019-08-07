@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block dashboard %}
-{% if reports %}
+{% if cards %}
 <table class="table text-center">
   <thead class="text-uppercase bg-primary">
       <tr class="text-white">
@@ -13,18 +13,17 @@
       </tr>
   </thead>
   <tbody>
-  {% for row in reports %}
+  {% for row in cards %}
     <tr>
-      <td>{{ row.title }}</td>
+      <td>{{ row.name }}</td>
       <td>{{ row.genre }}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 {% else %}
-<p>No reports created yet.</p>
+<p>No reports cards created yet.</p>
 {% endif %}
-
 
 {% include 'config/_add_report_form.html' %}
 

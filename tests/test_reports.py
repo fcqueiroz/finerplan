@@ -36,7 +36,7 @@ def test_information_report_income(mock_date, mock_user, test_user):
     report = InformationReport(report='Current Month Income')
     result = report.to_html()
 
-    assert 'current month income' in result
+    assert 'Current month income' in result
     assert '1200' in result
 
 
@@ -53,7 +53,7 @@ def test_information_report_expenses(mock_date, mock_user, test_user):
     report = InformationReport(report='Current Month Expenses')
     result = report.to_html()
 
-    assert 'current month expenses' in result
+    assert 'Current month expenses' in result
     assert '65' in result
 
 

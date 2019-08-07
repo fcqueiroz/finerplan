@@ -93,4 +93,4 @@ account_groups_list = ['Equity', 'Income', 'Expenses', 'Cash', 'Credit Card']
 
 # Reports
 genres = ['Information', 'Table', 'Graph']
-information_report_kinds = ['Current Balance']
+information_report_kinds = ['Current Balance', 'Current Month Income', 'Current Month Expenses', 'Savings Rate']

@@ -8,6 +8,13 @@ from finerplan.model import Account, Transaction
 from config import information_report_kinds
 
 
+def bold(func):
+    def wrapper(*args, **kwargs):
+        return " <b>" + func(*args, **kwargs) + "</b>"
+
+    return wrapper
+
+
 class BaseReport(object):
     _report = None
     _value = None
@@ -18,11 +25,14 @@ class BaseReport(object):
 
     def to_html(self):
         getattr(self, self._report)()
-        return self._text + self._formated_value
 
-    @property
-    def _formated_value(self):
-        return ' <b>{0:.2f}</b>'.format(self._value)
+        formatted_value = self._formatter()
+
+        return self._text + formatted_value
+
+    @bold
+    def _formatter(self):
+        return '{0:.2f}'.format(self._value)
 
     def _find_report_method(self, report, available_reports):
         if report in available_reports:
@@ -95,25 +105,45 @@ class InformationReport(BaseReport):
         self._text = 'Your current balance is:'
         self._value = self._account_balance(account='Equity', end=date.today())
 
-    def income(self) -> float:
+    def current_month_income(self) -> None:
         """
         Evaluates total income in the current month.
         """
-        return self._account_balance("Income", start=self._month_start, end=self._month_end)
+        self._text = 'Current month income:'
+        self._value = self._account_balance("Income", start=self._month_start, end=self._month_end)
 
-    def expenses(self) -> float:
+    def current_month_expenses(self) -> None:
         """
         Evaluates total expenses in the current month.
         """
-        return self._account_balance("Expenses", start=self._month_start, end=self._month_end)
+        self._text = 'Current month expenses:'
+        self._value = self._account_balance("Expenses", start=self._month_start, end=self._month_end)
 
-    def savings(self) -> float:
+    def current_month_savings(self) -> None:
         """
         Evaluates total savings in the current month.
         """
-        return self.income() - self.expenses()
+        self._text = 'This month savings:'
 
-    def savings_rate(self, length=12) -> str:
+        self.current_month_income()
+        income = self._value
+
+        self.current_month_expenses()
+        expenses = self._value
+
+        self._value = income - expenses
+
+    def _percent_formatter(self, msg=None):
+
+        def _formatter():
+            if msg:
+                return msg
+            else:
+                return '{0:.1f} %'.format(100 * self._value)
+
+        return _formatter
+
+    def savings_rate(self, length=12) -> None:
         """
         Calculates savings rate over a period of time.
 
@@ -122,6 +152,8 @@ class InformationReport(BaseReport):
         length: int
             Number of months in the past to include in the calculation.
         """
+        self._text = 'Last 12 months savings rate:'
+
         period_end = self._month_start
         period_start = period_end - relativedelta(months=length)
 
@@ -129,9 +161,11 @@ class InformationReport(BaseReport):
         _income = self._account_balance(account='Income', start=period_start, end=period_end)
 
         if _income == 0:
-            return "No income during period."
+            msg = "No income during period."
         elif _expenses > _income:
-            return "No savings in period. (expenses greater than income)"
+            msg = "No savings in period. (expenses greater than income)"
         else:
-            rate = 1 - _expenses / _income
-            return '{0:.1f} %'.format(100 * rate)
+            msg = None
+            self._value = 1 - _expenses / _income
+
+        setattr(self, '_formatter', self._percent_formatter(msg=msg))

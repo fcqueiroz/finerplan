@@ -3,7 +3,7 @@ import pytest
 
 from tests.test_auth import fill_login_form
 from tests.data.accounts import card_3412, turn_group_into_id
-from tests.data.cards import test_report
+from tests.data.cards import test_report, basic_report
 
 
 def test_accounts_add_income(client, test_accounts):
@@ -38,7 +38,7 @@ def test_reports_list(client):
         client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
         rv = client.get(url_for('dashboard.reports_list'), follow_redirects=True)
 
-        assert b'No reports created yet' in rv.data
+        assert b'No reports cards created yet.' in rv.data
 
 
 @pytest.mark.usefixtures('test_transactions')
