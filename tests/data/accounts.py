@@ -65,3 +65,10 @@ def card_3412():
         closing=11,  # Day of month when the credit card invoice closes
         payment=25  # Day of month when the credit card invoice is paid
     )
+
+
+def devices():
+    return dict(
+        name='Electronic Devices',
+        group='Expenses'
+    )

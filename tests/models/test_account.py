@@ -4,7 +4,7 @@ import pytest
 
 from finerplan.model import Account, AccountGroups
 
-from tests.data import accounts
+from tests.data import accounts, transactions
 
 
 def test_create_account(test_user):
@@ -109,26 +109,6 @@ def test_is_leaf_property_for_leaf_node(db_session):
     assert account.is_leaf
 
 
-@pytest.mark.usefixtures('test_transaction')
-def test_account_deposits(db_session):
-    """Tests relationship betwen Account and Transaction between the deposits attribute."""
-    source = db_session.query(Account).filter_by(name='Income').first()
-    destination = db_session.query(Account).filter_by(name='Expenses').first()
-
-    assert source.deposits.count() == 0
-    assert destination.deposits.count() == 1
-
-
-@pytest.mark.usefixtures('test_transaction')
-def test_account_withdraws(db_session):
-    """Tests relationship betwen Account and Transaction between the withdraws attribute."""
-    source = db_session.query(Account).filter_by(name='Income').first()
-    destination = db_session.query(Account).filter_by(name='Expenses').first()
-
-    assert source.withdraws.count() == 1
-    assert destination.withdraws.count() == 0
-
-
 @pytest.mark.usefixtures('test_accounts')
 def test_credit_card_account(test_user):
     """Tests polymorphism of credit card class."""
@@ -152,14 +132,10 @@ def test_credit_card_calculate_installments(test_transactions, test_accounts):
     transaction = test_transactions[1]
     source = test_accounts[5]
     value = 84.01
-    closing_day = 10
-    payment_day = 25
     expected = [
-        dict(cash_date=transaction.accrual_date + relativedelta(day=payment_day), value=42.01),
-        dict(cash_date=transaction.accrual_date + relativedelta(months=1, day=payment_day), value=42.00)
-    ]
+        dict(cash_date=transaction.accrual_date + relativedelta(day=source.payment), value=42.01),
+        dict(cash_date=transaction.accrual_date + relativedelta(months=1, day=source.payment), value=42.00)]
 
-    result = source.calculate_installments(
-        transaction=transaction, installments=2, value=value, closing_day=closing_day, payment_day=payment_day)
+    result = source.calculate_installments(transaction=transaction, installments=2, value=value)
 
     assert result == expected

@@ -37,7 +37,7 @@ class Account(db.Model):
         if cls.check_unique_fullname(name=name, user=user, parent=parent):
             new_account = cls(name=name, user_id=user.id, group_id=group_id, **kwargs)
             db.session.add(new_account)
-            db.session.commit()
+            db.session.flush()
 
         else:
             raise NameError("Each account's fullname must be unique.")
@@ -113,8 +113,8 @@ class Account(db.Model):
     def group(self):
         return self._group.name
 
-    def calculate_installments(self, transaction, **kwargs):
-        return self._group.calculate_installments(account=self, transaction=transaction, **kwargs)
+    def calculate_installments(self, **kwargs) -> list:
+        return self._group.calculate_installments(account=self, **kwargs)
 
     __mapper_args__ = {
         "polymorphic_identity": "account",
@@ -130,8 +130,10 @@ class CreditCard(Account):
 
     @classmethod
     def create(cls, closing, payment, **kwargs) -> 'Account':
-        new_account = super().create(closing=closing, payment=payment, **kwargs)
-        return new_account
+        return super().create(closing=closing, payment=payment, **kwargs)
+
+    def calculate_installments(self, **kwargs) -> list:
+        return super().calculate_installments(closing_day=self.closing, payment_day=self.payment, **kwargs)
 
     __mapper_args__ = {
         "polymorphic_identity": "credit_card",

@@ -3,6 +3,13 @@ from sqlalchemy.sql import func
 from finerplan import db
 
 
+class Installment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    cash_date = db.Column(db.DateTime)
+    value = db.Column(db.Float)
+
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     source_id = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -17,17 +24,51 @@ class Transaction(db.Model):
         backref=db.backref('deposits', lazy='dynamic'))
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     value = db.Column(db.Float)
-    installments = db.Column(db.Integer)
+    installments = db.relationship('Installment', lazy='dynamic')
     accrual_date = db.Column(db.DateTime)
-    # cash_date = db.Column(db.DateTime)
     description = db.Column(db.Text)
     # kind = db.Column(db.String(64))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def __repr__(self):
         return f'<{self.description[:24] + (self.description[24:] and "..")}\t({self.value})>'
+
+    @classmethod
+    def create(cls, description, accrual_date, source_id, destination_id, value, installments=1) -> 'Transaction':
+        """
+        Public method to create a transaction and its linked installments.
+
+        Parameters
+        ----------
+        description: str
+            Transaction description
+        accrual_date: datetime
+            Date when transaction happened
+        source_id: int
+            Account'id which was the source of the transfered value amount.
+        destination_id: int
+            Account'id which was the destination of the transfered value amount.
+        value: float
+            Total transaction's value
+        installments: int
+            Number of installments
+        Returns
+        -------
+        finerplan.model.transaction.Transaction
+        """
+        transaction = cls(
+            source_id=source_id, destination_id=destination_id,
+            description=description, accrual_date=accrual_date)
+        db.session.add(transaction)
+        db.session.flush()
+        source = transaction.source
+
+        new_data = source.calculate_installments(transaction=transaction, value=value, installments=installments)
+        new_installments = [Installment(transaction_id=transaction.id, **_data) for _data in new_data]
+        db.session.add_all(new_installments)
+
+        db.session.commit()
+
+        return transaction
 
     @classmethod
     def balance(cls, account, start=None, end=None) -> float:
