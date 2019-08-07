@@ -122,7 +122,7 @@ def test_account_calculate_installments(test_transactions):
     source = transaction.source
     value = 84.01
 
-    result = source.calculate_installments(transaction=transaction, value=value)
+    result = source.list_installments(transaction=transaction, value=value)
 
     assert result == [dict(cash_date=transaction.accrual_date, value=value)]
 
@@ -136,6 +136,6 @@ def test_credit_card_calculate_installments(test_transactions, test_accounts):
         dict(cash_date=transaction.accrual_date + relativedelta(day=source.payment), value=42.01),
         dict(cash_date=transaction.accrual_date + relativedelta(months=1, day=source.payment), value=42.00)]
 
-    result = source.calculate_installments(transaction=transaction, installments=2, value=value)
+    result = source.list_installments(transaction=transaction, installments=2, value=value)
 
     assert result == expected

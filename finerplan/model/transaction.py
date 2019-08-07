@@ -62,7 +62,7 @@ class Transaction(db.Model):
         db.session.flush()
         source = transaction.source
 
-        new_data = source.calculate_installments(transaction=transaction, value=value, installments=installments)
+        new_data = source.list_installments(transaction=transaction, value=value, installments=installments)
         new_installments = [Installment(transaction_id=transaction.id, **_data) for _data in new_data]
         db.session.add_all(new_installments)
 

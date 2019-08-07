@@ -113,8 +113,8 @@ class Account(db.Model):
     def group(self):
         return self._group.name
 
-    def calculate_installments(self, **kwargs) -> list:
-        return self._group.calculate_installments(account=self, **kwargs)
+    def list_installments(self, **kwargs) -> list:
+        return self._group.installments_enumerator(account=self, **kwargs)
 
     __mapper_args__ = {
         "polymorphic_identity": "account",
@@ -132,8 +132,8 @@ class CreditCard(Account):
     def create(cls, closing, payment, **kwargs) -> 'Account':
         return super().create(closing=closing, payment=payment, **kwargs)
 
-    def calculate_installments(self, **kwargs) -> list:
-        return super().calculate_installments(closing_day=self.closing, payment_day=self.payment, **kwargs)
+    def list_installments(self, **kwargs) -> list:
+        return super().list_installments(closing_day=self.closing, payment_day=self.payment, **kwargs)
 
     __mapper_args__ = {
         "polymorphic_identity": "credit_card",
