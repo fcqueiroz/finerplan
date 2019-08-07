@@ -7,16 +7,12 @@
 
 {% block dashboard %}
 <div class="row">
-  <div class="col-12 col-md-6 col-xl-4 py-3">
-    {% include 'explore/_add_transaction_form.html' %}
-  </div>
-  <div class="col-12 col-md-8 py-3">
-    {% include 'explore/_recent_transactions.html' %}
-  </div>
+  {% include 'explore/_add_transaction_form.html' %}
+
+  {% include 'explore/_recent_transactions.html' %}
+
   {% for card in cards %}
-  <div class="col-12">
     {% include 'explore/_card.html' %}
-  </div>
   {% endfor %}
 </div>
 {% endblock %}
