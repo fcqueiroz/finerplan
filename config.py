@@ -92,5 +92,8 @@ fundamental_accounts = ['Equity', 'Income', 'Expenses']
 account_groups_list = ['Equity', 'Income', 'Expenses', 'Cash', 'Credit Card']
 
 # Reports
-genres = ['Information', 'Table', 'Graph']
-information_report_kinds = ['Current Balance', 'Current Month Income', 'Current Month Expenses', 'Savings Rate']
+genres = ['Information']  # Planned to include 'Table' and 'Graph' soon
+report_names = {
+    'Information': ['Current Balance', 'Current Month Income', 'Current Month Expenses', 'Savings Rate'],
+    'Table': ['Last 12 Month Expenses', 'Recent Transactions'],
+    'Graph': []}

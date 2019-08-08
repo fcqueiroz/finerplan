@@ -51,6 +51,6 @@ class Card(db.Model):
     @staticmethod
     def _select_kwargs(genre, **kwargs):
         if genre == 'Information':
-            return kwargs.get('information_kinds')
+            return kwargs.get('information_names')
         else:
             raise ValueError(f"Unknown genre='{genre}'")

@@ -6,7 +6,7 @@ from .card import Card, Report
 from .user import User
 from .transaction import Transaction
 
-from config import fundamental_accounts, account_groups_list, information_report_kinds
+from config import fundamental_accounts, account_groups_list, report_names
 
 
 def init_fundamental_accounts(user):
@@ -35,7 +35,7 @@ def init_reports():
     """
     Inserts into Report the data needed for aplication.
     """
-    for report in information_report_kinds:
+    for report in report_names['Information']:
         result = Report.query.filter_by(name=report).first()
         if result is None:
             db.session.add(Report(name=report))

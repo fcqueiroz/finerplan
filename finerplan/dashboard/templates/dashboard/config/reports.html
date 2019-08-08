@@ -1,11 +1,12 @@
 {% extends "dashboard.html" %}
 
 {% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/report-form.js') }}" defer></script>
 {% endblock %}
 
 {% block dashboard %}
 <div class="row">
-  <!-- Add Report Form -->
+  <!-- Add Card Report Form -->
   <div class="col-12 col-md-6 col-xl-4 py-3">
     <div class="card">
       <div class="card-body">
@@ -13,7 +14,7 @@
         <form action="#" method="post" name="report">
           {{ form.hidden_tag() }}
 
-          <!-- Report Title -->
+          <!-- Card Report Title -->
           <div class="form-row form-group">
             {{ form.name.label(class_="col-form-label") }}
             {{ form.name(class_="form-control") }}
@@ -22,11 +23,38 @@
             {% endfor %}
           </div>
 
-          <!-- Report Type -->
-          <div class="form-row form-group">
+          <!-- Card Report Type -->
+          <div id='CardType' class="form-row form-group">
             {{ form.genre.label(class_="col-form-label") }}
-            {{ form.genre(class_="custom-select") }}
+            {{ form.genre() }}
             {% for error in form.genre.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          <!-- Information Reports -->
+          <div id='InformationReports' class="form-row form-group d-none">
+            {{ form.information_names.label(class_="col-form-label") }}
+            {{ form.information_names(class_="custom-select") }}
+            {% for error in form.information_names.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          <!-- Table Reports -->
+          <div id='TableReports' class="form-row form-group d-none">
+            {{ form.table_names.label(class_="col-form-label") }}
+            {{ form.table_names(class_="custom-select") }}
+            {% for error in form.table_names.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          <!-- Graph Reports -->
+          <div id='GraphReports' class="form-row form-group d-none">
+            {{ form.graph_names.label(class_="col-form-label") }}
+            {{ form.graph_names(class_="custom-select") }}
+            {% for error in form.graph_names.errors %}
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>

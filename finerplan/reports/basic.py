@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from finerplan.model import Account, Transaction
 
-from config import information_report_kinds
+from config import report_names
 
 
 def bold(func):
@@ -57,7 +57,7 @@ class InformationReport(BaseReport):
         report: str
             Name of the report to be generated.
         """
-        super().__init__(report=report, available_reports=information_report_kinds)
+        super().__init__(report=report, available_reports=report_names['Information'])
 
     @staticmethod
     def _kind_mapper(kind):

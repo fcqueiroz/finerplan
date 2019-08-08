@@ -42,7 +42,7 @@ $(function() {
   /* displays or hides InstallmentsArea based on source account chosen */
   $( "#source_id" ).change(function() {
     installments_ids = sessionStorage.installments_ids
-    if ( installments_ids.includes($(this).val()) ) {
+    if ( installments_ids.includes( $(this).val() ) ) {
       document.getElementById('InstallmentsArea').classList.remove('d-none');
     } else {
       document.getElementById('InstallmentsArea').classList.add('d-none');
