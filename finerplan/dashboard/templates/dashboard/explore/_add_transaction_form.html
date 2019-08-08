@@ -44,32 +44,32 @@
             <span>[{{ error }}]</span>
           {% endfor %}
         </div>
-        <!-- Transaction Source Account -->
-        <div class="form-row form-group">
-          {{ form.source_id.label(class_="col-form-label") }}
-          {{ form.source_id(class_="custom-select") }}
-          {% for error in form.source_id.errors %}
-            <span>[{{ error }}]</span>
-          {% endfor %}
-        </div>
-        <!-- Transaction Destination Account -->
-        <div class="form-row form-group">
-          {{ form.destination_id.label(class_="col-form-label") }}
-          {{ form.destination_id(class_="custom-select") }}
-          {% for error in form.destination_id.errors %}
-            <span>[{{ error }}]</span>
-          {% endfor %}
+        <div id="AccountsArea" class="d-none">
+          <!-- Transaction Source Account -->
+          <div class="form-row form-group">
+            {{ form.source_id.label(class_="col-form-label") }}
+            {{ form.source_id(class_="custom-select") }}
+            {% for error in form.source_id.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Destination Account -->
+          <div class="form-row form-group">
+            {{ form.destination_id.label(class_="col-form-label") }}
+            {{ form.destination_id(class_="custom-select") }}
+            {% for error in form.destination_id.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
         </div>
         <!-- Credit card installments -->
-        <!--
-        <div id="paymentInstallments" class="form-row form-group">
+        <div id="InstallmentsArea" class="form-row form-group d-none">
           {{ form.installments.label(class_="col-form-label") }}
           {{ form.installments(class_="form-control", type="number") }}
           {% for error in form.installments.errors %}
             <span>[{{ error }}]</span>
           {% endfor %}
         </div>
-        -->
         {{ form.submit(class_="btn btn-primary mt-4 pr-4 pl-4") }}
       </form>
     </div>

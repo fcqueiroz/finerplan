@@ -56,13 +56,15 @@ def accounts_json(transaction_kind):
     if transaction_kind == 'income':
         source = get_group_leaves(current_user, group='Income')
         destination = get_group_leaves(current_user, group='Equity')
+        destination.extend(get_group_leaves(current_user, group='Credit Card'))
     elif transaction_kind == 'expenses':
         source = get_group_leaves(current_user, group='Equity')
+        source.extend(get_group_leaves(current_user, group='Credit Card'))
         destination = get_group_leaves(current_user, group='Expenses')
     else:
         raise ValueError
 
-    data = {'sources': [{'id': account.id, 'name': account.fullname} for account in source],
+    data = {'sources': [{'id': account.id, 'name': account.fullname, 'type': account.type} for account in source],
             'destinations': [{'id': account.id, 'name': account.fullname} for account in destination]}
     return jsonify(data)
 
@@ -102,7 +104,7 @@ def accounts_create():
 
     # Post process form data
     parent_id = request.form.get('parent_id')
-    if parent_id is not None:
+    if parent_id:
         parent = Account.query.get(int(parent_id))
         assert parent.user_id == current_user.id
     else:
