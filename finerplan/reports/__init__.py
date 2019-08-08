@@ -18,5 +18,4 @@ class Report(object):
 
     @staticmethod
     def _get_reports(card):
-        kinds = [r.kind for r in card.reports]
-        return [InformationReport(report=k) for k in kinds]
+        return [InformationReport(report=report.name) for report in card.reports]

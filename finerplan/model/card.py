@@ -1,10 +1,16 @@
 from finerplan import db
 
 
-class CardReports(db.Model):
+class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
-    kind = db.Column(db.String(50))
+    name = db.Column(db.String(50))
+
+
+card_report = db.Table(
+    'card_report',
+    db.Column('card_id', db.Integer, db.ForeignKey('card.id'), primary_key=True),
+    db.Column('report_id', db.Integer, db.ForeignKey('report.id'), primary_key=True)
+)
 
 
 class Card(db.Model):
@@ -14,7 +20,7 @@ class Card(db.Model):
     name = db.Column(db.String(50))
     genre = db.Column(db.String(50))
 
-    reports = db.relationship('CardReports', lazy='dynamic')
+    reports = db.relationship('Report', secondary=card_report, lazy='dynamic')
 
     @classmethod
     def create(cls, user, name, genre, **kwargs) -> 'Card':
@@ -34,9 +40,9 @@ class Card(db.Model):
         db.session.add(new_card)
         db.session.flush()
 
-        kinds = cls._select_kwargs(genre, **kwargs)
-        reports = [CardReports(card_id=new_card.id, kind=k) for k in kinds]
-        db.session.add_all(reports)
+        card_report_names = cls._select_kwargs(genre, **kwargs)
+        card_reports = Report.query.filter(Report.name.in_(card_report_names))
+        new_card.reports.extend(card_reports)
 
         db.session.commit()
 

@@ -1,4 +1,4 @@
-from finerplan.model import init_account_groups
+from finerplan.model import init_account_groups, init_reports
 
 
 def register(app):
@@ -9,3 +9,4 @@ def register(app):
 
         with app.app_context():
             init_account_groups()
+            init_reports()

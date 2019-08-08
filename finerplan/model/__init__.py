@@ -2,11 +2,11 @@ from finerplan import db
 
 from .account import Account, CreditCard
 from .account_groups import AccountGroups
-from .card import Card
+from .card import Card, Report
 from .user import User
 from .transaction import Transaction
 
-from config import fundamental_accounts, account_groups_list
+from config import fundamental_accounts, account_groups_list, information_report_kinds
 
 
 def init_fundamental_accounts(user):
@@ -28,4 +28,15 @@ def init_account_groups():
         result = AccountGroups.query.filter_by(name=group_name).first()
         if result is None:
             db.session.add(AccountGroups(name=group_name))
+    db.session.commit()
+
+
+def init_reports():
+    """
+    Inserts into Report the data needed for aplication.
+    """
+    for report in information_report_kinds:
+        result = Report.query.filter_by(name=report).first()
+        if result is None:
+            db.session.add(Report(name=report))
     db.session.commit()

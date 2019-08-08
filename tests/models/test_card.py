@@ -12,7 +12,7 @@ def test_card_create(test_user):
 
     assert Card.query.count() == 1
     assert card.reports.count() == 1
-    assert card.reports.one().kind == report_data['information_kinds'][0]
+    assert card.reports.one().name == report_data['information_kinds'][0]
 
 
 @pytest.mark.usefixtures('test_transactions')
@@ -25,4 +25,4 @@ def test_reports_add_multiple_reports(test_user):
 
     assert card.reports.count() == 4
     for i, report in enumerate(card.reports):
-        assert report.kind == report_data['information_kinds'][i]
+        assert report.name == report_data['information_kinds'][i]
