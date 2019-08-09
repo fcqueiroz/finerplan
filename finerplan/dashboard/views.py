@@ -3,7 +3,7 @@ import logging
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
-from finerplan.model import Transaction, Account, CreditCard, AccountingGroup, Card, Report
+from finerplan.model import Transaction, Account, CreditCard, AccountingGroup, Card, Report, add_common_accounts
 from finerplan.reports import ReportCard, history
 
 from . import bp
@@ -44,29 +44,36 @@ def overview():
                            tables=tables, cards=cards)
 
 
-def get_group_leaves(user, group):
-    _group = AccountingGroup.query.filter_by(name=group).first()
-    major_group = user.accounts.filter_by(group_id=_group.id)
-    return [account for account in major_group if account.is_leaf]
-
-
 @bp.route('/accounts/<transaction_kind>')
 @login_required
 def accounts_json(transaction_kind):
+    def get_group_leaves(user, *group_names):
+        from sqlalchemy import or_
+        # group_names = ['Equity', 'Asset', 'Liability']
+        group_names_filter = [(name == AccountingGroup.group) for name in group_names]
+        accounts = user.accounts.join(Account._group).filter(or_(*group_names_filter))
+        result = [account for account in accounts if account.is_leaf]
+        return result
+
     if transaction_kind == 'income':
-        source = get_group_leaves(current_user, group='Income')
-        destination = get_group_leaves(current_user, group='Equity')
-        destination.extend(get_group_leaves(current_user, group='Credit Card'))
+        source = get_group_leaves(current_user, 'Income')
+        destination = get_group_leaves(current_user, 'Equity', 'Asset', 'Liability')
     elif transaction_kind == 'expenses':
-        source = get_group_leaves(current_user, group='Equity')
-        source.extend(get_group_leaves(current_user, group='Credit Card'))
-        destination = get_group_leaves(current_user, group='Expenses')
+        source = get_group_leaves(current_user, 'Equity', 'Asset', 'Liability')
+        destination = get_group_leaves(current_user, 'Expense')
     else:
         raise ValueError
 
     data = {'sources': [{'id': account.id, 'name': account.fullname, 'type': account.type} for account in source],
             'destinations': [{'id': account.id, 'name': account.fullname} for account in destination]}
     return jsonify(data)
+
+
+@bp.route('/accounts/create_common', methods=['POST'])
+@login_required
+def accounts_create_common():
+    add_common_accounts(current_user)
+    return redirect(url_for('dashboard.accounts_list'))
 
 
 @bp.route('/expenses', methods=['GET'])

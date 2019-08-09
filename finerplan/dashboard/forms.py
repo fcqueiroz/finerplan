@@ -5,7 +5,8 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
     StringField, SubmitField, HiddenField, SelectMultipleField
 from wtforms.validators import DataRequired
 
-from .custom_validators import OptionalIfFieldDifferentThan, GetGroupId
+from finerplan.model import GetAccountGroupId
+from .custom_validators import OptionalIfFieldDifferentThan
 
 from config import form_groups, report_names
 
@@ -29,10 +30,14 @@ class AddAccountForm(FlaskForm):
     group_id = SelectField('Account Group', validators=[DataRequired()], choices=[], coerce=int)
     closing = IntegerField(
         'Closing Day of Credit Card Invoice',
-        validators=[OptionalIfFieldDifferentThan(field='group_id', delayed=GetGroupId(name='Credit Card')), DataRequired()])
+        validators=[
+            OptionalIfFieldDifferentThan(field='group_id', delayed=GetAccountGroupId(name='Credit Card')),
+            DataRequired()])
     payment = IntegerField(
         'Payment Day of Credit Card Invoice',
-        validators=[OptionalIfFieldDifferentThan(field='group_id', delayed=GetGroupId(name='Credit Card')), DataRequired()])
+        validators=[
+            OptionalIfFieldDifferentThan(field='group_id', delayed=GetAccountGroupId(name='Credit Card')),
+            DataRequired()])
     submit = SubmitField('Create')
 
 

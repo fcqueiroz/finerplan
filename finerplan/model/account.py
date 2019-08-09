@@ -8,7 +8,7 @@ class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    path = db.Column(db.String(500), nullable=False)
+    path = db.Column(db.String(500), nullable=False)  # This should be unique..
     group_id = db.Column(db.Integer, db.ForeignKey('accounting_group.id'), nullable=False)
     type = db.Column(db.String(64), nullable=False)
 

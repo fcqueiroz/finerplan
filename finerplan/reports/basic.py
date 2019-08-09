@@ -141,7 +141,7 @@ class InformationReport(BaseReport):
             else:
                 return '{0:.1f} %'.format(100 * self._value)
 
-        return _formatter
+        return bold(_formatter)
 
     def savings_rate(self, length=12) -> None:
         """

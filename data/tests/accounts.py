@@ -12,7 +12,7 @@ def turn_group_into_id(account_data):
 def expenses():
     return dict(
         name='Expenses',
-        group='Expenses'
+        group='Expense'
     )
 
 
@@ -33,28 +33,28 @@ def equity():
 def housing():
     return dict(
         name='Housing',
-        group='Expenses'
+        group='Expense'
     )
 
 
 def food():
     return dict(
         name='Food',
-        group='Expenses'
+        group='Expense'
     )
 
 
 def rent():
     return dict(
         name='Rent',
-        group='Expenses'
+        group='Expense'
     )
 
 
 def utilities():
     return dict(
         name='Utilities',
-        group='Expenses'
+        group='Expense'
     )
 
 
@@ -70,5 +70,5 @@ def card_3412():
 def devices():
     return dict(
         name='Electronic Devices',
-        group='Expenses'
+        group='Expense'
     )

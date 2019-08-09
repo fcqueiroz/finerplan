@@ -3,7 +3,7 @@ import pytest
 
 from finerplan.model import Transaction
 
-from tests.data.transactions import computer
+from data.tests.transactions import computer
 
 
 @pytest.mark.usefixtures('test_transactions')

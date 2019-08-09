@@ -2,7 +2,7 @@ import pytest
 
 from finerplan.model import User
 
-from tests.data import users
+from data.tests import users
 
 
 @pytest.mark.usefixtures('db_session')

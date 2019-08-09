@@ -5,7 +5,7 @@ import pytest
 
 from finerplan.model import User
 
-from tests.data import users
+from data.tests import users
 
 
 def fill_login_form(username=None, password=None):

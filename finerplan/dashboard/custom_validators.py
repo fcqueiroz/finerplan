@@ -67,21 +67,6 @@ class CompareOtherField(object):
         return other_field.data
 
 
-class GetGroupId(object):
-    """
-    Returns the id of an account group based on the given name.
-    """
-    def __init__(self, name):
-        self.name = name
-
-    def __call__(self):
-        group = AccountingGroup.query.filter_by(name=self.name).one_or_none()
-        try:
-            return group.id
-        except AttributeError:
-            return None
-
-
 class RequiredIfFieldEqualTo(CompareOtherField, DataRequired):
     """
     Makes a field required only if another field has a desired value.

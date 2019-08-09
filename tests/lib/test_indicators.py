@@ -2,7 +2,7 @@ from pytest import approx
 
 from finerplan.lib.indicators import ExponentialMovingAverage
 
-from tests.data.time_series import hours_worked, hours_worked_ema_smoothed
+from data.tests.time_series import hours_worked, hours_worked_ema_smoothed
 
 
 def test_ema_last():

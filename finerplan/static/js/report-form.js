@@ -11,7 +11,7 @@ $(function() {
       element.querySelector('select').required = false;
     }
 
-  $( "#CardType" ).change(function() {
+  function updatesReportsArea () {
     /* Hides the element that is currently visible and makes it not required */
     for (let group of groups) {
       let element = document.getElementById(group + 'Reports')
@@ -23,14 +23,19 @@ $(function() {
     }
 
     /* Makes the right element visible and required */
-    let new_group = $(this).find("#group option:selected").val()
+    let new_group = $("#group option:selected").val()
+    if ( typeof new_group === 'undefined' ) {
+      new_group = $( '#group' ).val()
+    }
     if ( groups.includes(new_group) ) {
       let element_id = new_group + 'Reports'
       let element = document.getElementById( element_id )
       element.classList.remove('d-none')
       element.querySelector('select').required = true;
     }
+  }
 
-  })
+  updatesReportsArea()
+  $( "#CardType" ).change(updatesReportsArea())
 
 });

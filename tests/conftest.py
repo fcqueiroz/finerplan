@@ -5,7 +5,7 @@ from finerplan import create_app, db as _db
 from finerplan.model import User, Account, CreditCard, Transaction, Card, Report
 
 from tests import setup_db, teardown_db, clean_db, seed_db
-from tests.data import users, accounts, transactions, card_report
+from data.tests import accounts, users, transactions, card_report
 
 
 @pytest.fixture(scope="session")

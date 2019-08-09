@@ -68,29 +68,12 @@ form_words = {'earnings': "Receita",
               'outsourced': "Terceiros"}
 
 
-# Temporarily uses a hard-coded list of categories (until the other functionalities are implemented
-default_account_categories = (
-    ('Expenses', [
-        'Housing', 'Electronic devices', 'Personal care', 'Education', 'Business',
-        'Leisure', 'Food', 'Other', 'Health', 'Transportation']),
-    ('Income', ['Scholarship', 'Paycheck', 'Subsidy', 'Other', 'Business']),
-    ('Housing', ['Rent', 'Furniture', 'Maintenance', 'Utilities']),
-    ('Electronic devices', ['Phone', 'Computer']),
-    ('Personal care', ['Cosmetics', 'Hairdresser', 'Hair removal', 'Clothing']),
-    ('Education', ['Courses', 'Supplies', 'Books']),
-    ('Leisure', ['General', 'Hobbies', 'Vacation']),
-    ('Food', ['Groceries', 'Restaurants']),
-    ('Other', ['Uncategorized', 'Gifts and donations']),
-    ('Health', ['Pharmacy', 'Special care', 'Doctors', 'Medicine']),
-    ('Transportation', ['Auto', 'Public', 'Taxi', 'Travel'])
-)
-
 # Model
 # ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
 accounting_types = {
-    'Asset': ['Cash', 'Bank', 'Stock', 'Mutual Fund', 'Accounts Receivable', 'Other Assets'],
+    'Asset': ['Cash', 'Bank', 'Stock', 'Mutual Fund', 'Accounts Receivable', 'Asset'],
     'Equity': ['Equity'],
-    'Expense': ['Expenses'],
+    'Expense': ['Expense'],
     'Income': ['Income'],
     'Liability': ['Credit Card', 'Accounts Payable', 'Liability']
 }

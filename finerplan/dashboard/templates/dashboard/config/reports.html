@@ -82,7 +82,11 @@
           {% for row in cards %}
             <tr>
               <td>{{ row.name }}</td>
-              <td>{{ [rep.name for rep in row.reports] }}</td>
+              <td>
+                [{% for report in row.reports %}
+                {% if loop.index > 1 %}, {% endif %}{{ report.name }}
+                {% endfor %}]
+              </td>
             </tr>
           {% endfor %}
           </tbody>

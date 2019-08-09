@@ -3,6 +3,8 @@ import json
 from flask import url_for
 import pytest
 
+from finerplan.model import add_common_accounts
+
 from tests.test_auth import fill_login_form
 
 
@@ -20,3 +22,17 @@ def test_get_lead_accounts_json(client, test_accounts, transaction_kind, source_
 
         assert json.loads(rv.data)['sources'][0]['name'] == source.fullname
         assert json.loads(rv.data)['destinations'][0]['name'] == destination.fullname
+
+
+def test_accounts_json_issue_1(client, test_user):
+
+    with client:
+        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
+        add_common_accounts(test_user)
+        assert test_user.accounts.count() > 0
+
+        rv = client.get(url_for('dashboard.accounts_json', transaction_kind='expenses'))
+        rv = json.loads(rv.data)
+
+        assert len(rv['destinations']) == 29
+        assert len(rv['sources']) == 1

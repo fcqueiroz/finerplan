@@ -4,8 +4,8 @@ import pytest
 from finerplan.model import Card
 
 from tests.test_auth import fill_login_form
-from tests.data.accounts import card_3412, turn_group_into_id
-from tests.data.card_report import test_report, basic_report
+from data.tests.accounts import card_3412, turn_group_into_id
+from data.tests.card_report import test_report, basic_report
 
 
 def test_accounts_add_income(client, test_accounts):

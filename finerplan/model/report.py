@@ -20,11 +20,10 @@ class Report(db.Model):
         group: str
             Name of the Card's report group
         """
-        print(group)
-        print(kwargs)
         card_report_names = extract_report_list(group, **kwargs)
         card_reports = db.session.query(cls).filter(cls.name.in_(card_report_names))
         card.reports.extend(card_reports)
+        db.session.commit()
 
 
 def extract_report_list(group, **kwargs):
