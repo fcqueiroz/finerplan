@@ -1,24 +1,6 @@
-from dateutil.relativedelta import relativedelta
-
 import pytest
 
 from finerplan.model import Account, GetAccountGroupId
-
-from data.tests import accounts
-
-
-def test_create_account(test_user):
-    """Tests method to create an account linked to a user."""
-    account_data = accounts.equity()
-    return_value = Account.create(
-        name=account_data['name'], user=test_user, parent=None,
-        group_id=GetAccountGroupId(name='Equity').id)
-
-    assert test_user.accounts.count() == 1
-    assert test_user.accounts.first() == return_value
-    assert return_value.name == account_data['name']
-    assert return_value.path == '1'
-    assert return_value.group == account_data['group']
 
 
 def test_create_account_refuses_duplicated_fullname(test_user):
@@ -34,20 +16,6 @@ def test_create_account_refuses_duplicated_fullname(test_user):
         _ = Account.create(
             name='Equity', user=test_user, parent=None,
             group_id=GetAccountGroupId(name='Equity').id)
-
-
-def test_create_account_subaccount(test_user):
-    """Tests method to create a subaccount."""
-    parent_account = Account.create(
-        name=accounts.expenses()['name'], user=test_user,
-        group_id=GetAccountGroupId(name='Expense').id)
-
-    account = Account.create(
-        name=accounts.housing()['name'], user=test_user, parent=parent_account,
-        group_id=GetAccountGroupId(name='Expense').id)
-
-    assert test_user.accounts.count() == 2
-    assert account.path == '1.2'
 
 
 @pytest.mark.usefixtures('test_accounts')
@@ -88,7 +56,7 @@ def test_descendents_method(db_session):
     list of descendents from the queried account."""
     account = db_session.query(Account).filter_by(name='Expenses').first()
 
-    assert len(account.descendents()) == 2
+    assert len(account.descendents()) == 38
 
 
 @pytest.mark.usefixtures('test_accounts')
@@ -114,28 +82,3 @@ def test_credit_card_account(test_user):
     """Tests polymorphism of credit card class."""
     account_types = set([account.type for account in test_user.accounts])
     assert 'credit_card' in account_types
-
-
-def test_account_calculate_installments(test_transactions):
-    """Tests method 'calculate installments'."""
-    transaction = test_transactions[1]
-    source = transaction.source
-    value = 84.01
-
-    result = source.list_installments(transaction=transaction, value=value)
-
-    assert result == [dict(cash_date=transaction.accrual_date, value=value)]
-
-
-def test_credit_card_calculate_installments(test_transactions, test_accounts):
-    """Tests method 'calculate installments'."""
-    transaction = test_transactions[1]
-    source = test_accounts[5]
-    value = 84.01
-    expected = [
-        dict(cash_date=transaction.accrual_date + relativedelta(day=source.payment), value=42.01),
-        dict(cash_date=transaction.accrual_date + relativedelta(months=1, day=source.payment), value=42.00)]
-
-    result = source.list_installments(transaction=transaction, installments=2, value=value)
-
-    assert result == expected

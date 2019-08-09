@@ -2,6 +2,7 @@ import logging
 
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
+from sqlalchemy import or_
 
 from finerplan.model import Transaction, Account, CreditCard, AccountingGroup, Card, Report, add_common_accounts
 from finerplan.reports import ReportCard, history
@@ -48,8 +49,6 @@ def overview():
 @login_required
 def accounts_json(transaction_kind):
     def get_group_leaves(user, *group_names):
-        from sqlalchemy import or_
-        # group_names = ['Equity', 'Asset', 'Liability']
         group_names_filter = [(name == AccountingGroup.group) for name in group_names]
         accounts = user.accounts.join(Account._group).filter(or_(*group_names_filter))
         result = [account for account in accounts if account.is_leaf]

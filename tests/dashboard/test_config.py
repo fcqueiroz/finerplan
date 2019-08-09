@@ -4,24 +4,15 @@ import pytest
 from finerplan.model import Card
 
 from tests.test_auth import fill_login_form
-from data.tests.accounts import card_3412, turn_group_into_id
+from data.tests.accounts import visa
 from data.tests.card_report import test_report, basic_report
-
-
-def test_accounts_add_income(client, test_accounts):
-    income = test_accounts[1]
-    form = dict(name='Scholarship', parent_id=income.id, group_id=income.group_id)
-
-    with client:
-        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
-
-        rv = client.post(url_for('dashboard.accounts_create'), data=form, follow_redirects=True)
-        assert b'Income - Scholarship' in rv.data
 
 
 @pytest.mark.usefixtures('test_user')
 def test_accounts_add_credit_card(client):
-    credit_card = turn_group_into_id(card_3412())
+    credit_card = visa()
+    credit_card['group_id'] = credit_card['group'].id
+    del credit_card['group']
     credit_card['parent_id'] = None
 
     with client:

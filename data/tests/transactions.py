@@ -27,7 +27,7 @@ def phone_bill():
 
 def computer():
     return dict(
-        value=3600,
+        value=3600.03,
         description='High performance new Computer',
         accrual_date=datetime(2019, 6, 8),
         installments=4

@@ -2,7 +2,7 @@
 import pytest
 # Local Imports
 from finerplan import create_app, db as _db
-from finerplan.model import User, Account, CreditCard, Transaction, Card, Report
+from finerplan.model import User, Account, CreditCard, Transaction, Card, Report, add_common_accounts, GetAccountGroupId
 
 from tests import setup_db, teardown_db, clean_db, seed_db
 from data.tests import accounts, users, transactions, card_report
@@ -69,49 +69,35 @@ def test_user(db_session):
 
 
 @pytest.fixture(scope="function")
-def test_accounts(db_session, test_user):
+def test_accounts(db_session, test_user) -> None:
     """
     Creates some accounts for test user
     """
+    add_common_accounts(test_user)
 
-    new_account = accounts.turn_group_into_id(accounts.expenses())
-    expenses = Account.create(user=test_user, **new_account)
+    credit_card = accounts.visa()
+    credit_card['group_id'] = credit_card['group'].id
+    del credit_card['group']
 
-    new_account = accounts.turn_group_into_id(accounts.income())
-    income = Account.create(user=test_user, **new_account)
-
-    new_account = accounts.turn_group_into_id(accounts.equity())
-    equity = Account.create(user=test_user, **new_account)
-
-    new_account = accounts.turn_group_into_id(accounts.housing())
-    housing = Account.create(user=test_user, parent=expenses, **new_account)
-
-    new_account = accounts.turn_group_into_id(accounts.rent())
-    rent = Account.create(user=test_user, parent=housing, **new_account)
-
-    new_account = accounts.turn_group_into_id(accounts.card_3412())
-    credit_card = CreditCard.create(user=test_user, **new_account)
-
-    new_account = accounts.turn_group_into_id(accounts.devices())
-    devices = Account.create(user=test_user, **new_account)
-
-    _all_accounts = [expenses, income, equity, housing, rent, credit_card, devices]
-    return _all_accounts
+    CreditCard.create(user=test_user, **credit_card)
 
 
 @pytest.fixture(scope='function')
-def test_transactions(db_session, test_accounts):
+def test_transactions(db_session, test_accounts) -> None:
     """
     Creates some transactions
     """
-    expenses, income, equity = test_accounts[0:3]
+    cash = Account.query.filter_by(name='Cash').one()
 
-    first_salary = Transaction.create(source_id=income.id, destination_id=equity.id, **transactions.first_salary())
-    dining_out = Transaction.create(source_id=equity.id, destination_id=expenses.id, **transactions.dining_out())
-    phone_bill = Transaction.create(source_id=equity.id, destination_id=expenses.id, **transactions.phone_bill())
-
-    _all_transactions = [first_salary, dining_out, phone_bill]
-    return _all_transactions
+    Transaction.create(
+        source_id=Account.query.filter_by(name='Paycheck').one().id,
+        destination_id=cash.id, **transactions.first_salary())
+    Transaction.create(
+        source_id=cash.id, **transactions.dining_out(),
+        destination_id=Account.query.filter_by(name='Restaurants').one().id)
+    Transaction.create(
+        source_id=cash.id, **transactions.phone_bill(),
+        destination_id=Account.query.filter_by(name='Utilities').one().id)
 
 
 @pytest.fixture(scope='function')

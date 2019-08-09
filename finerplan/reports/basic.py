@@ -2,8 +2,9 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from flask_login import current_user
+from sqlalchemy import or_
 
-from finerplan.model import Account, Transaction
+from finerplan.model import Account, Transaction, AccountingGroup
 
 from config import report_names
 
@@ -72,29 +73,22 @@ class InformationReport(BaseReport):
         return date.today() + relativedelta(day=31)
 
     @staticmethod
-    def _account_balance(account, **kwargs) -> float:
+    def _transaction_balance(names, **kwargs) -> float:
         """
-        Evaluates account balance (ie deposits minus withdraws) in any time period.
+        Evaluates the balance (ie deposits minus withdraws) in any time period.
 
         Parameters
         ----------
-        account: str {'Income', 'Expenses', 'Equity'}
-            Account name to perform the calculation
+        names: list-like
+            Accounting types to select when performing the calculation
         """
-        _account_name = account
-        if _account_name in ('Income', 'Expenses', 'Equity'):
-            user_id = current_user.id
-            account = Account.query.filter_by(name=account, user_id=user_id).first()
-        else:
-            raise ValueError(f'Unknown account type "{account}"')
+        names_filter = [(name == AccountingGroup.name) for name in names]
+        accounts = Account.query.join(Account._group).filter(or_(*names_filter), Account.user_id == current_user.id)
 
-        # This only works when we deal with a leaf node. It
-        # doesn't calculate balance of account's descendents.
-        _result = Transaction.balance(account, **kwargs)
-        if _account_name == 'Income':
-            # Because transactions only flow out of Income, we must
-            # invert the signal to get a positive value.
-            _result = - _result
+        # TODO Remove the loop and make this calculation inside database!
+        _result = 0
+        for account in accounts:
+            _result += Transaction.balance(account, **kwargs)
 
         return _result
 
@@ -103,21 +97,21 @@ class InformationReport(BaseReport):
         Evaluates equity balance at present date.
         """
         self._text = 'Your current balance is:'
-        self._value = self._account_balance(account='Equity', end=date.today())
+        self._value = self._transaction_balance(names=['Asset', 'Cash', 'Bank'], end=date.today())
 
     def current_month_income(self) -> None:
         """
         Evaluates total income in the current month.
         """
         self._text = 'Current month income:'
-        self._value = self._account_balance("Income", start=self._month_start, end=self._month_end)
+        self._value = -self._transaction_balance(names=['Income'], start=self._month_start, end=self._month_end)
 
     def current_month_expenses(self) -> None:
         """
         Evaluates total expenses in the current month.
         """
         self._text = 'Current month expenses:'
-        self._value = self._account_balance("Expenses", start=self._month_start, end=self._month_end)
+        self._value = self._transaction_balance(names=['Expense'], start=self._month_start, end=self._month_end)
 
     def current_month_savings(self) -> None:
         """
@@ -157,8 +151,8 @@ class InformationReport(BaseReport):
         period_end = self._month_start
         period_start = period_end - relativedelta(months=length)
 
-        _expenses = self._account_balance(account='Expenses', start=period_start, end=period_end)
-        _income = self._account_balance(account='Income', start=period_start, end=period_end)
+        _expenses = self._transaction_balance(names=['Expense'], start=period_start, end=period_end)
+        _income = -self._transaction_balance(names=['Income'], start=period_start, end=period_end)
 
         if _income == 0:
             msg = "No income during period."
