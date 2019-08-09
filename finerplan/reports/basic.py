@@ -82,8 +82,8 @@ class InformationReport(BaseReport):
         names: list-like
             Accounting types to select when performing the calculation
         """
-        names_filter = [(name == AccountingGroup.name) for name in names]
-        accounts = Account.query.join(Account._group).filter(or_(*names_filter), Account.user_id == current_user.id)
+        names_filter = [(group_name == Account.group) for group_name in names]
+        accounts = Account.query.filter(or_(*names_filter), Account.user_id == current_user.id)
 
         # TODO Remove the loop and make this calculation inside database!
         _result = 0

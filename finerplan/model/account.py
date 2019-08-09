@@ -110,10 +110,6 @@ class Account(db.Model):
         """
         return len(self.descendents()) == 0
 
-    @hybrid_property
-    def group(self):
-        return self._group.name
-
     def list_installments(self, **kwargs) -> list:
         return self._group.installments_enumerator(account=self, **kwargs)
 

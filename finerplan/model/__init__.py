@@ -1,4 +1,6 @@
 from finerplan import db
+from sqlalchemy import select
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm.exc import NoResultFound
 
 from .account import Account, CreditCard
@@ -10,6 +12,12 @@ from .user import User
 
 from config import accounting_types, report_names
 from data.default import common_accounts
+
+
+Account.group = column_property(
+    select([AccountingGroup.name]).where(AccountingGroup.id == Account.group_id))
+Account.major_group = column_property(
+    select([AccountingGroup.group]).where(AccountingGroup.id == Account.group_id))
 
 
 def init_accounting_group():
@@ -88,7 +96,7 @@ def add_common_accounts(new_user, data=None, parent_account=None):
         try:
             accounting_type = account_data['accounting_type']
         except KeyError:
-            accounting_type = parent_account._group.name
+            accounting_type = parent_account.group
         group_id = GetAccountGroupId(name=accounting_type).id
 
         # Creates the account objects (or retrieves if it already exists)

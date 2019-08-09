@@ -48,9 +48,9 @@ def overview():
 @bp.route('/accounts/<transaction_kind>')
 @login_required
 def accounts_json(transaction_kind):
-    def get_group_leaves(user, *group_names):
-        group_names_filter = [(name == AccountingGroup.group) for name in group_names]
-        accounts = user.accounts.join(Account._group).filter(or_(*group_names_filter))
+    def get_group_leaves(user, *major_groups):
+        _filter = [(mg == Account.major_group) for mg in major_groups]
+        accounts = user.accounts.filter(or_(*_filter))
         result = [account for account in accounts if account.is_leaf]
         return result
 

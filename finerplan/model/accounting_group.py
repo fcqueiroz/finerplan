@@ -15,6 +15,9 @@ class AccountingGroup(db.Model):
     name = db.Column('name', db.String(64), unique=True, nullable=False)
     group = db.Column('group', db.String(64), nullable=False)
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {self.id} {self.group} {self.name}>'
+
     @property
     def installments_enumerator(self):
         """
