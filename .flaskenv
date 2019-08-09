@@ -1,3 +1,3 @@
-FLASK_APP=finerplan.py
+FLASK_APP=finerplan
 FLASK_ENV=development
 FLASK_RUN_PORT=5001
