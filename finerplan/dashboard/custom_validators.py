@@ -5,7 +5,7 @@ Custom validators to user together with wtforms
 from flask_login import current_user
 from wtforms.validators import DataRequired, ValidationError, Optional
 
-from finerplan.model import Account
+from finerplan.model import Account, AccountingGroup
 
 
 class UniqueFullname(object):
@@ -65,6 +65,21 @@ class CompareOtherField(object):
     def get_form_value(self, form):
         other_field = form[self._other_field]
         return other_field.data
+
+
+class GetGroupId(object):
+    """
+    Returns the id of an account group based on the given name.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self):
+        group = AccountingGroup.query.filter_by(name=self.name).one_or_none()
+        try:
+            return group.id
+        except AttributeError:
+            return None
 
 
 class RequiredIfFieldEqualTo(CompareOtherField, DataRequired):

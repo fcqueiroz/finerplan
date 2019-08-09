@@ -3,11 +3,11 @@ import logging
 from flask import redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 
-from finerplan.model import Transaction, Account, CreditCard, AccountGroups, Card
-from finerplan.reports import Report, history
+from finerplan.model import Transaction, Account, CreditCard, AccountingGroup, Card, Report
+from finerplan.reports import ReportCard, history
 
 from . import bp
-from .forms import AddTransactionForm, AddAccountForm, AddReportForm
+from .forms import AddTransactionForm, AddAccountForm, AddReportCardForm
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -38,14 +38,14 @@ def overview():
         (t.accrual_date, t.description, t.value, t.source.name, t.destination.name)
         for t in Transaction.query.all()]}
 
-    cards = [Report(card=c) for c in current_user.cards]
+    cards = [ReportCard(card=c) for c in current_user.cards]
 
     return render_template('explore/overview.html', title='Overview', form=form,
                            tables=tables, cards=cards)
 
 
 def get_group_leaves(user, group):
-    _group = AccountGroups.query.filter_by(name=group).first()
+    _group = AccountingGroup.query.filter_by(name=group).first()
     major_group = user.accounts.filter_by(group_id=_group.id)
     return [account for account in major_group if account.is_leaf]
 
@@ -80,7 +80,7 @@ def expenses():
 @login_required
 def accounts_list():
     form = AddAccountForm()
-    group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    group_choices = [(group.id, group.name) for group in AccountingGroup.query.all()]
     # TODO Dynamically populate this based on parent account group
     form.group_id.choices = group_choices
 
@@ -92,7 +92,7 @@ def accounts_list():
 @login_required
 def accounts_create():
     form = AddAccountForm()
-    group_choices = [(group.id, group.name) for group in AccountGroups.query.all()]
+    group_choices = [(group.id, group.name) for group in AccountingGroup.query.all()]
     # TODO Dynamically populate this based on parent account group
     form.group_id.choices = group_choices
 
@@ -118,7 +118,7 @@ def accounts_create():
             group_id=group_id,
             parent=parent)
 
-        if AccountGroups.query.get(group_id).name == 'Credit Card':
+        if AccountingGroup.query.get(group_id).name == 'Credit Card':
             CreditCard.create(
                 closing=form.data['closing'],
                 payment=form.data['payment'],
@@ -141,7 +141,7 @@ def edit_accounts(account_id):
 @bp.route('/config/reports', methods=['GET'])
 @login_required
 def reports_list():
-    form = AddReportForm()
+    form = AddReportCardForm()
     cards = current_user.cards.all()
 
     return render_template(
@@ -151,7 +151,7 @@ def reports_list():
 @bp.route('/config/reports', methods=['POST'])
 @login_required
 def reports_create():
-    form = AddReportForm()
+    form = AddReportCardForm()
     cards = current_user.cards.all()
 
     form.validate()
@@ -161,7 +161,8 @@ def reports_create():
         print(form.data)
 
     if form.validate_on_submit():
-        Card.create(user=current_user, **form.data)
+        card = Card.create(user=current_user, name=form.data.pop('name'))
+        Report.assign_to(card, **form.data)
 
         return redirect(url_for('dashboard.reports_list'))
 

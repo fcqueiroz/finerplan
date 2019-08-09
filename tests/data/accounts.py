@@ -1,9 +1,9 @@
-from finerplan.model import AccountGroups
+from finerplan.model import AccountingGroup
 
 
 def turn_group_into_id(account_data):
     _group = account_data['group']
-    _group_id = AccountGroups.query.filter_by(name=_group).first().id
+    _group_id = AccountingGroup.query.filter_by(name=_group).first().id
     del account_data['group']
     account_data['group_id'] = _group_id
     return account_data

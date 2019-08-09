@@ -5,18 +5,18 @@ from finerplan import db
 
 
 class Installment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
-    cash_date = db.Column(db.Date)
-    value = db.Column(db.Float)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
+    cash_date = db.Column(db.Date, nullable=False)
+    value = db.Column(db.Numeric(precision=14, scale=4), nullable=False)
 
 
 class Transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    source_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'))
-    accrual_date = db.Column(db.Date)
-    description = db.Column(db.Text)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    source_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
+    destination_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
+    accrual_date = db.Column(db.Date, nullable=False)
+    description = db.Column(db.Text, nullable=False)
     # pay_method_id = db.Column(db.Integer, db.ForeignKey('payment_method.id'))
     # kind = db.Column(db.String(64))
 

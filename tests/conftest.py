@@ -2,10 +2,10 @@
 import pytest
 # Local Imports
 from finerplan import create_app, db as _db
-from finerplan.model import User, Account, CreditCard, Transaction, Card
+from finerplan.model import User, Account, CreditCard, Transaction, Card, Report
 
 from tests import setup_db, teardown_db, clean_db, seed_db
-from tests.data import users, accounts, transactions, cards
+from tests.data import users, accounts, transactions, card_report
 
 
 @pytest.fixture(scope="session")
@@ -119,6 +119,8 @@ def test_card(db_session, test_transactions, test_user):
     """
     Creates a single report Card
     """
-    card = Card.create(user=test_user, **cards.test_report())
+    form_data = card_report.test_report()
+    card = Card.create(user=test_user, name=form_data.pop('name'))
+    Report.assign_to(card, **form_data)
 
     return card

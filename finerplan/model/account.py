@@ -5,13 +5,15 @@ from finerplan import db
 
 class Account(db.Model):
     __tablename__ = 'account'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    path = db.Column(db.String(500), index=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('account_groups.id'))
-    _group = db.relationship("AccountGroups")
-    type = db.Column(db.String(50))
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    path = db.Column(db.String(500), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('accounting_group.id'), nullable=False)
+    type = db.Column(db.String(64), nullable=False)
+
+    _group = db.relationship("AccountingGroup")
+
     # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
@@ -35,16 +37,22 @@ class Account(db.Model):
             parent Account and will have the same type.
         """
         if cls.check_unique_fullname(name=name, user=user, parent=parent):
-            new_account = cls(name=name, user_id=user.id, group_id=group_id, **kwargs)
-            db.session.add(new_account)
-            db.session.flush()
+            if parent is not None:
+                base_path = parent.path + '.'
+            else:
+                base_path = ''
 
+            new_account = cls(name=name, user_id=user.id, path=base_path, group_id=group_id, **kwargs)
+            db.session.add(new_account)
+
+            db.session.flush()
+            path = new_account.path + str(new_account.id)
+            assert path != base_path
+            new_account.path = path
+
+            db.session.commit()
         else:
             raise NameError("Each account's fullname must be unique.")
-
-        new_account._generate_path(parent=parent)
-
-        db.session.commit()
 
         return new_account
 
@@ -67,13 +75,6 @@ class Account(db.Model):
                 return False
 
         return True
-
-    def _generate_path(self, parent=None) -> None:
-        if parent is not None:
-            path = parent.path + '.'
-        else:
-            path = ''
-        self.path = path + str(self.id)
 
     @property
     def fullname(self):
@@ -124,9 +125,9 @@ class Account(db.Model):
 
 class CreditCard(Account):
     __tablename__ = 'credit_card'
-    id = db.Column(db.Integer, db.ForeignKey('account.id'), primary_key=True)
-    closing = db.Column(db.Integer)
-    payment = db.Column(db.Integer)
+    id = db.Column(db.Integer, db.ForeignKey('account.id'), primary_key=True, nullable=False)
+    closing = db.Column(db.Integer, nullable=False)
+    payment = db.Column(db.Integer, nullable=False)
 
     @classmethod
     def create(cls, closing, payment, **kwargs) -> 'Account':

@@ -1,8 +1,7 @@
-"""Generates basic reports for Overview page."""
 from .basic import InformationReport
 
 
-class Report(object):
+class ReportCard(object):
     """
     This class receives a finerplan.model.Card object and
     evaluates all the reports that should be in the card.

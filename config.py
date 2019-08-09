@@ -87,12 +87,16 @@ default_account_categories = (
 
 # Model
 # ref: https://www.gnucash.org/docs/v3/C/gnucash-guide/basics-accounting1.html
-fundamental_accounts = ['Equity', 'Income', 'Expenses']
-
-account_groups_list = ['Equity', 'Income', 'Expenses', 'Cash', 'Credit Card']
+accounting_types = {
+    'Asset': ['Cash', 'Bank', 'Stock', 'Mutual Fund', 'Accounts Receivable', 'Other Assets'],
+    'Equity': ['Equity'],
+    'Expense': ['Expenses'],
+    'Income': ['Income'],
+    'Liability': ['Credit Card', 'Accounts Payable', 'Liability']
+}
 
 # Reports
-genres = ['Information']  # Planned to include 'Table' and 'Graph' soon
+form_groups = ['Information']  # Planned to include 'Table' and 'Graph' soon
 report_names = {
     'Information': ['Current Balance', 'Current Month Income', 'Current Month Expenses', 'Savings Rate'],
     'Table': ['Last 12 Month Expenses', 'Recent Transactions'],

@@ -1,5 +1,5 @@
 from finerplan import db
-from finerplan.model import init_account_groups, init_reports
+from finerplan.model import init_accounting_group, init_report
 
 __all__ = ["setup_db", "clean_db", "teardown_db"]
 
@@ -12,8 +12,8 @@ def setup_db(app):
 
 def seed_db():
     """Method used to insert into database data needed for minimal use."""
-    init_account_groups()
-    init_reports()
+    init_accounting_group()
+    init_report()
 
 
 def teardown_db():

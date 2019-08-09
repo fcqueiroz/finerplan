@@ -5,10 +5,9 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
     StringField, SubmitField, HiddenField, SelectMultipleField
 from wtforms.validators import DataRequired
 
-from finerplan.model import AccountGroups
-from .custom_validators import OptionalIfFieldDifferentThan
+from .custom_validators import OptionalIfFieldDifferentThan, GetGroupId
 
-from config import genres, report_names
+from config import form_groups, report_names
 
 
 class AddTransactionForm(FlaskForm):
@@ -24,21 +23,6 @@ class AddTransactionForm(FlaskForm):
     submit = SubmitField("Add it")
 
 
-class GetGroupId(object):
-    """
-    Returns the id of an account group based on the given name.
-    """
-    def __init__(self, name):
-        self.name = name
-
-    def __call__(self):
-        group = AccountGroups.query.filter_by(name=self.name).one_or_none()
-        try:
-            return group.id
-        except AttributeError:
-            return None
-
-
 class AddAccountForm(FlaskForm):
     parent_id = HiddenField('Parent Account Id')
     name = StringField('Account Name', validators=[DataRequired()])
@@ -52,28 +36,28 @@ class AddAccountForm(FlaskForm):
     submit = SubmitField('Create')
 
 
-class AddReportForm(FlaskForm):
+class AddReportCardForm(FlaskForm):
     name = StringField("Report Title", validators=[DataRequired()])
-    if len(genres) == 1:
-        genre = StringField(
-            'Report Type', validators=[DataRequired()], default=genres[0],
+    if len(form_groups) == 1:
+        group = StringField(
+            'Report Type', validators=[DataRequired()], default=form_groups[0],
             render_kw={'class': "form-control", 'disabled': True})
     else:
-        genre = SelectField(
+        group = SelectField(
             'Report Type', validators=[DataRequired()], render_kw={'class': "custom-select"},
-            choices=[("", "---")] + [(s, s) for s in genres])
+            choices=[("", "---")] + [(s, s) for s in form_groups])
 
     information_names = SelectMultipleField(
         'Information Reports',
-        validators=[OptionalIfFieldDifferentThan(field='genre', value='Information'), DataRequired()],
+        validators=[OptionalIfFieldDifferentThan(field='group', value='Information'), DataRequired()],
         choices=[(s, s) for s in report_names['Information']])
     table_names = SelectField(
         'Table Reports',
-        validators=[OptionalIfFieldDifferentThan(field='genre', value='Table'), DataRequired()],
+        validators=[OptionalIfFieldDifferentThan(field='group', value='Table'), DataRequired()],
         choices=[("", "---")] + [(s, s) for s in report_names['Table']])
     graph_names = SelectField(
         'Graph Reports',
-        validators=[OptionalIfFieldDifferentThan(field='genre', value='Graph'), DataRequired()],
+        validators=[OptionalIfFieldDifferentThan(field='group', value='Graph'), DataRequired()],
         choices=[("", "---")] + [(s, s) for s in report_names['Graph']])
 
     submit = SubmitField('Create')

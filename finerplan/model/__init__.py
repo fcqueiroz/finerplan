@@ -1,42 +1,37 @@
 from finerplan import db
+from sqlalchemy.orm.exc import NoResultFound
 
 from .account import Account, CreditCard
-from .account_groups import AccountGroups
-from .card import Card, Report
-from .user import User
+from .accounting_group import AccountingGroup
+from .card import Card
+from .report import Report
 from .transaction import Transaction
+from .user import User
 
-from config import fundamental_accounts, account_groups_list, report_names
-
-
-def init_fundamental_accounts(user):
-    # Initialize user accounts here
-    for account_name in fundamental_accounts:
-        try:
-            Account.create(
-                name=account_name, user=user,
-                group_id=AccountGroups.query.filter_by(name=account_name).first().id)
-        except NameError:
-            pass  # Account is already created
+from config import accounting_types, report_names
 
 
-def init_account_groups():
+def init_accounting_group():
     """
-    Inserts into AccountGroups the data needed for aplication.
+    Inserts into AccountingGroup the data needed for aplication.
     """
-    for group_name in account_groups_list:
-        result = AccountGroups.query.filter_by(name=group_name).first()
-        if result is None:
-            db.session.add(AccountGroups(name=group_name))
+    for group in accounting_types.keys():
+        for name in accounting_types[group]:
+            try:
+                _ = AccountingGroup.query.filter_by(name=name, group=group).one()
+            except NoResultFound:
+                db.session.add(AccountingGroup(name=name, group=group))
     db.session.commit()
 
 
-def init_reports():
+def init_report():
     """
     Inserts into Report the data needed for aplication.
     """
-    for report in report_names['Information']:
-        result = Report.query.filter_by(name=report).first()
-        if result is None:
-            db.session.add(Report(name=report))
+    for group in report_names.keys():
+        for name in report_names[group]:
+            try:
+                _ = Report.query.filter_by(name=name, group=group).one()
+            except NoResultFound:
+                db.session.add(Report(name=name, group=group))
     db.session.commit()

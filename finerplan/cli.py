@@ -1,4 +1,4 @@
-from finerplan.model import init_account_groups, init_reports
+from finerplan.model import init_accounting_group, init_report
 
 
 def register(app):
@@ -8,5 +8,5 @@ def register(app):
         print("Seeding database...")
 
         with app.app_context():
-            init_account_groups()
-            init_reports()
+            init_accounting_group()
+            init_report()

@@ -1,9 +1,11 @@
 from flask import url_for
 import pytest
 
+from finerplan.model import Card
+
 from tests.test_auth import fill_login_form
 from tests.data.accounts import card_3412, turn_group_into_id
-from tests.data.cards import test_report, basic_report
+from tests.data.card_report import test_report, basic_report
 
 
 def test_accounts_add_income(client, test_accounts):
@@ -52,3 +54,19 @@ def test_reports_add_card(client):
         rv = client.post(url_for('dashboard.reports_create'), data=new_report, follow_redirects=True)
 
     assert new_report['name'].encode('utf-8') in rv.data
+
+
+@pytest.mark.usefixtures('test_transactions')
+def test_report_card_add_multiple_reports(client):
+    """
+    Tests that user can create a new report card containing multiple reports.
+    """
+    new_report = basic_report()
+    with client:
+        client.post(url_for('auth.login'), data=fill_login_form(), follow_redirects=True)
+        _ = client.post(url_for('dashboard.reports_create'), data=new_report, follow_redirects=True)
+
+    card = Card.query.one()
+    assert card.reports.count() == 4
+    for i, report in enumerate(card.reports):
+        assert report.name == new_report['information_names'][i]

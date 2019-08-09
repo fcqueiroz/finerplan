@@ -2,7 +2,7 @@ from dateutil.relativedelta import relativedelta
 
 import pytest
 
-from finerplan.model import Account, AccountGroups
+from finerplan.model import Account, AccountingGroup
 
 from tests.data import accounts
 
@@ -12,7 +12,7 @@ def test_create_account(test_user):
     account_data = accounts.equity()
     return_value = Account.create(
         name=account_data['name'], user=test_user, parent=None,
-        group_id=AccountGroups.query.filter_by(name='Equity').first().id)
+        group_id=AccountingGroup.query.filter_by(name='Equity').first().id)
 
     assert test_user.accounts.count() == 1
     assert test_user.accounts.first() == return_value
@@ -28,23 +28,23 @@ def test_create_account_refuses_duplicated_fullname(test_user):
     """
     _ = Account.create(
         name='Equity', user=test_user, parent=None,
-        group_id=AccountGroups.query.filter_by(name='Equity').first().id)
+        group_id=AccountingGroup.query.filter_by(name='Equity').first().id)
 
     with pytest.raises(NameError):
         _ = Account.create(
             name='Equity', user=test_user, parent=None,
-            group_id=AccountGroups.query.filter_by(name='Equity').first().id)
+            group_id=AccountingGroup.query.filter_by(name='Equity').first().id)
 
 
 def test_create_account_subaccount(test_user):
     """Tests method to create a subaccount."""
     parent_account = Account.create(
         name=accounts.expenses()['name'], user=test_user,
-        group_id=AccountGroups.query.filter_by(name='Expenses').first().id)
+        group_id=AccountingGroup.query.filter_by(name='Expenses').first().id)
 
     account = Account.create(
         name=accounts.housing()['name'], user=test_user, parent=parent_account,
-        group_id=AccountGroups.query.filter_by(name='Expenses').first().id)
+        group_id=AccountingGroup.query.filter_by(name='Expenses').first().id)
 
     assert test_user.accounts.count() == 2
     assert account.path == '1.2'

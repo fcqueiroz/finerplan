@@ -25,9 +25,9 @@
 
           <!-- Card Report Type -->
           <div id='CardType' class="form-row form-group">
-            {{ form.genre.label(class_="col-form-label") }}
-            {{ form.genre() }}
-            {% for error in form.genre.errors %}
+            {{ form.group.label(class_="col-form-label") }}
+            {{ form.group() }}
+            {% for error in form.group.errors %}
               <span>[{{ error }}]</span>
             {% endfor %}
           </div>
@@ -74,15 +74,15 @@
         <table class="table text-center">
           <thead class="text-uppercase bg-primary">
               <tr class="text-white">
-                  <th scope="col">Title</th>
-                  <th scope="col">Type</th>
+                  <th scope="col">Card Title</th>
+                  <th scope="col">Reports</th>
               </tr>
           </thead>
           <tbody>
           {% for row in cards %}
             <tr>
               <td>{{ row.name }}</td>
-              <td>{{ row.genre }}</td>
+              <td>{{ [rep.name for rep in row.reports] }}</td>
             </tr>
           {% endfor %}
           </tbody>

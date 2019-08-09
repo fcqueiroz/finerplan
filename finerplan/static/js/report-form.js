@@ -3,18 +3,18 @@
  */
 
 $(function() {
-  let genres = ['Information', 'Table', 'Graph']
+  let groups = ['Information', 'Table', 'Graph']
 
-  /* Makes every field of reports list not required until a genre is chosen */
-  for (let genre of genres) {
-      let element = document.getElementById(genre + 'Reports')
+  /* Makes every field of reports list not required until a group is chosen */
+  for (let group of groups) {
+      let element = document.getElementById(group + 'Reports')
       element.querySelector('select').required = false;
     }
 
   $( "#CardType" ).change(function() {
     /* Hides the element that is currently visible and makes it not required */
-    for (let genre of genres) {
-      let element = document.getElementById(genre + 'Reports')
+    for (let group of groups) {
+      let element = document.getElementById(group + 'Reports')
       if ( ! element.classList.contains('d-none') ) {
         element.classList.add('d-none');
         element.querySelector('select').required = false;
@@ -23,9 +23,9 @@ $(function() {
     }
 
     /* Makes the right element visible and required */
-    let new_genre = $(this).find("#genre option:selected").val()
-    if ( genres.includes(new_genre) ) {
-      let element_id = new_genre + 'Reports'
+    let new_group = $(this).find("#group option:selected").val()
+    if ( groups.includes(new_group) ) {
+      let element_id = new_group + 'Reports'
       let element = document.getElementById( element_id )
       element.classList.remove('d-none')
       element.querySelector('select').required = true;
