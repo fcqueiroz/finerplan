@@ -10,10 +10,12 @@ class Account(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     path = db.Column(db.String(500), nullable=False)  # This should be unique..
     group_id = db.Column(db.Integer, db.ForeignKey('accounting_group.id'), nullable=False)
+    # TODO: Find a way to eliminate the type column and use the group's name as the polymorphic identity
     type = db.Column(db.String(64), nullable=False)
 
     _group = db.relationship("AccountingGroup")
 
+    # TODO: Create a Closure Table hierarchy.
     # TODO: Transform properties into hybrid properties so SQLAlchemy can query them
 
     def __repr__(self):
@@ -93,22 +95,25 @@ class Account(db.Model):
         """
         return len(self.path.split('.'))
 
-    def descendents(self):
+    @hybrid_property
+    def _descendents(self):
         """
         Returns the descendents from self.
         """
         children_path = self.path + '.%'
-        children = Account.query.filter(Account.path.like(children_path))
+        return Account.query.filter(Account.path.like(children_path))
 
-        return children.all()
-
-    @property
+    @hybrid_property
     def is_leaf(self):
         """
         Returns a boolean indicating whether the queried account
         is a leaf (ie, has no descendents).
         """
-        return len(self.descendents()) == 0
+        return self._descendents.count() == 0
+
+    @is_leaf.expression
+    def is_leaf(cls):
+        raise NotImplementedError
 
     def list_installments(self, **kwargs) -> list:
         return self._group.installments_enumerator(account=self, **kwargs)
