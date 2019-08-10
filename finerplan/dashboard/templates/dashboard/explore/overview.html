@@ -1,8 +1,8 @@
 {% extends "dashboard.html" %}
 
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/overview/transaction-form.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/overview/datatable.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/transaction-form.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/datatable.js') }}" defer></script>
 {% endblock %}
 
 {% block dashboard %}
@@ -11,8 +11,12 @@
 
   {% include 'explore/_recent_transactions.html' %}
 
-  {% for card in cards %}
-    {% include 'explore/_card.html' %}
-  {% endfor %}
+  {% if cards %}
+    {% for card in cards %}
+      {% include 'explore/_card.html' %}
+    {% endfor %}
+  {% else %}
+  <p>There are no cards created for this page yet.</p>
+  {% endif %}
 </div>
 {% endblock %}

@@ -10,7 +10,6 @@ from .report import Report
 from .transaction import Transaction
 from .user import User
 
-from config import accounting_types, report_names
 from data.default import common_accounts
 
 
@@ -20,7 +19,7 @@ Account.major_group = column_property(
     select([AccountingGroup.group]).where(AccountingGroup.id == Account.group_id))
 
 
-def init_accounting_group():
+def init_accounting_group(accounting_types):
     """
     Inserts into AccountingGroup the data needed for aplication.
     """
@@ -33,7 +32,7 @@ def init_accounting_group():
     db.session.commit()
 
 
-def init_report():
+def init_report(report_names):
     """
     Inserts into Report the data needed for aplication.
     """

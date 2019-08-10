@@ -54,13 +54,11 @@ class Expenses(object):
         soma[-1] = ""
         return _df.append(soma)
 
-    def html_table(self, months=13):
+    def table(self, months=13):
         df = self._generate_expenses_dataframe(months)
 
         df = self._add_mean_column(df, new_col_name=self.mean_name)
 
         df = self._add_cumulative_weight_column(df, mean_col=self.mean_name, new_col_name=self.weight_name)
 
-        df = self._append_total_sum_row(df, index_name=self.index_name, sum_name=self.sum_name)
-
-        return df.to_html(classes='expenses', index=False)
+        return self._append_total_sum_row(df, index_name=self.index_name, sum_name=self.sum_name)

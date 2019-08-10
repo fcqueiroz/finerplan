@@ -6,9 +6,10 @@ from wtforms import DateField, DecimalField, IntegerField, RadioField, SelectFie
 from wtforms.validators import DataRequired
 
 from finerplan.model import GetAccountGroupId
+from finerplan.reports import InformationReport, TableReport
 from .custom_validators import OptionalIfFieldDifferentThan
 
-from config import form_groups, report_names
+from config import form_available_report_groups
 
 
 class AddTransactionForm(FlaskForm):
@@ -43,26 +44,26 @@ class AddAccountForm(FlaskForm):
 
 class AddReportCardForm(FlaskForm):
     name = StringField("Report Title", validators=[DataRequired()])
-    if len(form_groups) == 1:
+    if len(form_available_report_groups) == 1:
         group = StringField(
-            'Report Type', validators=[DataRequired()], default=form_groups[0],
+            'Report Type', validators=[DataRequired()], default=form_available_report_groups[0],
             render_kw={'class': "form-control", 'disabled': True})
     else:
         group = SelectField(
             'Report Type', validators=[DataRequired()], render_kw={'class': "custom-select"},
-            choices=[("", "---")] + [(s, s) for s in form_groups])
+            choices=[("", "---")] + [(s, s) for s in form_available_report_groups])
 
     information_names = SelectMultipleField(
         'Information Reports',
         validators=[OptionalIfFieldDifferentThan(field='group', value='Information'), DataRequired()],
-        choices=[(s, s) for s in report_names['Information']])
+        choices=[(s, s) for s in InformationReport.available_reports()])
     table_names = SelectField(
         'Table Reports',
         validators=[OptionalIfFieldDifferentThan(field='group', value='Table'), DataRequired()],
-        choices=[("", "---")] + [(s, s) for s in report_names['Table']])
+        choices=[("", "---")] + [(s, s) for s in TableReport.available_reports()])
     graph_names = SelectField(
         'Graph Reports',
         validators=[OptionalIfFieldDifferentThan(field='group', value='Graph'), DataRequired()],
-        choices=[("", "---")] + [(s, s) for s in report_names['Graph']])
+        choices=[("", "---")] + [(s, s) for s in []])
 
     submit = SubmitField('Create')

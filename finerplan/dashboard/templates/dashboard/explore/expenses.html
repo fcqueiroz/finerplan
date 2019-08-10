@@ -1,14 +1,17 @@
 {% extends "dashboard.html" %}
 
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/datatable.js') }}" defer></script>
+{% endblock %}
+
 {% block dashboard %}
 <div class="row">
-  <div class="col-12 col-md-10 py-3">
-    <div class="card">
-      <div class="card-body">
-        <h2 class="header-title">Past 12 months expenses</h2>
-        {{ tables | safe }}
-      </div>
-    </div>
-  </div>
+  {% if cards %}
+    {% for card in cards %}
+      {% include 'explore/_card.html' %}
+    {% endfor %}
+  {% else %}
+  <p>There are no cards created for this page yet.</p>
+  {% endif %}
 </div>
 {% endblock %}

@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import or_
 
 from finerplan.model import Transaction, Account, CreditCard, AccountingGroup, Card, Report, add_common_accounts
-from finerplan.reports import ReportCard, history
+from finerplan.reports import ReportCard
 
 from . import bp
 from .forms import AddTransactionForm, AddAccountForm, AddReportCardForm
@@ -73,13 +73,6 @@ def accounts_json(transaction_kind):
 def accounts_create_common():
     add_common_accounts(current_user)
     return redirect(url_for('dashboard.accounts_list'))
-
-
-@bp.route('/expenses', methods=['GET'])
-@login_required
-def expenses():
-    et1 = history.Expenses()
-    return render_template('explore/expenses.html', title='Expenses', tables=et1)
 
 
 @bp.route('/config/accounts', methods=['GET'])

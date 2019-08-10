@@ -79,8 +79,4 @@ accounting_types = {
 }
 
 # Reports
-form_groups = ['Information']  # Planned to include 'Table' and 'Graph' soon
-report_names = {
-    'Information': ['Current Balance', 'Current Month Income', 'Current Month Expenses', 'Savings Rate'],
-    'Table': ['Last 12 Month Expenses', 'Recent Transactions'],
-    'Graph': []}
+form_available_report_groups = ['Information', 'Table']  # Planned to include 'Graph' soon

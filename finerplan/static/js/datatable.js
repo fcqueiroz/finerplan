@@ -11,4 +11,10 @@
             "order": [[ 0, 'desc' ]]
         });
     }
+    if ($('#dataTable2').length) {
+        $('#dataTable2').DataTable({
+            responsive: true,
+            "order": [[ 13, 'asc' ]]
+        });
+    }
 }) (jQuery);

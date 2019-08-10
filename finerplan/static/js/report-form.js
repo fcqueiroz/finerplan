@@ -36,6 +36,6 @@ $(function() {
   }
 
   updatesReportsArea()
-  $( "#CardType" ).change(updatesReportsArea())
+  $( "#CardType" ).change(updatesReportsArea)
 
 });

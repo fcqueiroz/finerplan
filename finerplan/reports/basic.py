@@ -5,8 +5,7 @@ from flask_login import current_user
 from sqlalchemy import or_
 
 from finerplan.model import Account, Transaction
-
-from config import report_names
+from .history import Expenses
 
 
 def bold(func):
@@ -19,31 +18,24 @@ def bold(func):
 class BaseReport(object):
     _report = None
     _value = None
-    _text = None
+    _name_mapper = None
 
-    def __init__(self, report, available_reports):
-        self._find_report_method(report, available_reports)
-
-    def to_html(self):
-        getattr(self, self._report)()
-
-        formatted_value = self._formatter()
-
-        return self._text + formatted_value
-
-    @bold
-    def _formatter(self):
-        return '{0:.2f}'.format(self._value)
-
-    def _find_report_method(self, report, available_reports):
-        if report in available_reports:
-            self._report = self._name_mapper(report)
+    def __init__(self, report):
+        if report in self.available_reports():
+            self._report = self._name_mapper[report]
         else:
             raise ValueError(f"{type(self).__name__} doesn't provide report '{report}'")
 
-    @staticmethod
-    def _name_mapper(report_name):
+    def to_html(self):
         raise NotImplementedError
+
+    @classmethod
+    def available_reports(cls):
+        """Returns a list of all the implemented reports in this class."""
+        try:
+            return cls._name_mapper.keys()
+        except AttributeError:
+            raise NotImplementedError
 
 
 def _transaction_balance(names, **kwargs) -> float:
@@ -67,8 +59,15 @@ def _transaction_balance(names, **kwargs) -> float:
 
 
 class InformationReport(BaseReport):
+    _text = None
+    _name_mapper = {
+        'Current Balance': 'current_balance',
+        'Current Month Income': 'current_month_income',
+        'Current Month Expenses': 'current_month_expenses',
+        'Current Month Savings': 'current_month_savings',
+        'Savings Rate': 'savings_rate'}
 
-    def __init__(self, report):
+    def __init__(self, report, description=None):
         """
         Produces basic information reports (Descriptive text + Scalar value)
 
@@ -76,12 +75,22 @@ class InformationReport(BaseReport):
         ----------
         report: str
             Name of the report to be generated.
+        description:
+            Descriptive text that will appear together with the calculated value.
         """
-        super().__init__(report=report, available_reports=report_names['Information'])
+        super().__init__(report=report)
+        if description is not None:
+            self.description = description
 
-    @staticmethod
-    def _name_mapper(report_name):
-        return report_name.lower().replace(' ', '_')
+    def to_html(self):
+        getattr(self, self._report)()
+        formatted_value = self._formatter()
+        description = getattr(self, 'description', self._text)
+        return description + formatted_value
+
+    @bold
+    def _formatter(self):
+        return '{0:.2f}'.format(self._value)
 
     def current_balance(self) -> None:
         """
@@ -158,3 +167,26 @@ class InformationReport(BaseReport):
             self._value = 1 - _expenses / _income
 
         setattr(self, '_formatter', self._percent_formatter(msg=msg))
+
+
+class TableReport(BaseReport):
+    _name_mapper = {
+        # 'Recent Transactions': 'recent_transactions',
+        'Last 12 Month Expenses': 'last_12_month_expenses'}
+
+    def to_html(self):
+        getattr(self, self._report)()
+
+        html = '<div class="data-tables">'
+        html += self._value.to_html(
+            table_id='dataTable2', classes='text-center', index=False).replace('border="1" ', '')
+        html += '</div>'
+        return html
+
+    def recent_transactions(self):
+        raise NotImplementedError
+
+    def last_12_month_expenses(self) -> None:
+        creator = Expenses(index_name='Category', mean_name='Mean', weight_name="Acc W..", sum_name='Sum')
+        self._value = creator.table()
+
