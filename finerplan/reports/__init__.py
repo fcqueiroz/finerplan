@@ -16,5 +16,18 @@ class ReportCard(object):
         self.elements = self._get_reports(card)
 
     @staticmethod
-    def _get_reports(card):
-        return [InformationReport(report=report.name) for report in card.reports]
+    def _get_report_creator(report_group):
+        if report_group == 'Information':
+            return InformationReport
+        else:
+            raise NotImplementedError(f"Reports of type '{report_group}' are not supported yet.")
+
+    def _get_reports(self, card):
+        _elements = []
+        for report in card.reports:
+            creator = self._get_report_creator(report.group)
+            _elements.append(creator(report=report.name))
+        return _elements
+
+    def to_html(self):
+        return '<br>'.join([el.to_html() for el in self.elements])

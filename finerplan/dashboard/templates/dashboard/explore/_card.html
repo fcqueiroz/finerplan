@@ -3,9 +3,7 @@
     <div class="card-body">
       <h2>{{ card.title }}</h2>
       <p id="report{{ card.id }}">
-        {% for elem in card.elements %}
-          {{ elem.to_html() | safe }}<br>
-        {% endfor %}
+        {{ card.to_html() | safe }}
       </p>
     </div>
   </div>

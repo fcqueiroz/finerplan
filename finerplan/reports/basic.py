@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from flask_login import current_user
 from sqlalchemy import or_
 
-from finerplan.model import Account, Transaction, AccountingGroup
+from finerplan.model import Account, Transaction
 
 from config import report_names
 
@@ -37,14 +37,33 @@ class BaseReport(object):
 
     def _find_report_method(self, report, available_reports):
         if report in available_reports:
-            report = self._kind_mapper(report)
-            self._report = report
+            self._report = self._name_mapper(report)
         else:
             raise ValueError(f"{type(self).__name__} doesn't provide report '{report}'")
 
     @staticmethod
-    def _kind_mapper(kind):
+    def _name_mapper(report_name):
         raise NotImplementedError
+
+
+def _transaction_balance(names, **kwargs) -> float:
+    """
+    Evaluates the balance (ie deposits minus withdraws) in any time period.
+
+    Parameters
+    ----------
+    names: list-like
+        Accounting types to select when performing the calculation
+    """
+    names_filter = [(group_name == Account.group) for group_name in names]
+    accounts = Account.query.filter(or_(*names_filter), Account.user_id == current_user.id)
+
+    # TODO Remove the loop and make this calculation inside database!
+    _result = 0
+    for account in accounts:
+        _result += Transaction.balance(account, **kwargs)
+
+    return _result
 
 
 class InformationReport(BaseReport):
@@ -61,57 +80,33 @@ class InformationReport(BaseReport):
         super().__init__(report=report, available_reports=report_names['Information'])
 
     @staticmethod
-    def _kind_mapper(kind):
-        return kind.lower().replace(' ', '_')
-
-    @property
-    def _month_start(self):
-        return date.today() + relativedelta(day=1)
-
-    @property
-    def _month_end(self):
-        return date.today() + relativedelta(day=31)
-
-    @staticmethod
-    def _transaction_balance(names, **kwargs) -> float:
-        """
-        Evaluates the balance (ie deposits minus withdraws) in any time period.
-
-        Parameters
-        ----------
-        names: list-like
-            Accounting types to select when performing the calculation
-        """
-        names_filter = [(group_name == Account.group) for group_name in names]
-        accounts = Account.query.filter(or_(*names_filter), Account.user_id == current_user.id)
-
-        # TODO Remove the loop and make this calculation inside database!
-        _result = 0
-        for account in accounts:
-            _result += Transaction.balance(account, **kwargs)
-
-        return _result
+    def _name_mapper(report_name):
+        return report_name.lower().replace(' ', '_')
 
     def current_balance(self) -> None:
         """
         Evaluates equity balance at present date.
         """
         self._text = 'Your current balance is:'
-        self._value = self._transaction_balance(names=['Asset', 'Cash', 'Bank'], end=date.today())
+        self._value = _transaction_balance(names=['Asset', 'Cash', 'Bank'], end=date.today())
 
     def current_month_income(self) -> None:
         """
         Evaluates total income in the current month.
         """
         self._text = 'Current month income:'
-        self._value = -self._transaction_balance(names=['Income'], start=self._month_start, end=self._month_end)
+        _today = date.today()
+        self._value = -_transaction_balance(
+            names=['Income'], start=_today + relativedelta(day=1), end=_today + relativedelta(day=31))
 
     def current_month_expenses(self) -> None:
         """
         Evaluates total expenses in the current month.
         """
         self._text = 'Current month expenses:'
-        self._value = self._transaction_balance(names=['Expense'], start=self._month_start, end=self._month_end)
+        _today = date.today()
+        self._value = _transaction_balance(
+            names=['Expense'], start=_today + relativedelta(day=1), end=_today + relativedelta(day=31))
 
     def current_month_savings(self) -> None:
         """
@@ -148,11 +143,11 @@ class InformationReport(BaseReport):
         """
         self._text = 'Last 12 months savings rate:'
 
-        period_end = self._month_start
+        period_end = date.today() + relativedelta(day=1)
         period_start = period_end - relativedelta(months=length)
 
-        _expenses = self._transaction_balance(names=['Expense'], start=period_start, end=period_end)
-        _income = -self._transaction_balance(names=['Income'], start=period_start, end=period_end)
+        _expenses = _transaction_balance(names=['Expense'], start=period_start, end=period_end)
+        _income = -_transaction_balance(names=['Income'], start=period_start, end=period_end)
 
         if _income == 0:
             msg = "No income during period."
