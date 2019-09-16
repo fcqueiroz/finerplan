@@ -4,7 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class UserInfo(object):
     """Regular information about the default user"""
-    NAME = os.getenv("LOGNAME").capitalize()
+    NAME = os.getenv("LOGNAME", "Username").capitalize()
     CREDIT_CLOSING = 11  # Day of month when the credit card invoice closes
     CREDIT_PAYMENT = 25  # Day of month when the credit card invoice is paid
 

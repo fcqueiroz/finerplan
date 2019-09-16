@@ -80,12 +80,3 @@ def exponential_moving_average(alpha=0.15, beta=0.5, kind='simple'):
             tmp = mov_avg
             mov_avg = alpha * result + (1 - alpha) * (tmp + trend)
             trend = beta * (mov_avg - tmp) + (1 - beta) * trend
-
-
-def generate_month_expenses_table_data(start_date, final_date):
-    query = ("SELECT category,sum(value) "
-             "FROM expenses "
-             "WHERE accrual_date >= ? and accrual_date < ? "
-             "GROUP BY category;")
-    cur.execute(query, (start_date, final_date))
-    return cur.fetchall()
