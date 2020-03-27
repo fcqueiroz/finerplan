@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/form-visibility.js') }}" defer></script>
+{% endblock %}
+
+{% block title %}
+<h4 class="page-title pull-left">Overview</h4>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 col-md-6 col-xl-5 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2>Basic Report</h2>
+        <p id="basic-report">
+          Your current balance is <b>{{ report.balance }}</b><br>
+          Your balance after paying all debts will be<b>{{ report.free_balance }}</b><br>
+          Your next credit card payment is due {{ report.credit_date }}.<br>
+          The current value is <b>{{ report.credit_value }}</b>({{ report.credit_state }})<br>
+          {% if report.credit_state == 'Closed' %}
+            The current value for the following open invoice is
+            <b>{{ report.credit_nvalue }}</b><br>
+          {% endif %}
+          Current month earnings: <b>{{ report.earnings }}</b><br>
+          Available for luxury expending: <b>{{ report.lux_budget}}</b>({{ report.lux_rate}})<br>
+          Current month expenses: <b>{{ report.expenses }}</b><br>
+          Double Exponential Moving Average Expending: <b>{{ report.dema }}</b><br>
+          This month savings: <b>{{ report.savings }}</b><br>
+          Last 12 months savings rate: <b>{{ report.savings_rate }}</b>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-xl-4 py-3">
+    <div class="card">
+      <div class="card-body">
+        <form action="#" method="post" name="transaction">
+          {{ form.hidden_tag() }}
+
+          <h2>Add transaction</h2>
+          <!-- Transaction kind -->
+          <div id="transactionKind" class="form-row justify-content-center">
+            {{ form.transaction.label(class_="col-form-label col-12 mt-2") }}
+            <div class="flex-fill text-center">
+            {% for subfield in form.transaction %}
+              <div class="custom-control custom-radio custom-control-inline">
+                {{ subfield(class_="custom-control-input") }}
+                {{ subfield.label(class_="custom-control-label") }}
+              </div>
+            {% endfor %}
+            </div>
+            {% for error in form.transaction.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Description -->
+          <div class="form-row form-group">
+            {{ form.description.label(class_="col-form-label") }}
+            {{ form.description(class_="form-control") }}
+            {% for error in form.description.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Date -->
+          <div class="form-row form-group">
+            {{ form.date.label(class_="col-form-label") }}
+            {{ form.date(class_="form-control", type="date") }}
+            {% for error in form.date.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Value -->
+          <div class="form-row form-group">
+            {{ form.value.label(class_="col-form-label") }}
+            {{ form.value(class_="form-control") }}
+            {% for error in form.value.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Transaction Category -->
+          <div class="form-row form-group field-wobbly field-expenses field-category">
+            {{ form.cat_expense.label(class_="col-form-label") }}
+            {{ form.cat_expense(class_="custom-select") }}
+            {% for error in form.cat_expense.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-row form-group field-wobbly field-earnings field-category">
+            {{ form.cat_earning.label(class_="col-form-label") }}
+            {{ form.cat_earning(class_="custom-select") }}
+            {% for error in form.cat_earning.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <div class="form-check field-wobbly field-earnings field-expenses">
+              <input type="checkbox" class="form-check-input" id="newCategoryCheck">
+              <label class="form-check-label" for="newCategoryCheck">Add new category</label>
+          </div>
+          <div class="form-row form-group field-wobbly field-new-category">
+            {{ form.new_cat.label(class_="col-form-label") }}
+            {{ form.new_cat(class_="form-control") }}
+            {% for error in form.new_cat.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          <!-- Transaction payment method -->
+          <div id="paymentMethod" class="form-row form-group field-wobbly field-expenses">
+            {{ form.pay_method.label(class_="col-form-label col-12 mt-2") }}
+            <div class="flex-fill text-center">
+            {% for subfield in form.pay_method %}
+              <div class="custom-control custom-radio custom-control-inline">
+                {{ subfield(class_="custom-control-input") }}
+                {{ subfield.label(class_="custom-control-label") }}
+              </div>
+            {% endfor %}
+            </div>
+
+            {% for error in form.pay_method.errors %}
+            <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+          <!-- Credit card installments -->
+          <div id="paymentInstallments" class="form-row form-group field-wobbly field-expenses">
+            {{ form.installments.label(class_="col-form-label") }}
+            {{ form.installments(class_="form-control", type="number") }}
+            {% for error in form.installments.errors %}
+              <span>[{{ error }}]</span>
+            {% endfor %}
+          </div>
+
+          {{ form.submit(class_="btn btn-primary mt-4 pr-4 pl-4") }}
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-8 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Expenses</h2>
+        <div class="data-tables">
+        {% if tables.expenses %}
+          <table id="dataTable" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Payment Method</th>
+                <th>Accrual Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in tables.expenses %}
+              <tr>
+              {% for elem in row %}
+                <td>{{ elem }}</td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no expenses registered yet.</p>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Earnings</h2>
+        <div class="data-tables">
+        {% if tables.earnings %}
+          <table id="dataTable2" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Accrual Date</th>
+                <th>Cash Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for row in tables.earnings %}
+              <tr>
+              {% for elem in row %}
+                <td>{{ elem }}</td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no earnings registered yet.</p>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 py-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="header-title">Recent Investments</h2>
+        <div class="data-tables">
+        {% if tables.investments %}
+          <table id="dataTable3" class="text-center">
+            <thead class="bg-light text-capitalize">
+              <tr>
+                <th>Accrual Date</th>
+                <th>Cash Date</th>
+                <th>Description</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in tables.investments %}
+                <tr>
+                {% for elem in row %}
+                  <td>{{ elem }}</td>
+                {% endfor %}
+                  </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>There are no investments registered yet.</p>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -10,20 +10,13 @@ development stage. It's not well suited for any kind of serious work. This is a
 learning project before anything else.
 
 ## Getting Started
-Run the following commands to get the application working in a development environment.
 
-### Linux
+For installing the application, run the following command within the projects root directory finerplan/
 
-Create a local copy of the repository in the current folder
-> git clone https://github.com/fcqueiroz/finerplan.git  
-> cd finerplan  
+> pip install --editable .
 
-Install the application (using virtual environment is recommended)
-> pip install --editable .  
-> flask db upgrade  
-> flask seed
+The editable flag allows editing source code without having to reinstall the Flask app each time you make changes. You should then be able to start up the application with the following commands:
 
-Run this command inside finerplan/ folder whenever you want to start the application.
-> flask run  
+> flask run --host=0.0.0.0 --port=5001  
 
 The application will greet you on _http://localhost:5001/_

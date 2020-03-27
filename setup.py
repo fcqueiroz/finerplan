@@ -1,25 +1,18 @@
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
-    name='Finerplan',
+setup(
+    name='finerplan',
     version='0.3',
-    url='https://github.com/fcqueiroz/finerplan',
-    license='GPLv3+',
-    author='Fernanda Queiroz',
-    description='Financial Early Retirement Planner',
-    packages=setuptools.find_packages(),
+    packages=['finerplan'],
     include_package_data=True,
-    python_requires='>=3.7',
     install_requires=[
-        'Flask>=1.1',
-        'Flask-SQLAlchemy>=1.3',
-        'Flask-Login>=0.4',
-        'Flask-Migrate>=2.5',
-        'Flask-WTF>=0.14',
-        'pandas>=0.25',
-        'python-dotenv>=0.10'
+        'flask',
+    ],
+    python_requires='>=3',
+    setup_requires=[
+        'pytest-runner',
     ],
     tests_require=[
-        'pytest>=5.0'
+        'pytest',
     ],
 )
