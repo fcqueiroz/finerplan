@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Fixed
+- Security issue concerning the flask server visibility outside development machine.
+- The list of project package dependencies now contain all projects necessary for an install.
+- Removed commented code in HTML template as it was still executed by Jinja, raising errors.
+
+## [0.3.1] - 2020-03-27
+
+This is just a checkpoint for reverting all changes made since v0.3. 
+Also, from now on this project adopts the [Semantic Versioning](https://semver.org/). 
+
 ## [0.3] - 2019-06-23
 ### Added
 - The UI was updated using 
