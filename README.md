@@ -11,12 +11,15 @@ learning project before anything else.
 
 ## Getting Started
 
-For installing the application, run the following command within the projects root directory finerplan/
+For installing the application, run the following command within the projects root 
+directory finerplan/
 
 > pip install --editable .
 
-The editable flag allows editing source code without having to reinstall the Flask app each time you make changes. You should then be able to start up the application with the following commands:
+The editable flag allows editing source code without having to reinstall the Flask 
+app each time you make changes. You should then be able to start up the application 
+with the following commands:
 
-> flask run --host=0.0.0.0 --port=5001  
+> flask run --port=5001  
 
 The application will greet you on _http://localhost:5001/_
