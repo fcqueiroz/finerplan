@@ -21,7 +21,7 @@ def overview():
               'investments':sql.last_investments()}
     basic_report = reports.basic()
     basic_report['name'] = app.config['NAME']
-    return render_template('overview.html', title='Overview', form=form,
+    return render_template('overview.html.jinja', title='Overview', form=form,
                            tables=tables, report=basic_report)
 
 
@@ -29,7 +29,7 @@ def overview():
 def expenses():
     expenses_table = sql.expenses_table()
     expenses = sql.transactions_table(kind='expenses')
-    return render_template('expenses.html', title='Expenses',
+    return render_template('expenses.html.jinja', title='Expenses',
                            tables=expenses_table, expenses=expenses)
 
 
@@ -37,5 +37,5 @@ def expenses():
 def assets():
     brokerage_balance = sql.brokerage_balance()
 
-    return render_template('assets.html', title='Assets',
+    return render_template('assets.html.jinja', title='Assets',
                            tables=brokerage_balance)
