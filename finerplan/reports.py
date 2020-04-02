@@ -2,7 +2,7 @@ import locale
 from finerplan.sql import sum_query, ema
 from finerplan import dates
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, 'en_CA.UTF-8')
 
 
 def basic():
