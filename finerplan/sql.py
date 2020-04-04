@@ -15,12 +15,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 def create_tables(database: str):
     """Create the database tables from schema."""
-    con = sqlite3.connect(database,  check_same_thread=False)
     schema = os.path.join(basedir, 'schema.sql')
     with open(schema, mode='r') as f:
-        con.cursor().executescript(f.read())
-    con.commit()
-    con.close()
+        with sqlite3.connect(database, check_same_thread=False) as con:
+            con.executescript(f.read())
 
 
 def sum_query(query_str, query_values):
