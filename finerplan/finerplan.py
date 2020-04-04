@@ -2,16 +2,15 @@ import os
 from flask import Flask
 import sqlite3
 
-app = Flask(__name__) # create the application instance
-app.config.from_object(__name__) # load config from this file
+from config import obtain_config_object
 
-# Load default config and override config from an environment variable
+app = Flask(__name__) # create the application instance
+
+app.config.from_object(obtain_config_object(environment=app.config['ENV']))
 app.config.update(dict(
     NAME=os.getenv("LOGNAME").capitalize(),
-    DATABASE=os.path.join(app.root_path, 'finerplan.db'),
     CREDIT_CLOSING=11,  # Day of month when the credit card invoice closes
     CREDIT_PAYMENT=25,  # Day of month when the credit card invoice is paid
-    SECRET_KEY=(os.environ.get('SECRET_KEY') or "you-will-never-guess"),
 ))
 
 # Defines common words used in the forms
