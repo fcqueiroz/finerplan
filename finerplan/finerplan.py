@@ -1,6 +1,5 @@
 import os
 from flask import Flask
-import sqlite3
 
 from config import obtain_config_object
 
@@ -21,11 +20,8 @@ form_words = {'earnings': "Receita",
               'credit': "Crédito",
               'outsourced': "Terceiros"}
 
-# Creates the tables if they don't exist.
-con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
-with app.open_resource('schema.sql', mode='r') as f:
-    con.cursor().executescript(f.read())
-con.commit()
-con.close()
+from finerplan.sql import create_tables
+
+create_tables(database=app.config['DATABASE'])
 
 import finerplan.routes
