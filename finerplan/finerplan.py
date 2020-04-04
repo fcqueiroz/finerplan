@@ -7,7 +7,7 @@ app = Flask(__name__) # create the application instance
 
 app.config.from_object(obtain_config_object(environment=app.config['ENV']))
 app.config.update(dict(
-    NAME=os.getenv("LOGNAME").capitalize(),
+    NAME=os.getenv("LOGNAME", 'anon').capitalize(),
     CREDIT_CLOSING=11,  # Day of month when the credit card invoice closes
     CREDIT_PAYMENT=25,  # Day of month when the credit card invoice is paid
 ))
