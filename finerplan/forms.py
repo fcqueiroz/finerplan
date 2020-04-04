@@ -5,7 +5,6 @@ from wtforms import SubmitField, StringField, SelectField, IntegerField
 from wtforms import RadioField, DateField
 from wtforms.validators import DataRequired
 
-from .finerplan import form_words
 from finerplan.sql import generate_categories
 
 
@@ -14,14 +13,18 @@ class AddTransactionForm(FlaskForm):
     date = DateField("Registry Date", default=date.today(), validators=[DataRequired()])
     value = StringField("Value", validators=[DataRequired()])
     transaction = RadioField("Type of Transaction",
-                             choices=[('earnings', form_words['earnings']),
-                                      ('brokerage_transfers', form_words['brokerage_transfers']),
-                                      ('expenses', form_words['expenses'])])
+                             choices=[
+                                 ('earnings', "Receita"),
+                                 ('brokerage_transfers', "Investimento"),
+                                 ('expenses', "Gasto")
+                             ])
 
     pay_method = RadioField("Payment Method",
-                            choices=[(form_words['cash'], form_words['cash']),
-                                     (form_words['credit'], form_words['credit']),
-                                     (form_words['outsourced'], form_words['outsourced'])])
+                            choices=[
+                                ("Dinheiro", "Dinheiro"),
+                                ("Crédito", "Crédito"),
+                                ("Terceiros", "Terceiros")
+                            ])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
     new_cat = StringField("New Category")
     cat_expense = SelectField("Category", default="Mercado", choices = generate_categories('expenses'))

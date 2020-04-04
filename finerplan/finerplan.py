@@ -10,14 +10,6 @@ app.config.update(dict(
     NAME=os.getenv("LOGNAME", 'anon').capitalize(),
 ))
 
-# Defines common words used in the forms
-form_words = {'earnings': "Receita",
-              'expenses': "Gasto",
-              'brokerage_transfers': "Investimento",
-              'cash': "Dinheiro",
-              'credit': "Crédito",
-              'outsourced': "Terceiros"}
-
 from finerplan.sql import create_tables
 
 create_tables(database=app.config['DATABASE'])

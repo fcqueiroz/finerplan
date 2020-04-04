@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 from dateutil.relativedelta import *
 
-from .finerplan import app, form_words
+from .finerplan import app
 from finerplan import dates
 
 con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
@@ -196,7 +196,7 @@ def insert_entry(form):
             cat_0 = form.cat_expense.data
         cat_1 = "Outras Despesas"
         cat_2 = "Outras Despesas"
-        if method == form_words['credit']:
+        if method == "Crédito":
             cash = dates.cash(accrual)
             installments = form.installments.data
             installment_quotient = round(((100*t_val) // installments) / 100,2)
@@ -205,13 +205,13 @@ def insert_entry(form):
                             / 100,2)
         query_values = (method, accrual, cash, descr, cat_0, t_val)
         cur.execute(('INSERT INTO '+ query_str), query_values)
-        if method == form_words['credit'] and installments > 1:
+        if method == "Crédito" and installments > 1:
             t_val = installment_quotient
             for i in range(1, installments):
                 cash = cash + relativedelta(months=1)
                 query_values = (method, accrual, cash, descr, cat_0, t_val)
                 cur.execute(('INSERT INTO '+ query_str), query_values)
-        elif method == form_words['outsourced']:
+        elif method == "Terceiros":
             cur.execute(
                 ('INSERT INTO earnings ('
                     'accrual_date, cash_date, description, category, value) '
