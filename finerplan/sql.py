@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 from dateutil.relativedelta import *
 
-from .finerplan import app
+from finerplan.app import app
 from finerplan import dates
 
 con = sqlite3.connect(app.config['DATABASE'],  check_same_thread=False)
