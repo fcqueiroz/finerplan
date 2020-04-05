@@ -2,7 +2,7 @@ from flask import render_template, flash
 from .forms import AddTransactionForm
 
 from finerplan import sql, reports
-from .finerplan import app
+from finerplan.app import app
 
 
 @app.route('/', methods=['GET', 'POST'])
