@@ -12,6 +12,8 @@ class Default(object):
 
     WTF_CSRF_ENABLED = True
 
+    NAME = os.getenv("LOGNAME", 'anon').capitalize()
+
 
 class Development(Default):
     """Development configuration."""
