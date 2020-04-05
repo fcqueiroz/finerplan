@@ -1,3 +1,5 @@
 graft finerplan/templates
 graft finerplan/static
 include finerplan/schema.sql
+include tox.ini
+include tests/*
