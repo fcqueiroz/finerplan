@@ -11,8 +11,5 @@ setup(
         'Flask-WTF',
         'pandas',
     ],
-    python_requires='>=3',
-    setup_requires=[
-        'pytest-runner',
-    ],
+    python_requires='>=3.5',
 )
