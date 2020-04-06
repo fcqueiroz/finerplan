@@ -15,6 +15,8 @@ dashboard_blueprint = Blueprint("dashboard", "finerplan")
 @dashboard_blueprint.route('/overview', methods=['GET', 'POST'])
 def overview():
     form = AddTransactionForm()
+    form.cat_expense.choices = sql.generate_categories('expenses')
+    form.cat_earning.choices = sql.generate_categories('earnings')
     if form.submit.data:
         if form.transaction.data:
             err = sql.insert_entry(form)
