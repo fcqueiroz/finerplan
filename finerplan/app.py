@@ -1,6 +1,8 @@
 """Application setup."""
 from flask import Flask
 
+from finerplan.routes import dashboard_blueprint
+
 from config import obtain_config_object
 
 
@@ -18,6 +20,7 @@ def create_app(**kwargs):
     """Initialize application instance."""
     _app = Flask(__name__)
     load_config(_app, **kwargs)
+    register_blueprints(_app)
     return _app
 
 
@@ -27,4 +30,6 @@ from finerplan.sql import create_tables
 
 create_tables(database=app.config['DATABASE'])
 
-import finerplan.routes
+def register_blueprints(flask_app: Flask):
+    """Register application views."""
+    flask_app.register_blueprint(dashboard_blueprint)

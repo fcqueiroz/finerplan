@@ -1,12 +1,18 @@
-from flask import render_template, flash
+from flask import (
+    render_template,
+    flash,
+    Blueprint,
+    current_app,
+)
 from .forms import AddTransactionForm
 
 from finerplan import sql, reports
-from finerplan.app import app
+
+dashboard_blueprint = Blueprint("dashboard", "finerplan")
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/overview', methods=['GET', 'POST'])
+@dashboard_blueprint.route('/', methods=['GET', 'POST'])
+@dashboard_blueprint.route('/overview', methods=['GET', 'POST'])
 def overview():
     form = AddTransactionForm()
     if form.submit.data:
@@ -20,12 +26,12 @@ def overview():
               'earnings':sql.last_earnings(),
               'investments':sql.last_investments()}
     basic_report = reports.basic()
-    basic_report['name'] = app.config['NAME']
+    basic_report['name'] = current_app.config['NAME']
     return render_template('overview.html.jinja', title='Overview', form=form,
                            tables=tables, report=basic_report)
 
 
-@app.route('/expenses', methods=['GET'])
+@dashboard_blueprint.route('/expenses', methods=['GET'])
 def expenses():
     expenses_table = sql.expenses_table()
     expenses = sql.transactions_table(kind='expenses')
@@ -33,7 +39,7 @@ def expenses():
                            tables=expenses_table, expenses=expenses)
 
 
-@app.route('/assets', methods=['GET'])
+@dashboard_blueprint.route('/assets', methods=['GET'])
 def assets():
     brokerage_balance = sql.brokerage_balance()
 
