@@ -1,7 +1,7 @@
 ---
 name: Bug report (Must Fix)
 about: This must be fixed before next release
-title: "[BUG]"
+title: ''
 labels: bug
 assignees: ''
 
