@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='finerplan',
-    version='0.3.1',
+    version='0.3.2',
     packages=['finerplan'],
     include_package_data=True,
     install_requires=[
