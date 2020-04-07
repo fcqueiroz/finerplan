@@ -1,2 +1,3 @@
 FLASK_APP=finerplan.py
 FLASK_ENV=development
+FLASK_RUN_EXTRA_FILES=finerplan/templates:finerplan/static

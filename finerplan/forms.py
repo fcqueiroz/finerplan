@@ -5,8 +5,6 @@ from wtforms import SubmitField, StringField, SelectField, IntegerField
 from wtforms import RadioField, DateField
 from wtforms.validators import DataRequired
 
-from finerplan.sql import generate_categories
-
 
 class AddTransactionForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
@@ -27,7 +25,7 @@ class AddTransactionForm(FlaskForm):
                             ])
     installments = IntegerField("Installments", default=1, validators=[DataRequired()])
     new_cat = StringField("New Category")
-    cat_expense = SelectField("Category", default="Mercado", choices = generate_categories('expenses'))
-    cat_earning = SelectField("Category", default="Mercado", choices = generate_categories('earnings'))
+    cat_expense = SelectField("Category")
+    cat_earning = SelectField("Category")
 
     submit = SubmitField("Add it")
