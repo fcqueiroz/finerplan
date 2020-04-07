@@ -1,14 +1,14 @@
 """FinerPlan global configurations."""
 import os
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 class Default(object):
     """Default configuration."""
     TESTING = False
     SECRET_KEY = os.getenv("FINERPLAN_SECRET_KEY")
-    DATABASE = os.getenv("FINERPLAN_DATABASE")
+    SQLITE_DATABASE = os.getenv("FINERPLAN_DATABASE")
 
     WTF_CSRF_ENABLED = True
 
@@ -18,13 +18,13 @@ class Default(object):
 class Development(Default):
     """Development configuration."""
     SECRET_KEY = "finerplan"
-    DATABASE = os.path.join(basedir, "dev.finerplan.db")
+    SQLITE_DATABASE = os.path.join(PROJECT_ROOT, "dev.finerplan.db")
 
 
 class Testing(Development):
     """Testing configuration."""
     TESTING = True
-    DATABASE = ":memory:"
+    SQLITE_DATABASE = ''  # The database is created and destroyed per app instance
 
     WTF_CSRF_ENABLED = False
 
