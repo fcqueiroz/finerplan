@@ -4,7 +4,7 @@ from flask import Flask
 from finerplan.database import teardown_db, create_database
 from finerplan.routes import dashboard_blueprint
 
-from config import obtain_config_object
+from finerplan.config import obtain_config_object
 
 
 def load_config(flask_app: Flask, environment=None):
