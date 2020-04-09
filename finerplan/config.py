@@ -20,11 +20,15 @@ class Development(Default):
     SECRET_KEY = "finerplan"
     SQLITE_DATABASE = os.path.join(PROJECT_ROOT, "dev.finerplan.db")
 
+    EXPLAIN_TEMPLATE_LOADING = True
+
 
 class Testing(Development):
     """Testing configuration."""
     TESTING = True
     SQLITE_DATABASE = ''  # The database is created and destroyed per app instance
+
+    EXPLAIN_TEMPLATE_LOADING = False
 
     WTF_CSRF_ENABLED = False
 
