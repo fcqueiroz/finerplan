@@ -1,8 +1,8 @@
 """Application setup."""
 from flask import Flask
 
-from finerplan.database import teardown_db, create_database
 from finerplan.config import obtain_config_object
+from finerplan.database import db
 from finerplan.frontend import dashboard_blueprint
 
 
@@ -32,9 +32,9 @@ def register_blueprints(flask_app: Flask):
 
 def init_database(flask_app: Flask):
     """Initialize database."""
+    db.init_app(flask_app)
     with flask_app.app_context():
         # TODO:
         #  The db creation should be independent from app creation, but
         #  this line keeps the database creation automatic (expected behavior)
-        create_database()
-        flask_app.teardown_appcontext(teardown_db)
+        db.create_all()
