@@ -2,7 +2,7 @@ import math
 import pandas as pd
 from dateutil.relativedelta import *
 
-from finerplan import dates
+from finerplan.core import dates
 from finerplan.database import db
 
 

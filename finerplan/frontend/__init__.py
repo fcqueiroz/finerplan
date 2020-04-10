@@ -4,11 +4,11 @@ from flask import (
     Blueprint,
     current_app,
 )
-from .forms import AddTransactionForm
 
-from finerplan import sql, reports
+from finerplan.core import sql, reports
+from finerplan.frontend.forms import AddTransactionForm
 
-dashboard_blueprint = Blueprint("dashboard", "finerplan")
+dashboard_blueprint = Blueprint("dashboard", __name__, template_folder='templates')
 
 
 @dashboard_blueprint.route('/', methods=['GET', 'POST'])
