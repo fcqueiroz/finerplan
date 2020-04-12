@@ -1,5 +1,7 @@
 # FinerPlan - Financial Early Retirement Planner #
 
+![](https://github.com/fcqueiroz/finerplan/workflows/CI/badge.svg)
+
 This program intends to help those people seeking financial independence and 
 early retirement to track and analyze their finances. It's designed so that 
 you can focus on how to improve your savings rate and predict when you can set FIRE!
@@ -40,9 +42,10 @@ Some guidance for contributors:
 
 #### Checklist for creating a new release:
 
-* update CHANGELOG.md
-* update version number in setup.py
-* tag the release:
+* create a release-X.Y.Z branch
+* update [CHANGELOG](CHANGELOG.md)
+* update [VERSION](VERSION)
+* commit and push branch
+* if all CI tests pass, then tag the release and push it:
 > git tag -a vX.Y.Z
-* Push the tag to remote
 > git push origin vX.Y.Z
