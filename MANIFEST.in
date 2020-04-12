@@ -1,5 +1,8 @@
-graft finerplan/templates
 graft finerplan/static
+graft finerplan/frontend/templates
 include finerplan/schema.sql
 include tox.ini
 include tests/*
+include README.md
+include LICENSE
+include requirements.txt
