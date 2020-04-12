@@ -2,8 +2,11 @@ import locale
 from finerplan.sql import sum_query, ema
 from finerplan import dates
 
-locale.setlocale(locale.LC_ALL, 'en_CA.UTF-8')
-
+system_locale = locale.setlocale(locale.LC_ALL, '')
+if system_locale == 'C/UTF-8/C/C/C/C':
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+else:
+    locale.setlocale(locale.LC_ALL, '')
 
 def basic():
     """Generates basic reports for Overview page.
