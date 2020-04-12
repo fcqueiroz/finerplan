@@ -2,10 +2,18 @@
 
 ## [Unreleased]
 
-### Fixed
-- Security issue concerning the flask server visibility outside development machine.
-- The list of project package dependencies now contain all projects necessary for an install.
-- Removed commented code in HTML template as it was still executed by Jinja, raising errors.
+## [0.3.2] - 2020-04-06
+
+- Flask server visibility got limited to development machine.
+- Package dependencies were included in setup.py (including the correct 
+python minimum version i.e. 3.5).
+- Removed commented code in HTML template that raised errors. Apparently
+ Jinja does not care about HTML comments.
+- User name got a default value "Anon"
+- Add Transaction Form categories now update when page reload (before 
+it required a whole application restart).
+- Database connection is created per request and is not shared among 
+different threads anymore.
 
 ## [0.3.1] - 2020-03-27
 

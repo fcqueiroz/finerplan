@@ -1,6 +1,6 @@
 import locale
-from finerplan.sql import sum_query, ema
-from finerplan import dates
+from finerplan.core.sql import sum_query, ema
+from finerplan.core import dates
 
 system_locale = locale.setlocale(locale.LC_ALL, '')
 if system_locale == 'C/UTF-8/C/C/C/C':

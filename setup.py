@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='finerplan',
-    version='0.3.1',
+    version='0.3.2',
     packages=['finerplan'],
     include_package_data=True,
     install_requires=[
@@ -11,11 +11,5 @@ setup(
         'Flask-WTF',
         'pandas',
     ],
-    python_requires='>=3',
-    setup_requires=[
-        'pytest-runner',
-    ],
-    tests_require=[
-        'pytest',
-    ],
+    python_requires='>=3.5',
 )
