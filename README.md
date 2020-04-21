@@ -15,16 +15,13 @@ learning project before anything else.
 
 ### Getting Started
 
-For installing the application, run the following command within the projects root 
-directory finerplan/
+Clone the project source code, install it in editable mode and start 
+Flask development server from within the projects root directory:
 
-> pip install --editable .
-
-The editable flag allows editing source code without having to reinstall the Flask 
-app each time you make changes. You should then be able to start up the application 
-with the following commands:
-
-> flask run --port=5001  
+> git clone https://github.com/fcqueiroz/finerplan.git  
+> cd finerplan  
+> pip install --editable .  
+> flask run  
 
 The application will greet you on _http://localhost:5001/_
 
