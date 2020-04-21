@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    packages=find_namespace_packages(include=['finerplan.*']),
+    packages=find_namespace_packages(include=['finerplan', 'finerplan.*']),
     include_package_data=True,
     install_requires=install_requires,
     python_requires='~=3.6',
