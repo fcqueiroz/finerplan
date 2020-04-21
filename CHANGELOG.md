@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix distribution to include subpackages
+
 ## [0.3.3] - 2020-04-12
 
 - Implement github-actions to test and publish
