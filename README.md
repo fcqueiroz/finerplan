@@ -44,5 +44,5 @@ Some guidance for contributors:
 * update [VERSION](VERSION)
 * commit and push branch
 * if all CI tests pass, then tag the release and push it:
-> git tag -a vX.Y.Z
+> git tag -a vX.Y.Z  
 > git push origin vX.Y.Z

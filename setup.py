@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 import os
 
 
@@ -26,12 +26,13 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Framework :: Flask",
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    packages=['finerplan'],
+    packages=find_namespace_packages(include=['finerplan.*']),
     include_package_data=True,
     install_requires=install_requires,
     python_requires='~=3.6',
