@@ -7,15 +7,25 @@ from finerplan.database import db
 
 from tests import DataBaseFile
 
+_INSERT_EXPENSES_BEVERAGES = """
+INSERT INTO expenses (cash_date, description, value) 
+VALUES ('2020-03-14', 'beverages for Pi day', '200.0');"""
+_INSERT_EXPENSES_DONATION = """
+INSERT INTO expenses (cash_date, description, value) 
+VALUES ('2001-01-15', 'Donation to Wikipedia Foundation', '10000.00');"""
+_INSERT_EXPENSES_TOWEL = """
+INSERT INTO expenses (cash_date, description, value) 
+VALUES ('2020-05-25', 'A new towel', '15.99');"""
+_SELECT_COUNT_EXPENSES = "SELECT count(*) FROM expenses;"
+
 
 def test_database_connect_in_app_context(app):
     """Database connects using the app configuration."""
-    db.execute("INSERT INTO expenses (cash_date, description, value) "
-               "VALUES ('2020-03-14', 'beverages for Pi day', '200.0');")
+    db.execute(_INSERT_EXPENSES_BEVERAGES)
     db.commit()
 
     con = sqlite3.connect(app.config['SQLITE_DATABASE'])
-    assert con.execute("SELECT count(*) FROM expenses;").fetchone() == (1, )
+    assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
 
 
 def test_database_fails_outside_app_context():
@@ -42,34 +52,25 @@ def test_database_attach_app_context():
 
         with app1.app_context():
             db.create_all()
-            db.execute(
-                "INSERT INTO expenses (cash_date, description, value) "
-                "VALUES ('2020-03-14', 'beverages for Pi day', '200.0');"
-            )
+            db.execute(_INSERT_EXPENSES_BEVERAGES)
             db.commit()
 
         # Nothing was saved yet into app2 database
         con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
         with pytest.raises(sqlite3.OperationalError, match='no such table: expenses'):
-            con.execute("SELECT count(*) FROM expenses;").fetchone()
+            con.execute(_SELECT_COUNT_EXPENSES).fetchone()
 
         with app2.app_context():
             db.create_all()
-            db.execute(
-                "INSERT INTO expenses (cash_date, description, value) "
-                "VALUES ('2001-01-15', 'Donation to Wikipedia Foundation', '10000.00');"
-            )
-            db.execute(
-                "INSERT INTO expenses (cash_date, description, value) "
-                "VALUES ('2020-05-25', 'A new towel', '15.99');"
-            )
+            db.execute(_INSERT_EXPENSES_DONATION)
+            db.execute(_INSERT_EXPENSES_TOWEL)
             db.commit()
 
         con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
-        assert con.execute("SELECT count(*) FROM expenses;").fetchone() == (2,)
+        assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2,)
 
         con = sqlite3.connect(app1.config['SQLITE_DATABASE'])
-        assert con.execute("SELECT count(*) FROM expenses;").fetchone() == (1,)
+        assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1,)
 
 
 def test_database_persist_accross_requests():
@@ -80,15 +81,13 @@ def test_database_persist_accross_requests():
 
         with app.app_context():
             db.create_all()
-            db.execute("INSERT INTO expenses (cash_date, description, value) "
-                       "VALUES ('2020-03-14', 'beverages for Pi day', '200.0');")
+            db.execute(_INSERT_EXPENSES_BEVERAGES)
             db.commit()
-            assert db.execute("SELECT count(*) FROM expenses;").fetchone() == (1, )
+            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
 
         with app.app_context():
-            db.execute("INSERT INTO expenses (cash_date, description, value) "
-                       "VALUES ('2020-05-25', 'A new towel', '15.99');")
-            assert db.execute("SELECT count(*) FROM expenses;").fetchone() == (2, )
+            db.execute(_INSERT_EXPENSES_TOWEL)
+            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )
 
 
 def test_database_persist_accross_apps():
@@ -98,14 +97,12 @@ def test_database_persist_accross_apps():
         app1.config['SQLITE_DATABASE'] = tmp_file
         with app1.app_context():
             db.create_all()
-            db.execute("INSERT INTO expenses (cash_date, description, value) "
-                       "VALUES ('2020-03-14', 'beverages for Pi day', '200.0');")
+            db.execute(_INSERT_EXPENSES_BEVERAGES)
             db.commit()
-            assert db.execute("SELECT count(*) FROM expenses;").fetchone() == (1, )
+            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
 
         app2 = create_app(environment='testing')
         app2.config['SQLITE_DATABASE'] = tmp_file
         with app2.app_context():
-            db.execute("INSERT INTO expenses (cash_date, description, value) "
-                       "VALUES ('2020-05-25', 'A new towel', '15.99');")
-            assert db.execute("SELECT count(*) FROM expenses;").fetchone() == (2, )
+            db.execute(_INSERT_EXPENSES_TOWEL)
+            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )
