@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import pytest
 
-from finerplan.app import create_app
+from finerplan.app import create_app, create_tables
 from finerplan.database import db
 
 from tests import DataBaseFile
@@ -17,6 +17,6 @@ def app():
         _app.config['SQLITE_DATABASE'] = tmp_file
         ctx = _app.app_context()
         ctx.push()
-        db.create_all()
+        create_tables(_app, db.connection)
         yield _app
         ctx.pop()

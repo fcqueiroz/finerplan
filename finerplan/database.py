@@ -22,11 +22,6 @@ class SqliteDatabase(object):
             g.db = sqlite3.connect(database)
         return g.db
 
-    def create_all(self):
-        """Create the database tables from schema."""
-        with self._app.open_resource('schema.sql', mode='r') as f:
-            self.connect().executescript(f.read())
-
     @staticmethod
     def teardown_db(*args):
         """Close the database if it exists.

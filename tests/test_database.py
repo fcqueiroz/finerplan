@@ -2,7 +2,7 @@ import sqlite3
 
 import pytest
 
-from finerplan import create_app
+from finerplan.app import create_app, create_tables
 from finerplan.database import db
 
 from tests import DataBaseFile
@@ -53,7 +53,7 @@ def test_database_attach_app_context():
 
         with app1.app_context():
             con = db.connect()
-            db.create_all()
+            create_tables(app1, con)
             con.execute(_INSERT_EXPENSES_BEVERAGES)
             con.commit()
 
@@ -64,7 +64,7 @@ def test_database_attach_app_context():
 
         with app2.app_context():
             con = db.connect()
-            db.create_all()
+            create_tables(app2, con)
             con.execute(_INSERT_EXPENSES_DONATION)
             con.execute(_INSERT_EXPENSES_TOWEL)
             con.commit()
@@ -84,7 +84,7 @@ def test_database_persist_accross_requests():
 
         with app.app_context():
             con = db.connect()
-            db.create_all()
+            create_tables(app, con)
             con.execute(_INSERT_EXPENSES_BEVERAGES)
             con.commit()
             assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
@@ -102,7 +102,7 @@ def test_database_persist_accross_apps():
         app1.config['SQLITE_DATABASE'] = tmp_file
         with app1.app_context():
             con = db.connect()
-            db.create_all()
+            create_tables(app1, con)
             con.execute(_INSERT_EXPENSES_BEVERAGES)
             con.commit()
             assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
