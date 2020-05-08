@@ -24,9 +24,9 @@ def test_database_fails_outside_app_context():
         db.connect()
 
 
-@pytest.mark.xfail(reason="Database is bounded only to last initialized app.")
+@pytest.mark.xfail(reason="Database binds only to last initialized app.")
 def test_database_attach_app_context():
-    """Database is bounded only to the current app context.
+    """Database binds to the current app context.
 
     Checks that in a multi-app scenarion, the db global variable always
     use the current app context.
@@ -68,7 +68,7 @@ def test_database_attach_app_context():
         con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
         assert con.execute("SELECT count(*) FROM expenses;").fetchone() == (2,)
 
-        con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
+        con = sqlite3.connect(app1.config['SQLITE_DATABASE'])
         assert con.execute("SELECT count(*) FROM expenses;").fetchone() == (1,)
 
 
