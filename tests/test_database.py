@@ -35,7 +35,6 @@ def test_database_fails_outside_app_context():
         _ = db.connect()
 
 
-@pytest.mark.xfail(reason="Database binds only to last initialized app.")
 def test_database_attach_app_context():
     """Database binds to the current app context.
 

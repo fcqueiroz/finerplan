@@ -1,24 +1,24 @@
 import sqlite3
 
-from flask import g
+from flask import g, current_app, Flask
 
 
 class SqliteDatabase(object):
     """Control a Sqlite Database bounded to a Flask application context."""
-    def __init__(self, flaskapp=None):
+    def __init__(self, flaskapp: Flask = None):
         self._app = flaskapp
         if flaskapp is not None:
             self.init_app(flaskapp)
 
-    def init_app(self, flaskapp):
-        """Initializes the extension."""
+    def init_app(self, flaskapp: Flask):
+        """Initializes the flask application."""
         flaskapp.teardown_appcontext(self.teardown_db)
-        self._app = flaskapp
 
-    def connect(self):
+    @staticmethod
+    def connect():
         """Open a connection to the database storage."""
         if 'db' not in g:
-            database = self._app.config['SQLITE_DATABASE']
+            database = current_app.config['SQLITE_DATABASE']
             g.db = sqlite3.connect(database)
         return g.db
 

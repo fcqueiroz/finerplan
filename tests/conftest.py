@@ -17,6 +17,6 @@ def app():
         _app.config['SQLITE_DATABASE'] = tmp_file
         ctx = _app.app_context()
         ctx.push()
-        create_tables(_app, db.connection)
+        create_tables(_app, db.connect())
         yield _app
         ctx.pop()
