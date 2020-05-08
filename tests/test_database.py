@@ -21,8 +21,9 @@ _SELECT_COUNT_EXPENSES = "SELECT count(*) FROM expenses;"
 
 def test_database_connect_in_app_context(app):
     """Database connects using the app configuration."""
-    db.execute(_INSERT_EXPENSES_BEVERAGES)
-    db.commit()
+    con = db.connect()
+    con.execute(_INSERT_EXPENSES_BEVERAGES)
+    con.commit()
 
     con = sqlite3.connect(app.config['SQLITE_DATABASE'])
     assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
@@ -31,7 +32,7 @@ def test_database_connect_in_app_context(app):
 def test_database_fails_outside_app_context():
     """Database does not connect outside app context."""
     with pytest.raises(RuntimeError, match='outside of application context'):
-        db.connect()
+        _ = db.connect()
 
 
 @pytest.mark.xfail(reason="Database binds only to last initialized app.")
@@ -51,9 +52,10 @@ def test_database_attach_app_context():
         app2.config['SQLITE_DATABASE'] = tmp_file2
 
         with app1.app_context():
+            con = db.connect()
             db.create_all()
-            db.execute(_INSERT_EXPENSES_BEVERAGES)
-            db.commit()
+            con.execute(_INSERT_EXPENSES_BEVERAGES)
+            con.commit()
 
         # Nothing was saved yet into app2 database
         con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
@@ -61,10 +63,11 @@ def test_database_attach_app_context():
             con.execute(_SELECT_COUNT_EXPENSES).fetchone()
 
         with app2.app_context():
+            con = db.connect()
             db.create_all()
-            db.execute(_INSERT_EXPENSES_DONATION)
-            db.execute(_INSERT_EXPENSES_TOWEL)
-            db.commit()
+            con.execute(_INSERT_EXPENSES_DONATION)
+            con.execute(_INSERT_EXPENSES_TOWEL)
+            con.commit()
 
         con = sqlite3.connect(app2.config['SQLITE_DATABASE'])
         assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2,)
@@ -80,14 +83,16 @@ def test_database_persist_accross_requests():
         app.config['SQLITE_DATABASE'] = tmp_file
 
         with app.app_context():
+            con = db.connect()
             db.create_all()
-            db.execute(_INSERT_EXPENSES_BEVERAGES)
-            db.commit()
-            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
+            con.execute(_INSERT_EXPENSES_BEVERAGES)
+            con.commit()
+            assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
 
         with app.app_context():
-            db.execute(_INSERT_EXPENSES_TOWEL)
-            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )
+            con = db.connect()
+            con.execute(_INSERT_EXPENSES_TOWEL)
+            assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )
 
 
 def test_database_persist_accross_apps():
@@ -96,13 +101,15 @@ def test_database_persist_accross_apps():
         app1 = create_app(environment='testing')
         app1.config['SQLITE_DATABASE'] = tmp_file
         with app1.app_context():
+            con = db.connect()
             db.create_all()
-            db.execute(_INSERT_EXPENSES_BEVERAGES)
-            db.commit()
-            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
+            con.execute(_INSERT_EXPENSES_BEVERAGES)
+            con.commit()
+            assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (1, )
 
         app2 = create_app(environment='testing')
         app2.config['SQLITE_DATABASE'] = tmp_file
         with app2.app_context():
-            db.execute(_INSERT_EXPENSES_TOWEL)
-            assert db.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )
+            con = db.connect()
+            con.execute(_INSERT_EXPENSES_TOWEL)
+            assert con.execute(_SELECT_COUNT_EXPENSES).fetchone() == (2, )

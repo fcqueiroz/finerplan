@@ -7,7 +7,7 @@ from finerplan.database import db
 
 
 def sum_query(query_str, query_values):
-    result = db.execute('SELECT sum(value) FROM ' + query_str, query_values).fetchone()[0]
+    result = db.connect().execute('SELECT sum(value) FROM ' + query_str, query_values).fetchone()[0]
     if not isinstance(result, (int, float)):
         result = 0
     return result
@@ -22,7 +22,7 @@ def ema(alpha=0.15, beta=0.5, kind='simple'):
     sdate = dates.sdate()
     SOCM = sdate['SOCM']
     query = 'select accrual_date from expenses order by accrual_date;'
-    cur = db.execute(query)
+    cur = db.connect().execute(query)
     try:
         oldest_date = cur.fetchone()[0]
     except TypeError:
@@ -117,12 +117,12 @@ def transactions_table(kind=None, monthly=True, num=50):
                  'ORDER BY accrual_date DESC, id DESC '
                  'LIMIT ?;')
 
-    return db.execute(query, (num,)).fetchall()
+    return db.connect().execute(query, (num,)).fetchall()
 
 
 def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
-    return db.execute(
+    return db.connect().execute(
         ('SELECT pay_method,accrual_date,'
             'description,category,sum(value) '
          'FROM expenses '
@@ -135,7 +135,7 @@ def last_earnings():
     """Get all the current month earnings"""
     sdate = dates.sdate()
     SOCM, SOM = sdate['SOCM'], sdate['SOM']
-    return db.execute(
+    return db.connect().execute(
         ('SELECT accrual_date,cash_date,description,category,value '
          'FROM earnings '
          'WHERE accrual_date >= ? and accrual_date < ? '
@@ -147,7 +147,7 @@ def last_investments():
     """Get all the current month investments"""
     sdate = dates.sdate()
     SOCM, SOM = sdate['SOCM'], sdate['SOM']
-    return db.execute(
+    return db.connect().execute(
         ('SELECT accrual_date,cash_date,description,value '
          'FROM brokerage_transfers '
          'WHERE accrual_date >= ? and accrual_date < ? '
@@ -184,15 +184,15 @@ def insert_entry(form):
             t_val = round(( 100*(installment_quotient+installment_remainder) )
                             / 100,2)
         query_values = (method, accrual, cash, descr, cat_0, t_val)
-        db.execute(('INSERT INTO '+ query_str), query_values)
+        db.connect().execute(('INSERT INTO '+ query_str), query_values)
         if method == "Crédito" and installments > 1:
             t_val = installment_quotient
             for i in range(1, installments):
                 cash = cash + relativedelta(months=1)
                 query_values = (method, accrual, cash, descr, cat_0, t_val)
-                db.execute(('INSERT INTO '+ query_str), query_values)
+                db.connect().execute(('INSERT INTO '+ query_str), query_values)
         elif method == "Terceiros":
-            db.execute(
+            db.connect().execute(
                 ('INSERT INTO earnings ('
                     'accrual_date, cash_date, description, category, value) '
                  'Values(?, ?, ?, ?, ?)'),
@@ -204,16 +204,16 @@ def insert_entry(form):
         query_str = (table+' (accrual_date, cash_date, description, '
                      'category, value) Values(?, ?, ?, ?, ?)')
         query_values = (accrual, cash, descr, cat, t_val)
-        db.execute(('INSERT INTO '+ query_str), query_values)
+        db.connect().execute(('INSERT INTO '+ query_str), query_values)
     elif table == 'brokerage_transfers':
         query_str = (table+' (accrual_date, cash_date, description, '
                      'value) Values(?, ?, ?, ?)')
         query_values = (accrual, cash, descr, t_val)
-        db.execute(('INSERT INTO '+ query_str), query_values)
+        db.connect().execute(('INSERT INTO '+ query_str), query_values)
     else:
         return 2  # Unknown table
     try:
-        db.commit()
+        db.connect().commit()
     except:
         return 1  # Failed to commit changes to database
 
@@ -230,7 +230,7 @@ def generate_categories(table='expenses'):
         query = ('SELECT Category,count(Category) AS cont FROM earnings '
                  'GROUP BY Category ORDER BY cont DESC;')
 
-    return [(row[0], row[0]) for row in db.execute(query).fetchall()]
+    return [(row[0], row[0]) for row in db.connect().execute(query).fetchall()]
 
 
 
@@ -243,7 +243,7 @@ def expenses_table(months=13):
                  "FROM expenses "
                  "WHERE accrual_date >= ? and accrual_date < ? "
                  "GROUP BY category;")
-        result = db.execute(query, (sdate, fdate)).fetchall()
+        result = db.connect().execute(query, (sdate, fdate)).fetchall()
         label = sdate.strftime('%m/%y')
         tmp = pd.DataFrame(result, columns=['Category', label])
         df = pd.merge(df, tmp, how='outer',
@@ -274,13 +274,13 @@ def brokerage_balance():
     query = ('SELECT custodian,sum(value) '
              'FROM brokerage_transfers '
              'GROUP BY custodian;')
-    result = db.execute(query).fetchall()
+    result = db.connect().execute(query).fetchall()
 
     brokerage_in = pd.DataFrame(result, columns=['custodian', 'input'])
     query = ('SELECT custodian,sum(value) '
              'FROM investments '
              'GROUP BY custodian;')
-    result = db.execute(query).fetchall()
+    result = db.connect().execute(query).fetchall()
 
     brokerage_out = pd.DataFrame(result, columns=['custodian', 'output'])
 

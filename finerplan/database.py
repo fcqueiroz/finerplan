@@ -39,13 +39,5 @@ class SqliteDatabase(object):
         if _db is not None:
             _db.close()
 
-    def execute(self, *args, **kwargs):  # real signature unknown
-        """Proxy to Sqlite Connection.execute()."""
-        return self.connect().execute(*args, **kwargs)
-
-    def commit(self):
-        """Proxy to Sqlite Connection.commit()."""
-        self.connect().commit()
-
 
 db = SqliteDatabase()
