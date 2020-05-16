@@ -5,7 +5,4 @@ services:
     ports:
       - "5000:5000"
     volumes:
-    - ../finerplan:/code
-    depends_on:
-      - uwsgi
-  uwsgi:
+    - ../finerplan:/home/finerplan/src
