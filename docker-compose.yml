@@ -5,4 +5,4 @@ services:
     ports:
       - "5000:5000"
     volumes:
-    - ../finerplan:/home/finerplan/src
+    - ./finerplan:/home/finerplan/src
