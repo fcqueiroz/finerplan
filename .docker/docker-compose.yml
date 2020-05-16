@@ -1,0 +1,11 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+    - ../finerplan:/code
+    depends_on:
+      - uwsgi
+  uwsgi:
