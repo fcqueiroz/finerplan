@@ -7,7 +7,9 @@ from finerplan import database as db
 
 
 def sum_query(query_str, query_values):
-    result = db.connect().execute('SELECT sum(value) FROM ' + query_str, query_values).fetchone()[0]
+    cur = db.connect().cursor()
+    cur.execute('SELECT sum(value) FROM ' + query_str, query_values)
+    result =  cur.fetchone()[0]
     if not isinstance(result, (int, float)):
         result = 0
     return result
@@ -22,7 +24,8 @@ def ema(alpha=0.15, beta=0.5, kind='simple'):
     sdate = dates.sdate()
     SOCM = sdate['SOCM']
     query = 'select accrual_date from expenses order by accrual_date;'
-    cur = db.connect().execute(query)
+    cur = db.connect().cursor()
+    cur.execute(query)
     try:
         oldest_date = cur.fetchone()[0]
     except TypeError:
@@ -117,42 +120,50 @@ def transactions_table(kind=None, monthly=True, num=50):
                  'ORDER BY accrual_date DESC, id DESC '
                  'LIMIT ?;')
 
-    return db.connect().execute(query, (num,)).fetchall()
+    cur = db.connect().cursor()
+    cur.execute(query, (num,))
+    return cur.fetchall()
 
 
 def last_expenses(num=10):
     """Get last (default=10) entries in expenses database"""
-    return db.connect().execute(
+    cur = db.connect().cursor()
+    cur.execute(
         ('SELECT pay_method,accrual_date,'
             'description,category,sum(value) '
          'FROM expenses '
          'GROUP BY accrual_date, description '
          'ORDER BY accrual_date DESC, id DESC LIMIT ?;'),
-        (num,)).fetchall()
+        (num,))
+    return cur.fetchall()
 
 
 def last_earnings():
     """Get all the current month earnings"""
     sdate = dates.sdate()
     SOCM, SOM = sdate['SOCM'], sdate['SOM']
-    return db.connect().execute(
+    cur = db.connect().cursor()
+    cur.execute(
         ('SELECT accrual_date,cash_date,description,category,value '
          'FROM earnings '
          'WHERE accrual_date >= ? and accrual_date < ? '
          'ORDER BY accrual_date DESC, id DESC;'),
-        (SOCM, SOM)).fetchall()
+        (SOCM, SOM))
+    return cur.fetchall()
 
 
 def last_investments():
     """Get all the current month investments"""
     sdate = dates.sdate()
     SOCM, SOM = sdate['SOCM'], sdate['SOM']
-    return db.connect().execute(
+    cur = db.connect().cursor()
+    cur.execute(
         ('SELECT accrual_date,cash_date,description,value '
          'FROM brokerage_transfers '
          'WHERE accrual_date >= ? and accrual_date < ? '
          'ORDER BY accrual_date DESC, id DESC;'),
-        (SOCM, SOM)).fetchall()
+        (SOCM, SOM))
+    return cur.fetchall()
 
 
 def insert_entry(form):
@@ -167,6 +178,8 @@ def insert_entry(form):
     descr = form.description.data
     t_val = float(form.value.data.replace(',','.'))
     table = form.transaction.data
+    con = db.connect()
+    cur = con.cursor()
     if table == 'expenses':
         query_str = (table+' ( pay_method, accrual_date, cash_date, '
                      'description, category, value) Values(?, ?, ?, ?, ?, ?)')
@@ -184,15 +197,15 @@ def insert_entry(form):
             t_val = round(( 100*(installment_quotient+installment_remainder) )
                             / 100,2)
         query_values = (method, accrual, cash, descr, cat_0, t_val)
-        db.connect().execute(('INSERT INTO '+ query_str), query_values)
+        cur.execute(('INSERT INTO '+ query_str), query_values)
         if method == "Crédito" and installments > 1:
             t_val = installment_quotient
             for i in range(1, installments):
                 cash = cash + relativedelta(months=1)
                 query_values = (method, accrual, cash, descr, cat_0, t_val)
-                db.connect().execute(('INSERT INTO '+ query_str), query_values)
+                cur.execute(('INSERT INTO '+ query_str), query_values)
         elif method == "Terceiros":
-            db.connect().execute(
+            cur.execute(
                 ('INSERT INTO earnings ('
                     'accrual_date, cash_date, description, category, value) '
                  'Values(?, ?, ?, ?, ?)'),
@@ -204,16 +217,16 @@ def insert_entry(form):
         query_str = (table+' (accrual_date, cash_date, description, '
                      'category, value) Values(?, ?, ?, ?, ?)')
         query_values = (accrual, cash, descr, cat, t_val)
-        db.connect().execute(('INSERT INTO '+ query_str), query_values)
+        cur.execute(('INSERT INTO '+ query_str), query_values)
     elif table == 'brokerage_transfers':
         query_str = (table+' (accrual_date, cash_date, description, '
                      'value) Values(?, ?, ?, ?)')
         query_values = (accrual, cash, descr, t_val)
-        db.connect().execute(('INSERT INTO '+ query_str), query_values)
+        cur.execute(('INSERT INTO '+ query_str), query_values)
     else:
         return 2  # Unknown table
     try:
-        db.connect().commit()
+        con.commit()
     except:
         return 1  # Failed to commit changes to database
 
@@ -230,12 +243,16 @@ def generate_categories(table='expenses'):
         query = ('SELECT Category,count(Category) AS cont FROM earnings '
                  'GROUP BY Category ORDER BY cont DESC;')
 
-    return [(row[0], row[0]) for row in db.connect().execute(query).fetchall()]
+    cur = db.connect().cursor()
+    cur.execute(query)
+    super_cat = [(row[0], row[0]) for row in cur.fetchall()]
 
+    return super_cat
 
 
 def expenses_table(months=13):
     df = pd.DataFrame(columns=['Category'])
+    cur = db.connect().cursor()
     for num in range (months-1, -1, -1):
         sdate = dates.date.today() + relativedelta(day=1, months= - num)
         fdate = sdate + relativedelta(months=1)
@@ -243,7 +260,8 @@ def expenses_table(months=13):
                  "FROM expenses "
                  "WHERE accrual_date >= ? and accrual_date < ? "
                  "GROUP BY category;")
-        result = db.connect().execute(query, (sdate, fdate)).fetchall()
+        cur.execute(query, (sdate, fdate))
+        result = cur.fetchall()
         label = sdate.strftime('%m/%y')
         tmp = pd.DataFrame(result, columns=['Category', label])
         df = pd.merge(df, tmp, how='outer',
@@ -271,17 +289,18 @@ def expenses_table(months=13):
 
 
 def brokerage_balance():
+    cur = db.connect().cursor()
     query = ('SELECT custodian,sum(value) '
              'FROM brokerage_transfers '
              'GROUP BY custodian;')
-    result = db.connect().execute(query).fetchall()
-
+    cur.execute(query)
+    result = cur.fetchall()
     brokerage_in = pd.DataFrame(result, columns=['custodian', 'input'])
     query = ('SELECT custodian,sum(value) '
              'FROM investments '
              'GROUP BY custodian;')
-    result = db.connect().execute(query).fetchall()
-
+    cur.execute(query)
+    result = cur.fetchall()
     brokerage_out = pd.DataFrame(result, columns=['custodian', 'output'])
 
     brokerage = pd.merge(brokerage_in, brokerage_out, how='outer',
