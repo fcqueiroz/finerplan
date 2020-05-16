@@ -1,5 +1,6 @@
 *
-!finerplan/
+!finerplan/**
 !docker-compose.yml
 !Dockerfile
 !requirements.txt
+!wsgi.py

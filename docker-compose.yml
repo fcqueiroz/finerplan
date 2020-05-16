@@ -1,8 +1,31 @@
+# FinerPlan Web Server (uWSGI + NGINX)
+# References:
+# - https://pythonise.com/series/learning-flask/building-a-flask-app-with-docker-compose
 version: '3'
+
 services:
-  app:
+  finerplan:
+    image: finerplan:0.3.3
     build: .
-    ports:
-      - "5000:5000"
+    environment:
+      - APP=/usr/src/app
+      - PORT=3031
+      - FINERPLAN_DATABASE=/usr/src/app/finerplan.db
+      - FINERPLAN_SECRET_KEY=realfinerplan
     volumes:
-    - ./finerplan:/home/finerplan/src
+      - ./uwsgi.ini:/usr/src/app/uwsgi.ini:ro
+      - ./finerplan:/usr/src/app/finerplan:ro
+      - ./dev.finerplan.db:/usr/src/app/finerplan.db:rw
+    command: "uwsgi /usr/src/app/uwsgi.ini"
+    expose:
+      - 3031
+
+  nginx:
+    image: nginx:1.17-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./finerplan:/usr/share/nginx/html:ro
+    depends_on:
+      - finerplan
+    ports:
+      - 80:80
