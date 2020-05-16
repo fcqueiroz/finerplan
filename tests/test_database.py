@@ -1,9 +1,10 @@
+"""Test database module."""
 import sqlite3
 
 import pytest
 
 from finerplan.app import create_app, create_tables
-from finerplan.database import db
+from finerplan import database as db
 
 from tests import DataBaseFile
 

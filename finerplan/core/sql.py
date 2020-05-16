@@ -3,7 +3,7 @@ import pandas as pd
 from dateutil.relativedelta import *
 
 from finerplan.core import dates
-from finerplan.database import db
+from finerplan import database as db
 
 
 def sum_query(query_str, query_values):

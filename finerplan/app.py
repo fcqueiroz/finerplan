@@ -4,7 +4,7 @@ import sqlite3
 from flask import Flask
 
 from finerplan.config import obtain_config_object
-from finerplan.database import db
+from finerplan import database as db
 from finerplan.frontend import dashboard_blueprint
 
 
