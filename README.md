@@ -1,5 +1,7 @@
 # FinerPlan - Financial Early Retirement Planner #
 
+![](https://github.com/fcqueiroz/finerplan/workflows/CI/badge.svg)
+
 This program intends to help those people seeking financial independence and 
 early retirement, so this can be helpful to track and analyze their finances.
 It's designed so that you can focus on how to improve your savings rate and
@@ -14,16 +16,13 @@ learning project before anything else.
 
 ### Getting Started
 
-To install the application, run the following command within the project root 
-directory finerplan/
+Clone the project source code, install it in editable mode and start 
+Flask development server from within the projects root directory:
 
-> pip install --editable .
-
-The editable flag allows editing source code without having to reinstall the Flask 
-application each time you make changes. You should then be able to start the application 
-with the command:
-
-> flask run --port=5001  
+> git clone https://github.com/fcqueiroz/finerplan.git  
+> cd finerplan  
+> pip install --editable .  
+> flask run  
 
 The application will greet you on _http://localhost:5001/_
 
@@ -41,9 +40,10 @@ Some guidance for contributors:
 
 #### Checklist for creating a new release:
 
-* update CHANGELOG.md
-* update version number in setup.py
-* tag the release:
-> git tag -a vX.Y.Z
-* Push the tag to remote
+* create a release-X.Y.Z branch
+* update [CHANGELOG](CHANGELOG.md)
+* update [VERSION](VERSION)
+* commit and push branch
+* if all CI tests pass, then tag the release and push it:
+> git tag -a vX.Y.Z  
 > git push origin vX.Y.Z

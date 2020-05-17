@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+- Fix distribution to include subpackages
+
+## [0.3.3] - 2020-04-12
+
+- Implement github-actions to test and publish
+- Update package metadata and publish to PyPI
+- Implement first tests
+- Drop support to python==3.5.* because pandas>=1.1 requires python>=3.6.1
+
 ## [0.3.2] - 2020-04-06
 
 - Flask server visibility got limited to development machine.
