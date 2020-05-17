@@ -1,23 +1,29 @@
 import locale
+import sys
 from finerplan.core.sql import sum_query, ema
 from finerplan.core import dates
 
 
-def _assure_locale(default="pt_BR.UTF-8", verified=('LC_MONETARY', 'LC_TIME')):
-    """Prevent Bug #29 by setting the default locale as pt_BR.UTF-8.
+def _relevant_locale_settings():
+    """Return generator for locale settings that must be configured."""
+    yield 'LC_MONETARY'
+    yield 'LC_TIME'
+    yield 'LC_NUMERIC'
 
-    :param default:
-        The default locale in case it is not defined for the system.
-    :param verified:
-        A tuple containing the locale settings that must be configured.
-    """
-    locale.setlocale(locale.LC_ALL, '')
 
-    for lc in verified:
+def _obtain_user_locale():
+    try:
+        locale.setlocale(locale.LC_ALL, '')
+    except locale.Error:
+        sys.exit("Could not obtain system default locale.")
+
+
+def _assure_valid_locale():
+    """Prevent Bug #29 by exiting when locale is C/POSIX."""
+    for lc in _relevant_locale_settings():
         language_code, encoding = locale.getlocale(category=getattr(locale, lc))
         if language_code is None or encoding is None:
-            locale.setlocale(locale.LC_ALL, default)
-            break
+            sys.exit(f"Host system must provide locale but '{lc}' is undefined.")
 
 
 def basic():
@@ -110,4 +116,5 @@ def basic():
             'credit_state': invoice_state}
 
 
-_assure_locale()
+_obtain_user_locale()
+_assure_valid_locale()
