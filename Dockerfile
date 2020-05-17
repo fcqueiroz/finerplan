@@ -3,8 +3,6 @@
 # - https://hackersandslackers.com/deploy-flask-uwsgi-nginx/
 # - https://medium.com/bitcraft/docker-composing-a-python-3-flask-app-line-by-line-93b721105777
 # - https://medium.com/@greut/minimal-python-deployment-on-docker-with-uwsgi-bc5aa89b3d35
-# TODO: In a regular image, locales use 31MB and manual pages another 5MB
-# We can possibly reduce 35MB in image size by compiling our own image
 
 FROM debian:bullseye-slim
 
@@ -16,6 +14,20 @@ RUN apt-get update && \
 # Install Python dependencies for app
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+
+# Configure timezone and locales
+# Ref: https://serverfault.com/a/689947
+RUN apt-get update && \
+    apt-get install -y locales && \
+    echo "America/Sao_Paulo" > /etc/timezone && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && \
+    echo 'LANG="pt_BR.UTF-8"'>/etc/default/locale && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=pt_BR.UTF-8 && \
+    apt-get remove -y locales && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the directory where we'll be running the app
 ENV APP_FOLDER /usr/src/app
