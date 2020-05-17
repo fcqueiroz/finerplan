@@ -1,9 +1,10 @@
 from datetime import date, datetime
 from dateutil.relativedelta import *
 
-from .finerplan import app
-
 __MODEL = '%Y-%m-%d'
+
+CREDIT_CLOSING = 11  # Day of month when the credit card invoice closes
+CREDIT_PAYMENT = 25  # Day of month when the credit card invoice is paid
 
 
 def date_converter(_date):
@@ -23,15 +24,15 @@ def cash(_date):
     closing the invoice.
     """
     _date = date_converter(_date)
-    cash_date = _date.replace(day=app.config['CREDIT_PAYMENT'])
-    if _date.day > app.config['CREDIT_CLOSING']:
+    cash_date = _date.replace(day=CREDIT_PAYMENT)
+    if _date.day > CREDIT_CLOSING:
         cash_date = cash_date + relativedelta(months=1)
     return cash_date
 
 
 def credit_state():
-    if ((date.today().day > app.config['CREDIT_CLOSING'])
-            and (date.today().day < app.config['CREDIT_PAYMENT'])):
+    if ((date.today().day > CREDIT_CLOSING)
+            and (date.today().day < CREDIT_PAYMENT)):
         return True
     else:
         return False
@@ -46,8 +47,8 @@ def sdate():
     EOM = date.today() + relativedelta(day=31)  # End Of [current] Month
     SOM = date.today() + relativedelta(months=1, day=1)  # Start Of [next] Month
     # Date of credit card's next payment
-    NEXT_PAY = date.today().replace(day=app.config['CREDIT_PAYMENT'])
-    if date.today().day >= app.config['CREDIT_PAYMENT']:
+    NEXT_PAY = date.today().replace(day=CREDIT_PAYMENT)
+    if date.today().day >= CREDIT_PAYMENT:
         NEXT_PAY = NEXT_PAY + relativedelta(months=1)
     FOLLOWING_NEXT_PAY = NEXT_PAY + relativedelta(months=1)
     MONTH_PROGRESS = date.today().day / EOM.day
