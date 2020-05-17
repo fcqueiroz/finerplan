@@ -2,7 +2,22 @@ import locale
 from finerplan.core.sql import sum_query, ema
 from finerplan.core import dates
 
-locale.setlocale(locale.LC_ALL, '')
+
+def _assure_locale(default="pt_BR.UTF-8", verified=('LC_MONETARY', 'LC_TIME')):
+    """Prevent Bug #29 by setting the default locale as pt_BR.UTF-8.
+
+    :param default:
+        The default locale in case it is not defined for the system.
+    :param verified:
+        A tuple containing the locale settings that must be configured.
+    """
+    locale.setlocale(locale.LC_ALL, '')
+
+    for lc in verified:
+        language_code, encoding = locale.getlocale(category=getattr(locale, lc))
+        if language_code is None or encoding is None:
+            locale.setlocale(locale.LC_ALL, default)
+            break
 
 
 def basic():
@@ -93,3 +108,6 @@ def basic():
             'credit_value': locale.currency(invoice_value, grouping=True),
             'credit_nvalue': locale.currency(next_invoice_value, grouping=True),
             'credit_state': invoice_state}
+
+
+_assure_locale()
