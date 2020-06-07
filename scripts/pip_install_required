@@ -1,0 +1,116 @@
+#!/bin/bash
+# Install FinerPlan python dependencies.
+# 
+# Author: @fcqueiroz, Created: 2020-06-01
+
+# Configurable parameters
+REQUIREMENTS_FILE='/vagrant/finerplan/dev/requirements.txt'
+TEMP_FOLDER='/tmp/finerplan'
+F_VERBOSE=0
+
+set -o errexit
+set -o pipefail
+
+readonly SCRIPT_NAME=$(basename $0)
+readonly ROOT_ID=0
+readonly WORKING_DIR="$PWD"
+
+trap "die 'Cancelled by the user.'" INT
+trap "die 'Something went wrong.'" ERR
+trap finally EXIT
+
+# --------------------------
+# Section 0: Helpers
+# --------------------------
+
+## Print message to stderr and exit return code 1.
+die(){
+  local message=$1
+  echo "ERROR: $message" >&2
+  exit 1
+}
+
+## Print message to stdout
+inform(){
+  local message=$1
+  [ $F_VERBOSE -gt 0 ] && echo "INFO: $message"
+}
+
+require_command(){
+  local cmd=$1
+  [ $(command -v $cmd) ] || die "Command '$cmd' is required but is not available."
+}
+
+
+# ----------------------------------
+# Section 1: Install Python Packages
+# ----------------------------------
+
+# Configure and verify python packages
+update_environment(){
+  require_command 'pip3'
+  require_command 'python3'
+  
+  inform "Installing python dependencies..."  
+  pip3 install --no-cache-dir -q -r "$REQUIREMENTS_FILE"
+  
+  local test_imports="$TEMP_FOLDER/requirements.py"
+  cat > $test_imports <<EOF
+import flask
+import flask_wtf
+import pandas
+import dotenv
+
+EOF
+
+  cd $TEMP_FOLDER
+  if python3 -m requirements; then
+    inform "Python dependencies are satisfied."
+  else
+    die "Could not verify python dependencies."
+  fi
+}
+
+usage(){
+  cat <<EOF
+  Install FinerPlan python dependencies.
+
+usage: $SCRIPT_NAME [options]
+
+-h, --help            Print this help and exit.
+-v, --verbose         Show more information.
+-r, --requirements    Install from the given requirements file.
+
+EOF
+}
+
+main(){
+  # Default options
+  local python_user=$(whoami)
+  
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -h|--help)          usage
+                          exit ;;
+      -v|--verbose)       F_VERBOSE=1 ;;
+      -r|--requirements)  REQUIREMENTS_FILE=$2
+                          shift ;;
+      *)              die "Unknown parameter '$1'. For usage try '$SCRIPT_NAME --help'." ;;
+    esac
+    shift
+  done
+
+  mkdir $TEMP_FOLDER || die "Temp folder '$TEMP_FOLDER' already exists."
+  update_environment
+}
+
+
+finally(){
+  if [ -d $TEMP_FOLDER ]; then
+    rm -r $TEMP_FOLDER/
+  fi
+  cd "$WORKING_DIR"
+}
+
+main "$@"
+

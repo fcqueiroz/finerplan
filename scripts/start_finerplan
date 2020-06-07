@@ -1,0 +1,65 @@
+#!/bin/bash
+# Start FinerPlan
+
+# Configurable parameters
+FINERPLAN_DEV_ROOT=/vagrant/finerplan/dev
+readonly DEV_LOG_FILE=$FINERPLAN_DEV_ROOT/finerplan.log
+
+set -o errexit
+
+readonly SCRIPT_NAME=$(basename $0)
+readonly WORKING_DIR="$PWD"
+
+trap "die 'Cancelled by the user.'" INT
+trap "die 'Something went wrong.'" ERR
+trap "cd '$WORKING_DIR'" EXIT
+
+## Print message to stderr and exit return code 1.
+die(){
+  local message=$1
+  echo "ERROR: $message" >&2
+  exit 1
+}
+
+start_dev(){
+  cd $FINERPLAN_DEV_ROOT
+  nohup flask run >&2 2>>$DEV_LOG_FILE &
+}
+
+start_prd(){
+  uwsgi /etc/uwsgi/apps-enabled/finerplan.ini
+}
+
+check_environment(){
+  [ ! -z "$FINERPLAN_DATABASE" ] || die "FINERPLAN_DATABASE is null or unset."
+  [ -w "$FINERPLAN_DATABASE" ] || die "FINERPLAN_DATABASE is not writable."
+  [ ! -z "$FINERPLAN_SECRET_KEY" ] || die "FINERPLAN_SECRET_KEY is null or unset."
+}
+
+usage(){
+  cat <<EOF
+  Start FinerPlan.
+
+usage: $SCRIPT_NAME {development|production}
+
+development       Start FinerPlan using flask server.
+production        Start FinerPlan using uWSGI.
+
+EOF
+}
+
+main(){
+  if [ $# -gt 0 ]; then
+    check_environment
+    case "$1" in
+      development)    start_dev ;;
+      production)     start_prd ;;
+      *)              usage ;;
+    esac
+  else
+    usage
+  fi
+}
+
+main "$@"
+

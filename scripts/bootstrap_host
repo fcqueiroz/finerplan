@@ -1,0 +1,137 @@
+#!/bin/bash
+# Install FinerPlan system dependencies and configure locale/timezone.
+#
+# Ref: https://serverfault.com/a/689947
+#
+# Author: @fcqueiroz, Created: 2020-06-01
+
+# Configurable parameters
+SERVER_TIMEZONE='America/Sao_Paulo'
+SERVER_LOCALE='pt_BR.UTF-8'
+F_VERBOSE=0
+
+set -o errexit
+set -o pipefail
+
+readonly SCRIPT_NAME=$(basename $0)
+readonly ROOT_ID=0
+
+trap "die 'Cancelled by the user.'" INT
+trap "die 'Something went wrong.'" ERR
+
+# --------------------------
+# Section 0: Helpers
+# --------------------------
+
+## Print message to stderr and exit return code 1.
+die(){
+  local message=$1
+  echo "ERROR: $message" >&2
+  exit 1
+}
+
+## Print message to stdout
+inform(){
+  local message=$1
+  [ $F_VERBOSE -gt 0 ] && echo "INFO: $message"
+}
+
+require_root(){
+  [ $UID -eq $ROOT_ID ] || die "Must be root to execute!"
+}
+
+require_command(){
+  local cmd=$1
+  [ $(command -v $cmd) ] || die "Command '$cmd' is required but is not available."
+}
+
+
+# ---------------------------------------------------
+# Section 1-A: Prepare system enviroment
+# ---------------------------------------------------
+
+install_minimal(){
+  inform "Checking system packages..."
+  apt-get -qq install python3-pip locales
+  inform "System packages are up to date."
+}
+
+  
+  
+update_timezone(){
+  require_command 'timedatectl'
+  
+  is_timezone_set(){
+    [ $(timedatectl | grep -c -i "$SERVER_TIMEZONE") -eq 1 ]
+  }
+  
+  if is_timezone_set; then
+    inform "Timezone is already set. Skipped..."
+  else
+    timedatectl set-timezone "$SERVER_TIMEZONE"
+    is_timezone_set || die "Couldn't set the timezone."
+    inform "Timezone was gracefully set to $SERVER_TIMEZONE."
+  fi
+}
+
+# Configure and verify locale
+update_locale(){
+  require_command 'locale'
+  
+  is_locale_set(){
+    [ $(locale | grep 'LC_' | grep -c "POSIX") -eq 0 ] &&
+    [ $(localectl status | grep -c "$SERVER_LOCALE") -eq 1 ]
+  }
+  
+  if is_locale_set; then
+    inform "Locale is already set. Skipped..."
+  else
+    echo "LANG='$SERVER_LOCALE'" > /etc/default/locale
+    sed -i -e "s/# $SERVER_LOCALE/$SERVER_LOCALE/" /etc/locale.gen
+    dpkg-reconfigure --frontend=noninteractive locales
+    update-locale LANG=$SERVER_LOCALE
+    is_locale_set || die "Couldn't set the locale."
+    inform "Locale was gracefully set to $SERVER_LOCALE."
+  fi
+}
+
+usage(){
+  cat <<EOF
+  Install FinerPlan system dependencies.
+
+usage: $SCRIPT_NAME [options]
+
+-h, --help        Print this help and exit.
+-v, --verbose     Show more information.
+-l, --locale      Set locale
+-t, --timezone    Set timezone
+
+EOF
+}
+
+main(){
+  require_root
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -h|--help)      usage
+                      exit ;;
+      -v|--verbose)   F_VERBOSE=1 ;;
+      -l|--locale)    SERVER_LOCALE=$2
+                      shift ;;
+      -t|--timezone)  SERVER_TIMEZONE=$2
+                      shift ;;
+      *)              die "Unknown parameter '$1'. For usage try '$SCRIPT_NAME --help'." ;;
+    esac
+    shift
+  done
+
+  export DEBIAN_FRONTEND=noninteractive
+  
+  install_minimal
+  update_timezone
+  update_locale
+}
+
+main "$@"
+
