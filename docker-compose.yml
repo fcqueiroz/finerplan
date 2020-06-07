@@ -6,21 +6,17 @@ version: '3'
 
 services:
   finerplan:
+    container_name: dev_finerplan
     image: finerplan:0.3.3
     build: .
-    env_file:
-      - .env
     environment:
-      - APP_FOLDER=$APP_FOLDER
-      - UWSGI_PORT=$UWSGI_PORT
-      - UWSGI_USER=$UWSGI_USER
-      - FINERPLAN_SECRET_KEY=$FINERPLAN_SECRET_KEY
+      - FINERPLAN_SECRET_KEY
+      - FINERPLAN_PORT=3031
     volumes:
-      - ./uwsgi.ini:${APP_FOLDER}/uwsgi.ini:ro
-      - ./finerplan:${APP_FOLDER}/finerplan:ro
-      - ./dev.finerplan.db:${APP_FOLDER}/finerplan.db:rw
+      - ./uwsgi.ini:/etc/uwsgi/apps-enabled/finerplan.ini:ro
+      - ./dev.db:/var/lib/finerplan/app.db:rw
     expose:
-      - ${UWSGI_PORT}
+      - 3031
 
   nginx:
     image: nginx:1.17-alpine

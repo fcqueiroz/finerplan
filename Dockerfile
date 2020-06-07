@@ -4,63 +4,52 @@
 # - https://medium.com/bitcraft/docker-composing-a-python-3-flask-app-line-by-line-93b721105777
 # - https://medium.com/@greut/minimal-python-deployment-on-docker-with-uwsgi-bc5aa89b3d35
 
-FROM debian:bullseye-slim
+FROM debian:bullseye-20200514-slim
 
-# Install system dependencies
 RUN apt-get update && \
-    apt-get install -y uwsgi uwsgi-plugin-python3 python3-pip && \
+    apt-get -qq install uwsgi uwsgi-plugin-python3 python3-pip locales && \
+    apt-get purge -y gcc && apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies for app
-COPY ./requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 # Configure timezone and locales
 # Ref: https://serverfault.com/a/689947
-RUN apt-get update && \
-    apt-get install -y locales && \
-    rm -rf /var/lib/apt/lists/*
-ARG lang_opt_1=pt_BR.UTF-8
-ARG lang_opt_2=en_US.UTF-8
+ARG DEFAULT_LANG=pt_BR.UTF-8
 RUN echo "America/Sao_Paulo" > /etc/timezone && \
     dpkg-reconfigure -f noninteractive tzdata && \
-    sed -i -e "s/# $lang_opt_2 UTF-8/$lang_opt_2 UTF-8/" /etc/locale.gen && \
-    sed -i -e "s/# $lang_opt_1 UTF-8/$lang_opt_1 UTF-8/" /etc/locale.gen && \
-    echo "LANG='$lang_opt_1'">/etc/default/locale && \
+    sed -i -e "s/# $DEFAULT_LANG/$DEFAULT_LANG/" /etc/locale.gen && \
+    echo "LANG='$DEFAULT_LANG'">/etc/default/locale && \
     dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=$lang_opt_1
-ENV LANG $lang_opt_1
+    update-locale LANG=$DEFAULT_LANG
+ENV LANG $DEFAULT_LANG
 
-# Set the directory where we'll be running the app
-ENV APP_FOLDER /usr/src/app
+ARG APP_FOLDER=/var/lib/finerplan
 RUN mkdir -p $APP_FOLDER
 WORKDIR $APP_FOLDER
 
-# Create unprivileged user for running the web server
-ENV UWSGI_USER uwsgi
+ARG UWSGI_USER=uwsgi
 RUN useradd -r -M -s /usr/sbin/nologin $UWSGI_USER && \
     chown -R $UWSGI_USER:$UWSGI_USER $APP_FOLDER
+ENV UWSGI_USER $UWSGI_USER
 
-# Define volume containing the uwsgi configuration
-VOLUME $APP_FOLDER/uwsgi.ini
+ARG REQUIREMENTS_FILE=./requirements.txt
+COPY $REQUIREMENTS_FILE /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
-# Define volume containing the source code
-VOLUME $APP_FOLDER/finerplan
-# Copy uwsgi app entrypoint
-COPY ./wsgi.py $APP_FOLDER/wsgi.py
+ARG PACKAGE_LOCAL=./dist/finerplan-0.3.3-py3-none-any.whl
+COPY $PACKAGE_LOCAL /tmp/finerplan-0.3.3-py3-none-any.whl
+RUN pip3 install --no-cache-dir /tmp/finerplan-0.3.3-py3-none-any.whl
 
-# Set the port uWSGI will listen on
-ENV UWSGI_PORT 3031
-EXPOSE $UWSGI_PORT
+ARG WSGI_ENTRYPOINT=./wsgi.py
+COPY $WSGI_ENTRYPOINT $APP_FOLDER/wsgi.py
+COPY ./scripts/start_finerplan $APP_FOLDER/start_finerplan
 
-# Set FinerPlan environment variables
+VOLUME $APP_FOLDER/app.db
+VOLUME /etc/uwsgi/apps-enabled/finerplan.ini
+
 ENV FINERPLAN_SECRET_KEY realfinerplan
-ENV FINERPLAN_DATABASE $APP_FOLDER/finerplan.db
-VOLUME $APP_FOLDER/finerplan.db
+ENV FINERPLAN_DATABASE $APP_FOLDER/app.db
+ENV FINERPLAN_PORT 3031
+EXPOSE $FINERPLAN_PORT
 
-# Set uwsgi with proper configuration as the default command to run
-CMD ["uwsgi", "uwsgi.ini"]
+CMD ["./start_finerplan", "production"]
 
-
-
-## Steps in comments
