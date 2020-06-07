@@ -1,3 +1,3 @@
-from finerplan.app import create_app
+from finerplan import create_app
 
 application = create_app()

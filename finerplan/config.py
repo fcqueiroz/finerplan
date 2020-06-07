@@ -18,7 +18,7 @@ class Default(object):
 class Development(Default):
     """Development configuration."""
     SECRET_KEY = "finerplan"
-    SQLITE_DATABASE = os.path.join(PROJECT_ROOT, "dev.finerplan.db")
+    SQLITE_DATABASE = os.path.join(PROJECT_ROOT, "dev.db")
 
     EXPLAIN_TEMPLATE_LOADING = True
 

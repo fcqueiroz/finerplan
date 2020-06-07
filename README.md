@@ -14,6 +14,8 @@ learning project before anything else.
 
 ## Development
 
+NOTE: The master branch of this repository tracks the very latest development and may contain features and changes that do not exist on any released version. To find the spec for a specific version, look in the versions subdirectory.
+
 ### Getting Started
 
 Clone the project source code, install it in editable mode and start 
@@ -21,10 +23,10 @@ Flask development server from within the projects root directory:
 
 > git clone https://github.com/fcqueiroz/finerplan.git  
 > cd finerplan  
-> pip install --editable .  
+> pip install -r requirements.txt  
 > flask run  
 
-The application will greet you on _http://localhost:5001/_
+The application will greet you on _http://localhost:5000/_
 
 ### Contributing
 
