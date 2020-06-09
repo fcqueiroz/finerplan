@@ -23,17 +23,15 @@ trap "die 'Something went wrong.'" ERR
 # Section 0: Helpers
 # --------------------------
 
-## Print message to stderr and exit return code 1.
 die(){
   local message=$1
   echo "ERROR: $message" >&2
   exit 1
 }
 
-## Print message to stdout
 inform(){
   local message=$1
-  [ $F_VERBOSE -gt 0 ] && echo "INFO: $message"
+  [ $F_VERBOSE -eq 0 ] || echo "INFO: $message"
 }
 
 require_root(){
@@ -56,8 +54,7 @@ install_minimal(){
   inform "System packages are up to date."
 }
 
-  
-  
+
 update_timezone(){
   require_command 'timedatectl'
   
