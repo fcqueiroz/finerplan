@@ -17,7 +17,7 @@ services:
       - FINERPLAN_PORT=3031
     volumes:
       - ./uwsgi.ini:/etc/uwsgi/apps-enabled/finerplan.ini:ro
-      - ./dev.db:/var/lib/finerplan/app.db:rw
+      - ${FINERPLAN_DATABASE}:/var/lib/finerplan/app.db:rw
     expose:
       - 3031
 
