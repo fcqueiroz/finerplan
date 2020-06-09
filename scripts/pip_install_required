@@ -4,7 +4,7 @@
 # Author: @fcqueiroz, Created: 2020-06-01
 
 # Configurable parameters
-REQUIREMENTS_FILE='/vagrant/finerplan/dev/requirements.txt'
+REQUIREMENTS_FILE='./requirements.txt'
 TEMP_FOLDER='/tmp/finerplan'
 F_VERBOSE=0
 
@@ -23,17 +23,15 @@ trap finally EXIT
 # Section 0: Helpers
 # --------------------------
 
-## Print message to stderr and exit return code 1.
 die(){
   local message=$1
   echo "ERROR: $message" >&2
   exit 1
 }
 
-## Print message to stdout
 inform(){
   local message=$1
-  [ $F_VERBOSE -gt 0 ] && echo "INFO: $message"
+  [ $F_VERBOSE -eq 0 ] || echo "INFO: $message"
 }
 
 require_command(){
