@@ -10,7 +10,7 @@ with open(os.path.join(here, "README.md")) as f:
     long_description = f.read()
 
 with open(os.path.join(here, "VERSION")) as f:
-    version = f.read()
+    version = f.read().strip()
 
 setup(
     name="finerplan",
