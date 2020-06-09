@@ -26,10 +26,12 @@ To find the spec for a specific version, look in the versions subdirectory.
 Clone the project source code, install it in editable mode and start 
 Flask development server from within the projects root directory:
 
-> git clone https://github.com/fcqueiroz/finerplan.git  
-> cd finerplan  
-> pip install -r requirements.txt  
-> flask run  
+```bash
+git clone https://github.com/fcqueiroz/finerplan.git
+cd finerplan
+pip install -r requirements.txt
+flask run
+```
 
 The application will greet you on _http://localhost:5000/_
 
@@ -41,10 +43,12 @@ builds and runs Nginx container as reverse proxy and a uWSGI server
 providing FinerPlan application.
 
 Example:
-> python3 setup.py sdist bdist_wheel  
-> export FINERPLAN_VERSION=$(cat VERSION)  
-> export FINERPLAN_DATABASE=dev.db  
-> docker-compose up --build  
+```bash
+python3 setup.py sdist bdist_wheel
+export FINERPLAN_VERSION=$(cat VERSION)
+export FINERPLAN_DATABASE=dev.db
+docker-compose up --build
+```
 
 The application will greet you on _http://localhost/_
 
@@ -67,5 +71,7 @@ Some guidance for contributors:
 * update [VERSION](VERSION)
 * commit and push branch
 * if all CI tests pass, then tag the release and push it:
-> git tag -a vX.Y.Z  
-> git push origin vX.Y.Z  
+```bash
+git tag -a vX.Y.Z
+git push origin vX.Y.Z
+```
