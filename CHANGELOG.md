@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [0.3.4] - 2020-06-08
+
 - Fix distribution to include subpackages.
 - Require python>=3.6.1
 - Include docker deploy option with uWSGI.
