@@ -1,7 +1,5 @@
 # FinerPlan - Financial Early Retirement Planner #
 
-![](https://github.com/fcqueiroz/finerplan/workflows/CI/badge.svg)
-
 This program intends to help those people seeking financial independence and 
 early retirement, so this can be helpful to track and analyze their finances.
 It's designed so that you can focus on how to improve your savings rate and
@@ -11,6 +9,11 @@ predict when you can set FIRE!
 This is my first big project and the program is still in a really early 
 development stage. It's not well suited for any kind of serious work. This is a
 learning project before anything else.
+
+## Requirements
+
+- Python >=3.6.1
+- A defined locale (other than C/POSIX)
 
 ## Development
 

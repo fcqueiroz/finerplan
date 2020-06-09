@@ -2,27 +2,23 @@
 
 ## [Unreleased]
 
-- Fix distribution to include subpackages
+- Fix distribution to include subpackages.
+- Require python>=3.6.1
+- Include docker deploy option with uWSGI.
+- Include scripts for easier install on Debian host.
 
 ## [0.3.3] - 2020-04-12
 
-- Implement github-actions to test and publish
-- Update package metadata and publish to PyPI
-- Implement first tests
-- Drop support to python==3.5.* because pandas>=1.1 requires python>=3.6.1
+- Implement first tests.
+- Drop support to python==3.5.*
 
 ## [0.3.2] - 2020-04-06
 
-- Flask server visibility got limited to development machine.
-- Package dependencies were included in setup.py (including the correct 
-python minimum version i.e. 3.5).
-- Removed commented code in HTML template that raised errors. Apparently
- Jinja does not care about HTML comments.
-- User name got a default value "Anon"
-- Add Transaction Form categories now update when page reload (before 
-it required a whole application restart).
-- Database connection is created per request and is not shared among 
-different threads anymore.
+- Include package dependencies.
+- Remove HTML comments that raise errors in Jinja.
+- Define User name default value as "Anon"
+- Fix AddTransactionForm categories to update on page reload.
+- Create new database connection per request and do not share among different threads.
 
 ## [0.3.1] - 2020-03-27
 
@@ -31,7 +27,7 @@ Also, from now on this project adopts the [Semantic Versioning](https://semver.o
 
 ## [0.3] - 2019-06-23
 ### Added
-- The UI was updated using 
+- Adopt 
 [SRTdash admin dashboard](https://github.com/puikinsh/srtdash-admin-dashboard) template.
 - New expenses/earnings categories can be added while including a new transaction.
 
