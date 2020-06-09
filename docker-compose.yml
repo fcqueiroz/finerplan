@@ -7,7 +7,7 @@ version: '3'
 services:
   finerplan:
     container_name: dev_finerplan
-    image: finerplan:0.3.3
+    image: finerplan:$FINERPLAN_VERSION
     build: .
     environment:
       - FINERPLAN_SECRET_KEY
