@@ -17,7 +17,9 @@ learning project before anything else.
 
 ## Development
 
-NOTE: The master branch of this repository tracks the very latest development and may contain features and changes that do not exist on any released version. To find the spec for a specific version, look in the versions subdirectory.
+NOTE: The master branch of this repository tracks the very latest development 
+and may contain features and changes that do not exist on any released version. 
+To find the spec for a specific version, look in the versions subdirectory.
 
 ### Getting Started
 
@@ -30,6 +32,21 @@ Flask development server from within the projects root directory:
 > flask run  
 
 The application will greet you on _http://localhost:5000/_
+
+### Run docker container
+
+An optional working docker solution is offered with this repository. 
+It requires docker-compose executable available on path. The next example
+builds and runs Nginx container as reverse proxy and a uWSGI server
+providing FinerPlan application.
+
+Example:
+> python3 setup.py sdist bdist_wheel  
+> export FINERPLAN_VERSION=$(cat VERSION)  
+> export FINERPLAN_DATABASE=dev.db  
+> docker-compose up --build  
+
+The application will greet you on _http://localhost/_
 
 ### Contributing
 
@@ -51,4 +68,4 @@ Some guidance for contributors:
 * commit and push branch
 * if all CI tests pass, then tag the release and push it:
 > git tag -a vX.Y.Z  
-> git push origin vX.Y.Z
+> git push origin vX.Y.Z  

@@ -7,14 +7,17 @@ version: '3'
 services:
   finerplan:
     container_name: dev_finerplan
-    image: finerplan:0.3.3
-    build: .
+    image: finerplan:$FINERPLAN_VERSION
+    build:
+      context: .
+      args:
+        - FINERPLAN_PACKAGE=finerplan-${FINERPLAN_VERSION}-py3-none-any.whl
     environment:
       - FINERPLAN_SECRET_KEY
       - FINERPLAN_PORT=3031
     volumes:
       - ./uwsgi.ini:/etc/uwsgi/apps-enabled/finerplan.ini:ro
-      - ./dev.db:/var/lib/finerplan/app.db:rw
+      - ${FINERPLAN_DATABASE}:/var/lib/finerplan/app.db:rw
     expose:
       - 3031
 

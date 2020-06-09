@@ -35,9 +35,9 @@ ARG REQUIREMENTS_FILE=./requirements.txt
 COPY $REQUIREMENTS_FILE /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
-ARG PACKAGE_LOCAL=./dist/finerplan-0.3.3-py3-none-any.whl
-COPY $PACKAGE_LOCAL /tmp/finerplan-0.3.3-py3-none-any.whl
-RUN pip3 install --no-cache-dir /tmp/finerplan-0.3.3-py3-none-any.whl
+ARG FINERPLAN_PACKAGE
+COPY ./dist/$FINERPLAN_PACKAGE /tmp/$FINERPLAN_PACKAGE
+RUN pip3 install --no-cache-dir /tmp/$FINERPLAN_PACKAGE
 
 ARG WSGI_ENTRYPOINT=./wsgi.py
 COPY $WSGI_ENTRYPOINT $APP_FOLDER/wsgi.py
