@@ -8,7 +8,10 @@ services:
   finerplan:
     container_name: dev_finerplan
     image: finerplan:$FINERPLAN_VERSION
-    build: .
+    build:
+      context: .
+      args:
+        - FINERPLAN_PACKAGE=finerplan-${FINERPLAN_VERSION}-py3-none-any.whl
     environment:
       - FINERPLAN_SECRET_KEY
       - FINERPLAN_PORT=3031
