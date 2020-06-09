@@ -4,13 +4,6 @@ from finerplan.core.sql import sum_query, ema
 from finerplan.core import dates
 
 
-def _relevant_locale_settings():
-    """Return generator for locale settings that must be configured."""
-    yield 'LC_MONETARY'
-    yield 'LC_TIME'
-    yield 'LC_NUMERIC'
-
-
 def _obtain_user_locale():
     try:
         locale.setlocale(locale.LC_ALL, '')
@@ -20,7 +13,12 @@ def _obtain_user_locale():
 
 def _assure_valid_locale():
     """Prevent Bug #29 by exiting when locale is C/POSIX."""
-    for lc in _relevant_locale_settings():
+    relevant_locale = (
+        "LC_MONETARY",
+        "LC_NUMERIC",
+        "LC_TIME"
+    )
+    for lc in relevant_locale:
         language_code, encoding = locale.getlocale(category=getattr(locale, lc))
         if language_code is None or encoding is None:
             sys.exit(f"Host system must provide locale but '{lc}' is undefined.")
