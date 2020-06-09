@@ -1,18 +1,6 @@
-# Test code using supported Python versions
 name: CI
 
-on:
-  push:
-    paths:
-      - 'finerplan/**'
-      - 'tests/**'
-    branches: [ master ]
-  pull_request:
-    paths:
-      - 'finerplan/**'
-      - 'tests/**'
-    branches: [ master ]
-
+on: push
 jobs:
   lint:
     name: "Static Analysis"
